@@ -2,39 +2,67 @@
 import pikepdf
 import xml.dom.minidom
 fname = './af1206-e.pdf'
+outfname = './test.pdf'
+bulletText = """first line
+test bullet 1
+test bullet 2
+refactoring in dictionaries
+"""
+
 pdfobj = pikepdf.Pdf.open(fname,suppress_warnings=False)
 
 xfaroot = pdfobj.Root.AcroForm.XFA
 
 xmldata = ''
+xfaDict = {}
 for i,item in enumerate(xfaroot):
-    if(isinstance(item,pikepdf.String)):
-        print(f'label: {item}')
+    if(i % 2 == 0 and isinstance(item,pikepdf.String)):
+        #print(f'label {i}: {item}')
         label = f'{item}'
-        if(label == 'datasets'):
-            xmlDatastream = xfaroot[i+1]
-            xmlString = xmlDatastream.read_bytes()
+        xfaDict[label] = xfaroot[i+1]
     else:
         pass
         #print(f'value: {item.read_bytes()}')
 
-print(xmlString)
-doc = xml.dom.minidom.parseString(xmlString)
+#print(xmlString)
 
-bulletTag = doc.getElementsByTagName('specificAccomplishments')[0]
-if(bulletTag.hasChildNodes()):
-    bulletTag.childNodes[0].nodeValue = 'hello world!!!!!'
-else:
-    txt = doc.createTextNode('hello world v2!!!!')
-    bulletTag.appendChild(txt)
+xmlDict = {}
+for key,item in xfaDict.items():
+    if(isinstance(item,pikepdf.Stream)):
+        xmlDict[key] = item.read_bytes()
+    else:
+        xmlDict[key] = item
 
-#documentElement hotfix is needed to omit <?xml version=...> tag at beginning of document
-xmlStringEdited = bytes(doc.documentElement.toxml(),'utf-8')
-print(xmlStringEdited)
-#xmlDatastream.write(xmlStringEdited)
-#xmlDatastream.write(b'\n<xfa:datasets xmlns:xfa="http://www.xfa.org/schema/xfa-data/1.0/"\n><xfa:data\n><form1\n><category\n/><nomineeTelephone\n/><awardPeriod\n/><majcom_foa_dru\n/><award\n/><rankName\n/><DAFSC\n/><officeAddress\n/><rank\n/><specificAccomplishments\n>asdhjfklasjdfkljasdfkljasdfkljaskldfj</specificAccomplishments\n><p2Name\n/><p2SpecificAccomplishments\n/></form1\n></xfa:data\n></xfa:datasets\n>')
-#xmlDatastream.write(xmlString)
-#pdfobj.remove_unreferenced_resources()
-pdfobj.save('test.pdf',encryption=pdfobj.encryption)
-pdfobj.close()
+xmlFormData = xmlDict['datasets']
+
+formdoc = xml.dom.minidom.parseString(xmlFormData)
+
+bulletTag = formdoc.getElementsByTagName('specificAccomplishments')[0]
+
+def setTagText(tag,text):
+    if(tag.hasChildNodes()):
+        tag.childNodes[0].nodeValue = text
+    else:
+        txtTag = tag.ownerDocument.createTextNode(text)
+        tag.appendChild(txtTag)
+
+def getTagText(tag,text):
+    if(tag.hasChildNodes()):
+        return tag.childNodes[0].nodeValue
+    else:
+        return 'None'
+
+setTagText(bulletTag,bulletText)
+
+
+#formdoc.documentElement hotfix is needed to omit <?xml version=...> tag at beginning of document
+xmlStringEdited = bytes(formdoc.documentElement.toxml(),'utf-8')
+#print(xmlStringEdited)
+
+xfaDict['datasets'].write(xmlStringEdited)
+
+
+pdfobj.remove_unreferenced_resources()
+pdfobj.save(outfname,encryption=True)
+#pdfobj.close()
 
