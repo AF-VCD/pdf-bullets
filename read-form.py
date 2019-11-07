@@ -16,6 +16,11 @@ xfaField = 'datasets'
 
 pdfobj = pikepdf.Pdf.open(fname,suppress_warnings=False)
 
+#things I want to be able to do:
+#  pdfobj --> xfa array/dict-like structure
+#  indexed xfa obj --> return text representation
+# indexed xfa obj --> write input
+
 xfaroot = pdfobj.Root.AcroForm.XFA
 
 xfaDict = {}
@@ -44,6 +49,7 @@ for i,item in enumerate(xfaroot):
 
 
 #html.parser seemed to work the best!
+#never mind, html.parser was not case sensitive enough.
 formSoup = BeautifulSoup(xmlDict[xfaField],'xml')
 targetTag = formSoup.find(tagName)
 
@@ -53,7 +59,7 @@ targetTag.string = bulletText
 xmlStringEdited = bytes(str(formSoup.findChild()),'utf-8')
 print(xmlStringEdited)
 
-xfaDict['datasets'].write(xmlStringEdited)
+xfaDict[xfaField].write(xmlStringEdited)
 
 
 pdfobj.remove_unreferenced_resources()
