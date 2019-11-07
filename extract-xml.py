@@ -4,12 +4,8 @@ import xml.dom.minidom
 import xml.etree.ElementTree as ET
 import re
 fname = './af1206-e.pdf'
-outfname = './test.pdf'
-bulletText = """first line
-test bullet 1
-test bullet 2
-refactoring in dictionaries
-"""
+
+
 
 pdfobj = pikepdf.Pdf.open(fname,suppress_warnings=False)
 
