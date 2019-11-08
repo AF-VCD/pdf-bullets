@@ -5,12 +5,8 @@ from xfaTools import XfaObj
 from bs4 import BeautifulSoup
 fname = './af1206-blank.pdf'
 outfname = './test.pdf'
-bulletText = """first line
-test bullet 1
-test bullet 2
-refactoring in dictionaries
-refactoring in beautifulsoup
-refactoring object orientedness
+bulletText = """testing overflow line:
+1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0
 """
 
 with pikepdf.Pdf.open(fname,suppress_warnings=False) as pdfobj:
