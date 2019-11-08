@@ -1,0 +1,55 @@
+<html>
+    <head>
+        <title>
+
+        </title>
+    <style type='text/css'>
+        #charDiv{
+            display:inline-block;
+            /*visibility:hidden;*/
+            font-family: "Times New Roman";
+            font-size: 12pt;
+            padding:0px;
+            border:0px;
+            text-align: left;
+            text-indent: 0px;
+            text-rendering: geometricPrecision;
+            border: none;
+        }
+    </style>
+    </head>
+    <body>
+        <script type='text/javascript'>
+            var widths = {};
+            function getWidth(sentence){
+                var width = 0.0;
+                for (character of sentence.split('')){
+                    width += widths[character];
+                }
+                return width
+            }
+            window.onload = function(){
+                var alphabet = 'abcdefghijklmnopqrstuvwxyz';
+                var numbers = '0123456789';
+                var special = ' !@#$%^&*()\\/.,\'`';
+                var testdata = 'hello !'
+                
+                for (word of [alphabet,numbers,special]){ 
+                    for (letter of word.split('')){
+                        //console.log(letter);
+                        charDiv = document.getElementById("charDiv")
+                        charDiv.innerHTML = letter;
+                        widths[letter] = parseFloat((window.getComputedStyle(charDiv).width).split('px')[0]);
+
+                    }
+                }
+
+                console.log(getWidth("iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii"));
+            }
+
+
+
+        </script>
+        <span id=charDiv></span>
+    </body>
+</html>
