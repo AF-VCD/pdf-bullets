@@ -1,16 +1,19 @@
 <HTML>
 <head>
     <!--This is important! needs to be UTF-8 to be compatible with adobe acceptable text-->
+    <!-- python -m http.server 8021 --cgi -->
     <meta charset="UTF-8">
 <title>
     Bullets Viewer
 </title>
 <style type="text/css">
-#bulletTextArea{
+@font-face {
+  font-family: "AdobeTimes";
+  src: url("./TimesNewRomanPSMT.ttf");
+}
+textarea.bullets{
     margin: 0px;
     height: 500px;
-    /*width: 202.321mm;*/
-    width:765.5px;
     white-space: pre-wrap;
     text-indent: 0px;
     overflow: hidden;
@@ -18,11 +21,13 @@
     padding-left: 0px;
     resize: vertical;
     /*word-break: break-all;*/
-    /*text-rendering: optimizeSpeed;*/
+    text-rendering: geometricPrecision;
 }
 .border{
     border: solid black 1px;
     display: inline-block;
+    margin:10px;
+    vertical-align:top;
 }
 
 #processedBullets{
@@ -30,20 +35,32 @@
     vertical-align:top;
 }
 .bullets{
-    font-family: "Times New Roman";
+    font-family: "AdobeTimes";
     font-size: 12pt;
-    white-space:pre;
+    white-space:pre-wrap;
     display:inline;
+    text-rendering: optimizeSpeed;
 }
-.bulletContainer{
-    width: 765.5px;
-}
+
 </style>
 <script type="text/javascript">
+function selectText(containerid) {
+    if (document.selection) { // IE
+        var range = document.body.createTextRange();
+        range.moveToElementText(document.getElementById(containerid));
+        range.select();
+    } else if (window.getSelection) {
+        var range = document.createRange();
+        range.selectNode(document.getElementById(containerid));
+        window.getSelection().removeAllRanges();
+        window.getSelection().addRange(range);
+    }
+}
 updateWidth = function(){
         newWidth = document.getElementById("bulletTextAreaWidth").value + 'mm';
-        //document.getElementById("bulletTextArea").style.width = newWidth;
-        //document.getElementById("processedBulletsBorder").style.width = document.getElementById("bulletsBorder").style.width;
+        document.getElementById("bulletTextArea").style.width = newWidth;
+        //document.getElementById("bulletTextArea2").style.width = newWidth;
+        updateProcessedBullets()
         //console.log('value changed: ' + document.getElementById("bulletTextArea").style.width + ' ' + document.getElementById("bulletTextArea").clientWidth + 'px');
     }
 updateProcessedBullets = function(){
@@ -54,12 +71,14 @@ updateProcessedBullets = function(){
     for (bullet of rawBullets){
         bullet = bullet.trim();
         //console.log(bullet);
-        if(! bullet){continue;}
+        if(! bullet){bullet = " ";}
         //create container for bullet
         var divNode = document.createElement("div");
         var spanNode = document.createElement("span");
         spanNode.className = "bullets";
-        divNode.className = "bulletContainer";
+        spanNode.style.width = document.getElementById("bulletTextAreaWidth").value + 'mm';
+        divNode.style.width = document.getElementById("bulletTextAreaWidth").value + 'mm';
+     
         //202.489
         //765.4px
         // add bullet to container, add container to document
@@ -67,13 +86,13 @@ updateProcessedBullets = function(){
         divNode.appendChild(spanNode);
         processedBulletsDiv.appendChild(divNode);
         optimizeSpacings(spanNode)
-        //words = tokenizeSentence(bullet);
+        //words = tokenize(bullet);
 
 
 
     }
 }
-function tokenizeSentence(sentence){
+function tokenize(sentence){
     words = sentence.split(/[\s]+/);
     //console.log(words);
     return words;
@@ -90,54 +109,48 @@ String.prototype.hashCode = function() {
   return hash;
 };
 
-function getRandomIntOld(seed, max) {
-  return Math.floor(Math.random() * Math.floor(max));
-  //rand = Math.floor( Math.abs(Math.floor(((9*seed.hashCode()+5) % 100000) / 100000)) * Math.floor(max));
-  //return rand;
-}
-
 function getRandomInt(seed,max){
     return Math.floor( Math.abs((Math.floor(9*seed.hashCode()+5) % 100000) / 100000) * Math.floor(max));
 }
 
 function optimizeSpacings(spanNode){
 
-    var desiredSize = spanNode.parentNode.getBoundingClientRect().width;
-    var words = tokenizeSentence(spanNode.innerText);
+   
+    var words = tokenize(spanNode.innerText);
     
     var smallerSpace = "\u2009";
     var largerSpace = "\u2004";
 
     var originalSentence = words.join(' '); 
     spanNode.innerText = originalSentence;
-    var originalSize = spanNode.getBoundingClientRect().width;
+  
+
+    if(!originalSentence.trim()){return;}
 
     var previousSentence = originalSentence;//initial instantiation of previousSentence
-    var newSize = originalSize;
+    spanNode.style.whiteSpace = "nowrap"
+    singleHeight = spanNode.offsetHeight;
+    spanNode.style.whiteSpace = ""
 
-    error = desiredSize - originalSize;
-    var addSpace = (error > 0) ? true: false;
-
+    var addSpace = (spanNode.offsetHeight <= singleHeight);
+    if(addSpace){
+        reSplacement = largerSpace;
+    }else{
+        reSplacement = smallerSpace;
+    }
     console.log('sentence: ' + originalSentence)
-    console.log('span node size: ' + originalSize)
-    console.log('div node size: ' + desiredSize)
-    tol = 2;
+    console.log('span node height: ' + spanNode.offsetHeight)
+    console.log('desired height: ' + singleHeight)
+    console.log('addSpace: ' + addSpace)
+
     while(true){
 
-        if((addSpace && (error) < tol) || (!addSpace && newSize < desiredSize)){
-            console.log("Final error of " + error);
+       if(words.length <= 2){
+            console.log("Warning: Can't replace any more spaces");
+            spanNode.style.color = '#DC143C';
             break;
         }
-
-        if(words.length <= 2){
-            console.log("Warning: Can't replace any more spaces;\n Final error of " + error +  ": " + originalSentence);
-            break;
-        }
-        if(addSpace){
-            reSplacement = largerSpace;
-        }else{
-            reSplacement = smallerSpace;
-        }
+        
         //don't select the first space after the dash- that would be noticeable and look wierd.
         // also don't select the last word, don't want to add a space after that.
         iReplace = getRandomInt(words.join(''), words.length -1 -1) + 1;
@@ -152,38 +165,91 @@ function optimizeSpacings(spanNode){
         newSentence = words.join(' ');
         //check 
         spanNode.innerText = newSentence;
-        newSize = spanNode.getBoundingClientRect().width;
-        
-        if(addSpace && newSize > desiredSize){
+
+        overflow = (spanNode.offsetHeight>singleHeight);
+
+        if(addSpace && overflow){
             
-            console.log("Warning: Can't add more spaces without overflow, reverting to previous;\n Final error of " + error );
+            console.log("Warning: Can't add more spaces without overflow, reverting to previous" );
             spanNode.innerText = previousSentence;
             break;
         
-        } 
-        error = (desiredSize - newSize);
-        console.log("error: " + error);
+        } else if(!addSpace && !overflow){
+            console.log("Removed enough spaces. " );
+            
+            break;
+        }
+     
+
         previousSentence = newSentence;
-
-
     }
 }
+
+function escapeHtml(unsafe) {
+    return unsafe
+         .replace(/&/g, "&amp;")
+         .replace(/</g, "&lt;")
+         .replace(/>/g, "&gt;")
+         .replace(/"/g, "&quot;")
+         .replace(/'/g, "&#039;");
+}
+function bakeCookie(){
+    cookieData = encodeURIComponent(
+        document.getElementById('bulletTextArea').value
+        );
+    //console.log(cookieData);
+    document.cookie = cookieData +  '; expires=Thu, 18 Dec 3000 12:00:00 UTC; path=/';
+    console.log("saved cookie with character length " + cookieData.length);
+}
 window.onload = function(e){
+    //document.getElementById("bulletTextAreaWidth").value = 202.321;
+    document.getElementById("bulletTextAreaWidth").value = 202.51;
+    if(document.cookie){
+        document.getElementById("bulletTextArea").value = 
+            decodeURIComponent(document.cookie);
+    }
     updateWidth();
     updateProcessedBullets();
     document.getElementById("bulletTextAreaWidth").oninput = updateWidth;
-    document.getElementById("bulletTextArea").oninput = updateProcessedBullets;
+    document.getElementById("bulletTextArea").oninput = function(){
+        updateProcessedBullets();
+        //bakeCookie();
+    };
+    document.getElementById("cookieButton").onclick = bakeCookie;
+    document.getElementById("processedBulletsBorder").onclick = function(e){
+        if(e.detail === 4){
+            selectText("processedBulletsBorder");
+        }
+    }
+    document.getElementById('resetButton').onclick = function(e){
+        cleaned = '';
+        for (sentence of (document.getElementById("bulletTextArea")).value.split('\n')){
+            cleaned += tokenize(sentence).join(' ') + '\n';
+        }
+        console.log("reformatted all white spaces")
+        document.getElementById("bulletTextArea").value = cleaned;
+    }
+    
 };
 
 </script>
 </head>
 <body>
     <label>Form width (should not have to adjust): </label>
-    <input type="number" id="bulletTextAreaWidth" name="width" min="100" max="500" step=".001" value="202.321">
-    <!-- TODO: add button to clean whitespace in bullet textarea into normal bullets-->
+    <input type="number" id="bulletTextAreaWidth" name="width" min="100" max="500" step=".001">
+    <button type="button" id="resetButton" >renormalize all spaces</button>
+    <button type="button" onclick="selectText('processedBulletsBorder')">select perfected text</button>
+    <button type="button" id="cookieButton" >save text</button>
+    
     <br />
     <div class="border" id="bulletsBorder">
     <textarea class='bullets' id="bulletTextArea">
+    </textarea>
+</div>
+<div id="processedBulletsBorder" class='border'>
+</div>
+
+        <!--
 - Trained Navy test tm; taught h/w-in-loop procedure & mobile control box design--primed msn data cape f/jt trng pod
 - 17-mbr programming test tm; delivered 9 cbt & test s/w files for 3 sys's--fortified F-16/A-10 electronic attack capes
 - Instructed 53 electronic cmbt pilots on jamming concepts; brf'd sys capes & effects--enhanced CAF ops effectiveness 
@@ -202,9 +268,6 @@ window.onload = function(e){
 - Directed multisvc jammer eval; exec'd 1K RF sims/optimized effects vs 2 sys's--improved 1.3K cbt acft survivability
 - Built Cbt Adv Surface-to-Air Msl Survivability s/w; gen'd resps vs 9 threats--prompted on-time $300K flt test launch  
 - Spearheaded reaction to urgent HHQ reqmt; certified 8 cbt threats f/2 sys's--satisfied COMACC request 10 days early
-</textarea>
-</div>
-<div id="processedBulletsBorder" class='border'>
-</div>
+-->
 </body>
 </HTML>

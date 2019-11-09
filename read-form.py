@@ -29,4 +29,4 @@ with pikepdf.Pdf.open(fname,suppress_warnings=False) as pdfobj:
 
 
     pdfobj.remove_unreferenced_resources()
-    pdfobj.save(outfname,encryption=True)
+    pdfobj.save(outfname,encryption=False)
