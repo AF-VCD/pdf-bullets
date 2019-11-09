@@ -43,6 +43,7 @@ textarea.bullets{
 }
 
 </style>
+<script src="bullet-fixer.js"></script>
 <script type="text/javascript">
 function selectText(containerid) {
     if (document.selection) { // IE
@@ -57,177 +58,78 @@ function selectText(containerid) {
     }
 }
 updateWidth = function(){
-        newWidth = document.getElementById("bulletTextAreaWidth").value + 'mm';
-        document.getElementById("bulletTextArea").style.width = newWidth;
-        //document.getElementById("bulletTextArea2").style.width = newWidth;
-        updateProcessedBullets()
-        //console.log('value changed: ' + document.getElementById("bulletTextArea").style.width + ' ' + document.getElementById("bulletTextArea").clientWidth + 'px');
-    }
+        newWidth = document.getElementById("bulletInputSize").value + 'mm';
+        document.getElementById("bulletInput").style.width = newWidth;        
+}
+
 updateProcessedBullets = function(){
-    var rawBulletStr = document.getElementById("bulletTextArea").value;
+    var rawBulletStr = document.getElementById("bulletInput").value;
     var rawBullets = rawBulletStr.split('\n');
-    var processedBulletsDiv = document.getElementById('processedBulletsBorder');
-    processedBulletsDiv.innerHTML = ''; //clear out 
+    var outputWrapper = document.getElementById('outputBorder');
+    outputWrapper.innerHTML = ''; //clear out 
     for (bullet of rawBullets){
         bullet = bullet.trim();
         //console.log(bullet);
+        
+        //we want to preserve manual line breaks between both bullet input and bullet output
         if(! bullet){bullet = " ";}
-        //create container for bullet
+
+        //create double-wrapped container for bullet
         var divNode = document.createElement("div");
         var spanNode = document.createElement("span");
         spanNode.className = "bullets";
-        spanNode.style.width = document.getElementById("bulletTextAreaWidth").value + 'mm';
-        divNode.style.width = document.getElementById("bulletTextAreaWidth").value + 'mm';
+        spanNode.style.width = document.getElementById("bulletInputSize").value + 'mm';
+        divNode.style.width = document.getElementById("bulletInputSize").value + 'mm';
      
-        //202.489
-        //765.4px
-        // add bullet to container, add container to document
+ 
         spanNode.innerText = bullet;
         divNode.appendChild(spanNode);
-        processedBulletsDiv.appendChild(divNode);
+        outputWrapper.appendChild(divNode);
         optimizeSpacings(spanNode)
-        //words = tokenize(bullet);
-
-
-
-    }
-}
-function tokenize(sentence){
-    words = sentence.split(/[\s]+/);
-    //console.log(words);
-    return words;
-}
-
-String.prototype.hashCode = function() {
-  var hash = 0, i, chr;
-  if (this.length === 0) return hash;
-  for (i = 0; i < this.length; i++) {
-    chr   = this.charCodeAt(i);
-    hash  = ((hash << 5) - hash) + chr;
-    hash |= 0; // Convert to 32bit integer
-  }
-  return hash;
-};
-
-function getRandomInt(seed,max){
-    return Math.floor( Math.abs((Math.floor(9*seed.hashCode()+5) % 100000) / 100000) * Math.floor(max));
-}
-
-function optimizeSpacings(spanNode){
-
-   
-    var words = tokenize(spanNode.innerText);
-    
-    var smallerSpace = "\u2009";
-    var largerSpace = "\u2004";
-
-    var originalSentence = words.join(' '); 
-    spanNode.innerText = originalSentence;
-  
-
-    if(!originalSentence.trim()){return;}
-
-    var previousSentence = originalSentence;//initial instantiation of previousSentence
-    spanNode.style.whiteSpace = "nowrap"
-    singleHeight = spanNode.offsetHeight;
-    spanNode.style.whiteSpace = ""
-
-    var addSpace = (spanNode.offsetHeight <= singleHeight);
-    if(addSpace){
-        reSplacement = largerSpace;
-    }else{
-        reSplacement = smallerSpace;
-    }
-    console.log('sentence: ' + originalSentence)
-    console.log('span node height: ' + spanNode.offsetHeight)
-    console.log('desired height: ' + singleHeight)
-    console.log('addSpace: ' + addSpace)
-
-    while(true){
-
-       if(words.length <= 2){
-            console.log("Warning: Can't replace any more spaces");
-            spanNode.style.color = '#DC143C';
-            break;
-        }
-        
-        //don't select the first space after the dash- that would be noticeable and look wierd.
-        // also don't select the last word, don't want to add a space after that.
-        iReplace = getRandomInt(words.join(''), words.length -1 -1) + 1;
-        
-        words.splice( 
-            iReplace, 2, 
-            words.slice(iReplace,iReplace+2).join(reSplacement)
-        );
-        console.log( (addSpace?'increased':'decreased') + ' space at index ' + iReplace + " : " + words[iReplace]);
-
-        //make all other spaces the normal space size
-        newSentence = words.join(' ');
-        //check 
-        spanNode.innerText = newSentence;
-
-        overflow = (spanNode.offsetHeight>singleHeight);
-
-        if(addSpace && overflow){
-            
-            console.log("Warning: Can't add more spaces without overflow, reverting to previous" );
-            spanNode.innerText = previousSentence;
-            break;
-        
-        } else if(!addSpace && !overflow){
-            console.log("Removed enough spaces. " );
-            
-            break;
-        }
-     
-
-        previousSentence = newSentence;
     }
 }
 
-function escapeHtml(unsafe) {
-    return unsafe
-         .replace(/&/g, "&amp;")
-         .replace(/</g, "&lt;")
-         .replace(/>/g, "&gt;")
-         .replace(/"/g, "&quot;")
-         .replace(/'/g, "&#039;");
-}
-function bakeCookie(){
+
+function saveCookie(){
     cookieData = encodeURIComponent(
-        document.getElementById('bulletTextArea').value
+        document.getElementById('bulletInput').value
         );
     //console.log(cookieData);
     document.cookie = cookieData +  '; expires=Thu, 18 Dec 3000 12:00:00 UTC; path=/';
     console.log("saved cookie with character length " + cookieData.length);
 }
+
 window.onload = function(e){
-    //document.getElementById("bulletTextAreaWidth").value = 202.321;
-    document.getElementById("bulletTextAreaWidth").value = 202.51;
+    //This function runs when the window is finished loading. sort of like a main()
+
+    //initialize a default width for the textarea window
+    //document.getElementById("bulletInputSize").value = 202.321;
+    document.getElementById("bulletInputSize").value = 202.51;
+    
     if(document.cookie){
-        document.getElementById("bulletTextArea").value = 
+        document.getElementById("bulletInput").value = 
             decodeURIComponent(document.cookie);
     }
+
     updateWidth();
     updateProcessedBullets();
-    document.getElementById("bulletTextAreaWidth").oninput = updateWidth;
-    document.getElementById("bulletTextArea").oninput = function(){
+    
+    document.getElementById("bulletInputSize").oninput = function(){
+        updateWidth();
         updateProcessedBullets();
-        //bakeCookie();
+    }
+    document.getElementById("bulletInput").oninput = function(){
+       updateProcessedBullets();
+       //saveCookie();
     };
-    document.getElementById("cookieButton").onclick = bakeCookie;
-    document.getElementById("processedBulletsBorder").onclick = function(e){
+    document.getElementById("cookieButton").onclick = saveCookie;
+    document.getElementById("outputBorder").onclick = function(e){
         if(e.detail === 4){
-            selectText("processedBulletsBorder");
+            selectText("outputBorder");
         }
     }
-    document.getElementById('resetButton').onclick = function(e){
-        cleaned = '';
-        for (sentence of (document.getElementById("bulletTextArea")).value.split('\n')){
-            cleaned += tokenize(sentence).join(' ') + '\n';
-        }
-        console.log("reformatted all white spaces")
-        document.getElementById("bulletTextArea").value = cleaned;
+    document.getElementById('resetButton').onclick = function(){
+        normalizeWhiteSpace("bulletInput");
     }
     
 };
@@ -235,18 +137,21 @@ window.onload = function(e){
 </script>
 </head>
 <body>
+    <form>
+        <label>import from pdf: </label><input type='file' id='importPdf' name='choose pdf' accept="application/pdf">
+    </form>
     <label>Form width (should not have to adjust): </label>
-    <input type="number" id="bulletTextAreaWidth" name="width" min="100" max="500" step=".001">
+    <input type="number" id="bulletInputSize" name="width" min="100" max="500" step=".001">
     <button type="button" id="resetButton" >renormalize all spaces</button>
-    <button type="button" onclick="selectText('processedBulletsBorder')">select perfected text</button>
+    <button type="button" onclick="selectText('outputBorder')">select perfected text</button>
     <button type="button" id="cookieButton" >save text</button>
     
     <br />
     <div class="border" id="bulletsBorder">
-    <textarea class='bullets' id="bulletTextArea">
+    <textarea class='bullets' id="bulletInput">
     </textarea>
 </div>
-<div id="processedBulletsBorder" class='border'>
+<div id="outputBorder" class='border'>
 </div>
 
         <!--
