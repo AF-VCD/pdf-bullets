@@ -161,6 +161,13 @@ window.onload = function(e){
             selectText("outputBorder");
         }
     }
+    document.getElementById("outputBorder").onkeydown = function(e){
+        if(e.ctrlKey && e.keyCode == 65){
+        e.preventDefault();
+        //console.log('control-a')
+        selectText('outputBorder')
+        }
+    }
     document.getElementById('resetButton').onclick = function(){
         normalizeWhiteSpace("bulletInput");
     }
@@ -187,7 +194,7 @@ window.onload = function(e){
     <textarea class='bullets' id="bulletInput">
     </textarea>
 </div>
-<div id="outputBorder" class='border'>
+<div id="outputBorder" class='border' tabindex=1><!--tabindex is needed to get select thing to work-->
 </div>
 
         <!--
