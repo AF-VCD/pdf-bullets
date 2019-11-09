@@ -43,7 +43,7 @@ function optimizeSpacings(spanNode){
     //This checks to see what the single line height of the span element is.
     spanNode.style.whiteSpace = "nowrap"
     singleHeight = spanNode.offsetHeight;
-    spanNode.style.whiteSpace = ""
+    spanNode.style.whiteSpace = "inherit"
 
     var addSpace = (spanNode.offsetHeight <= singleHeight);
     
