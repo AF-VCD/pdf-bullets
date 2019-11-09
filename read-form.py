@@ -1,7 +1,5 @@
 import pikepdf
-
 from xfaTools import XfaObj
-
 from bs4 import BeautifulSoup
 fname = './af1206-blank.pdf'
 outfname = './test.pdf'
