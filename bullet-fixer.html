@@ -45,7 +45,9 @@ form{
 }
 
 </style>
-<script src="bullet-fixer.js"></script>
+<script type="text/javascript" src="pdf.js"></script>
+<script type="text/javascript" src="import-bullets.js"></script>
+<script type="text/javascript" src="bullet-fixer.js"></script>
 <script type="text/javascript">
 function selectText(containerid) {
     if (document.selection) { // IE
@@ -106,32 +108,23 @@ function importPdf(){
         console.log('no file picked');
         return;
     }
-    var xhttp = new XMLHttpRequest();
-    xhttp.onreadystatechange = function() {
-        if(this.readyState == 4 && this.status == 200){
-            console.log("Request statuses were: " );
-            console.log("\t Status:      " + this.status);
-            console.log("\t Ready State: " + this.readyState );
-            dat = JSON.parse(this.responseText)
-            console.log(dat.bullets);
-            document.getElementById('bulletInput').value = dat.bullets
-            console.log(dat)
-            document.getElementById('bulletInputSize').value = dat.width.replace(/mm/,'');
-            updateWidth();
-            updateProcessedBullets();
-        }
-    }
- 
-    xhttp.open("POST","/cgi-bin/readXfaPdf.py",true);
+    work = getBulletsFromPdf(document.getElementById("importPdf").files[0]);
 
-    // I think sending formdata sets all the http headers the way I need them already.
-    var formData = new FormData();
-    formData.append("pdf", document.getElementById("importPdf").files[0], document.getElementById("importPdf").value)
-    
-    
-    xhttp.send(formData);
+    work.pullBullets.then(function(bullets){
+            //console.log(bullets);
+            //need to use innerHTML here to match consistency with pdf importing stuff
+            document.getElementById("bulletInput").innerHTML = bullets;
+            work.getPageInfo.then(function(data){
+                console.log(data)
+                document.getElementById("bulletInputSize").value = data.width.replace(/mm/,'');
+                updateWidth();
+                updateProcessedBullets();
+        });
+    });
+
+
 }
-
+var temp;
 window.onload = function(e){
     //This function runs when the window is finished loading. sort of like a main()
 

@@ -50,8 +50,8 @@ function optimizeSpacings(spanNode){
     newSpace = addSpace? largerSpace: smallerSpace;
     
     console.log('sentence: ' + originalSentence)
-    console.log('\tspan node height: ' + spanNode.offsetHeight)
-    console.log('\tdesired height: ' + singleHeight)
+    //console.log('\tspan node height: ' + spanNode.offsetHeight)
+    //console.log('\tdesired height: ' + singleHeight)
     console.log('\taddSpace: ' + addSpace)
 
     while(true){
@@ -71,7 +71,7 @@ function optimizeSpacings(spanNode){
             iReplace, 2, 
             words.slice(iReplace,iReplace+2).join(newSpace)
         );
-        console.log( (addSpace?'increased':'decreased') + ' space at index ' + iReplace + " : " + words[iReplace]);
+        //console.log( (addSpace?'increased':'decreased') + ' space at index ' + iReplace + " : " + words[iReplace]);
 
         //make all other spaces the normal space size
         newSentence = words.join(' ');
@@ -81,12 +81,12 @@ function optimizeSpacings(spanNode){
         overflow = (spanNode.offsetHeight>singleHeight);
 
         if(addSpace && overflow){            
-            console.log("Warning: Can't add more spaces without overflow, reverting to previous" );
+            //console.log("Warning: Can't add more spaces without overflow, reverting to previous" );
             spanNode.innerText = previousSentence;
             break;
         
         } else if(!addSpace && !overflow){
-            console.log("Removed enough spaces. Terminating." );     
+            //console.log("Removed enough spaces. Terminating." );     
             break;
         }
      
