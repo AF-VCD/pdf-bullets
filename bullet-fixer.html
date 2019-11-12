@@ -99,8 +99,9 @@ function saveCookie(){
         document.getElementById('bulletInput').value
         );
     //console.log(cookieData);
-    document.cookie = cookieData +  '; expires=Thu, 18 Dec 3000 12:00:00 UTC; path=/';
-    console.log("saved cookie with character length " + cookieData.length);
+    //document.cookie = cookieData +  '; expires=Thu, 18 Dec 3000 12:00:00 UTC; path=/';
+    localStorage.setItem('bullets',cookieData)
+    console.log("saved to local storage with character length " + cookieData.length);
 }
 
 function importPdf(){
@@ -132,9 +133,9 @@ window.onload = function(e){
     //document.getElementById("bulletInputSize").value = 202.321;
     document.getElementById("bulletInputSize").value = 202.51;
     
-    if(document.cookie){
+    if(localStorage.getItem('bullets')){
         document.getElementById("bulletInput").value = 
-            decodeURIComponent(document.cookie);
+            decodeURIComponent(localStorage.getItem("bullets"));
     }
 
     updateWidth();

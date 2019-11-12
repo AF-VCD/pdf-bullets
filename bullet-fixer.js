@@ -49,7 +49,7 @@ function optimizeSpacings(spanNode){
     
     newSpace = addSpace? largerSpace: smallerSpace;
     
-    console.log('sentence: ' + originalSentence)
+    console.log('Sentence: ' + originalSentence)
     //console.log('\tspan node height: ' + spanNode.offsetHeight)
     //console.log('\tdesired height: ' + singleHeight)
     console.log('\taddSpace: ' + addSpace)
@@ -57,7 +57,7 @@ function optimizeSpacings(spanNode){
     while(true){
 
        if(words.length <= 2){
-            console.log("Warning: Can't replace any more spaces");
+            console.log("\tWarning: Can't replace any more spaces");
             spanNode.style.color = '#DC143C';
             break;
         }

@@ -46,7 +46,7 @@ function getBulletsFromPdf(filedata){
         font = bulletTag.querySelector('font').getAttribute('typeface');
         fontSize = bulletTag.querySelector('font').getAttribute('size');
         width = bulletTag.getAttribute('w');
-        console.log(xmlDoc)
+        //console.log(xmlDoc)
         return {'font': font, 'fontSize':fontSize, 'width':width}
         
         //accomplishmentsTag = templateXML.match(/name="specificAccomplishments"(.*?)<\/field/);
