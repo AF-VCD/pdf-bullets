@@ -1,5 +1,3 @@
-
-
 from PyQt5.QtCore import QPointF, QSize, Qt
 from PyQt5.QtGui import QBrush, QFont, QFontMetrics, QPainter, QPainterPath,QLabel
 from PyQt5.QtWidgets import QApplication, QComboBox, QGridLayout, QWidget
@@ -58,3 +56,4 @@ if __name__ == '__main__':
 #fontMetrics = PyQt5.QtGui.QFontMetrics(font)
 #pixelsWide = fontMetrics.width('hello world!!!!!!!!!!!!!!')
 #
+

@@ -1,0 +1,204 @@
+<HTML>
+<head>
+    <!--This is important! needs to be UTF-8 to be compatible with adobe acceptable text-->
+    <!-- python -m http.server 8021 --cgi -->
+    <meta charset="UTF-8">
+<title>
+    Bullets Viewer
+</title>
+<style type="text/css">
+@font-face {
+  font-family: "AdobeTimes";
+  src: url("./TimesNewRomanPSMT.ttf");
+}
+textarea.bullets{
+    margin: 0px;
+    height: 500px;
+    white-space: pre-wrap;
+    text-indent: 0px;
+    overflow: hidden;
+    border: none;
+    padding-left: 0px;
+    resize: vertical;
+    /*word-break: break-all;*/
+    text-rendering: geometricPrecision;
+}
+.border{
+    border: solid black 1px;
+    display: inline-block;
+    margin:10px;
+    vertical-align:top;
+}
+form{
+    margin:10px
+}
+#processedBullets{
+    display:inline-block;
+    vertical-align:top;
+}
+.bullets{
+    font-family: "AdobeTimes";
+    font-size: 12pt;
+    white-space:pre-wrap;
+    display:inline;
+    text-rendering: geometricPrecision;
+}
+
+</style>
+<script src="bullet-fixer.js"></script>
+<script type="text/javascript">
+function selectText(containerid) {
+    if (document.selection) { // IE
+        var range = document.body.createTextRange();
+        range.moveToElementText(document.getElementById(containerid));
+        range.select();
+    } else if (window.getSelection) {
+        var range = document.createRange();
+        range.selectNode(document.getElementById(containerid));
+        window.getSelection().removeAllRanges();
+        window.getSelection().addRange(range);
+    }
+}
+updateWidth = function(){
+        newWidth = document.getElementById("bulletInputSize").value + 'mm';
+        document.getElementById("bulletInput").style.width = newWidth;        
+}
+
+updateProcessedBullets = function(){
+    var rawBulletStr = document.getElementById("bulletInput").value;
+    var rawBullets = rawBulletStr.split('\n');
+    var outputWrapper = document.getElementById('outputBorder');
+    outputWrapper.innerHTML = ''; //clear out 
+    for (bullet of rawBullets){
+        bullet = bullet.trim();
+        //console.log(bullet);
+        
+        //we want to preserve manual line breaks between both bullet input and bullet output
+        if(! bullet){bullet = " ";}
+
+        //create double-wrapped container for bullet
+        var divNode = document.createElement("div");
+        var spanNode = document.createElement("span");
+        spanNode.className = "bullets";
+        spanNode.style.width = document.getElementById("bulletInputSize").value + 'mm';
+        divNode.style.width = document.getElementById("bulletInputSize").value + 'mm';
+     
+ 
+        spanNode.innerText = bullet;
+        divNode.appendChild(spanNode);
+        outputWrapper.appendChild(divNode);
+        optimizeSpacings(spanNode)
+    }
+}
+
+
+function saveCookie(){
+    cookieData = encodeURIComponent(
+        document.getElementById('bulletInput').value
+        );
+    //console.log(cookieData);
+    document.cookie = cookieData +  '; expires=Thu, 18 Dec 3000 12:00:00 UTC; path=/';
+    console.log("saved cookie with character length " + cookieData.length);
+}
+
+function importPdf(){
+    if(!document.getElementById("importPdf").value){
+        console.log('no file picked');
+        return;
+    }
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+        if(this.readyState == 4 && this.status == 200){
+            console.log("Request statuses were: " );
+            console.log("\t Status:      " + this.status);
+            console.log("\t Ready State: " + this.readyState );
+            dat = JSON.parse(this.responseText)
+            console.log(dat.bullets);
+            document.getElementById('bulletInput').value = dat.bullets
+            console.log(dat)
+            document.getElementById('bulletInputSize').value = dat.width.replace(/mm/,'');
+            updateWidth();
+            updateProcessedBullets();
+        }
+    }
+ 
+    xhttp.open("POST","/cgi-bin/readXfaPdf.py",true);
+
+    // I think sending formdata sets all the http headers the way I need them already.
+    var formData = new FormData();
+    formData.append("pdf", document.getElementById("importPdf").files[0], document.getElementById("importPdf").value)
+    
+    
+    xhttp.send(formData);
+}
+
+window.onload = function(e){
+    //This function runs when the window is finished loading. sort of like a main()
+
+    //initialize a default width for the textarea window
+    //document.getElementById("bulletInputSize").value = 202.321;
+    document.getElementById("bulletInputSize").value = 202.51;
+    
+    if(document.cookie){
+        document.getElementById("bulletInput").value = 
+            decodeURIComponent(document.cookie);
+    }
+
+    updateWidth();
+    updateProcessedBullets();
+    
+    document.getElementById("bulletInputSize").oninput = function(){
+        updateWidth();
+        updateProcessedBullets();
+    }
+    document.getElementById("bulletInput").oninput = function(){
+       updateProcessedBullets();
+       //saveCookie();
+    };
+    document.getElementById("cookieButton").onclick = saveCookie;
+    document.getElementById("outputBorder").onclick = function(e){
+        if(e.detail === 4){
+            selectText("outputBorder");
+        }
+    }
+    document.getElementById("outputBorder").onkeydown = function(e){
+        if(e.ctrlKey && e.keyCode == 65){
+        e.preventDefault();
+        //console.log('control-a')
+        selectText('outputBorder')
+        }
+    }
+    document.getElementById('resetButton').onclick = function(){
+        normalizeWhiteSpace("bulletInput");
+    }
+    document.getElementById('importButton').onclick = importPdf;
+    
+};
+
+</script>
+</head>
+<body>
+    <form id="importForm" >
+        <label>import from pdf: </label><input type='file' id='importPdf' name='choose pdf' accept="application/pdf">
+        <button type="button" id="importButton" >import from pdf</button>
+    </form>
+    <form id="toolsForm">
+    <label>Form width (should not have to adjust): </label>
+    <input type="number" id="bulletInputSize" name="width" min="100" max="500" step=".001">
+    <button type="button" id="resetButton" >renormalize all spaces</button>
+    <button type="button" onclick="selectText('outputBorder')">select perfected text</button>
+    <button type="button" id="cookieButton" >save text</button>
+    </form>
+    
+    <div class="border" id="bulletsBorder">
+    <textarea class='bullets' id="bulletInput">
+    </textarea>
+</div>
+<div id="outputBorder" class='border' tabindex=1><!--tabindex is needed to get select thing to work-->
+</div>
+
+        <!--
+
+-->
+</body>
+</HTML>
