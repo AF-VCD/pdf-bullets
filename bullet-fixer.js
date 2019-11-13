@@ -52,7 +52,7 @@ function optimizeSpacings(spanNode){
     console.log('Sentence: ' + originalSentence)
     //console.log('\tspan node height: ' + spanNode.offsetHeight)
     //console.log('\tdesired height: ' + singleHeight)
-    console.log('\taddSpace: ' + addSpace)
+    //console.log('\taddSpace: ' + addSpace)
 
     while(true){
 

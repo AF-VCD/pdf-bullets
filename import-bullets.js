@@ -15,10 +15,10 @@ function getBulletsFromPdf(filedata){
         for (var i = 0; i < xfa.length;i++){
             if(i % 2 == 0 ){                
                 var str = '';
-                for (var byte of xref.fetch(xfa[i+1]).getBytes()){
-                    str += String.fromCharCode(byte)
-                }
-                xfaDict[xfa[i]] = str;
+                var bytes = xref.fetch(xfa[i+1]).getBytes()
+
+                xfaDict[xfa[i]] = new TextDecoder().decode(bytes)
+                //console.log(new TextDecoder().decode(bytes))
             }
         }
         //console.log(xfaDict);
@@ -27,12 +27,14 @@ function getBulletsFromPdf(filedata){
 
     var pullBullets = getXFA.then(function(xfaDict){
         datasetXML = xfaDict['datasets'];
+        
         datasetXML = datasetXML.replace(/&#xD;/g,'\n');
+        
         var parser = new DOMParser();
         xmlDoc = parser.parseFromString(datasetXML, "text/xml");
         bulletTag = xmlDoc.querySelector('specificAccomplishments');
         //bulletText = bulletText.replace(/&#xD;/g,'\n')
-        //console.log(bulletText);
+        //console.log(bulletTag);
         //console.log(bulletTag);
         //console.log(xfaDict['template']);
         return bulletTag.innerHTML;
