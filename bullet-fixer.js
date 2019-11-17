@@ -31,6 +31,7 @@ function sentence2Key(sentence){
 function updateDict(textAreaId){
     newBulletDict = {}
     for (sentence of (document.getElementById(textAreaId)).value.split('\n')){
+        sentence = replaceAbbrs(sentence);
         key = sentence2Key(sentence)
         if(window.bulletDict[key]){
             newBulletDict[key] = window.bulletDict[key];
@@ -90,7 +91,11 @@ class Bullet{
         var smallerSpace = "\u2009";
         var largerSpace = "\u2004";
     
+
+
         var originalSentence = this.words.join(' ');
+        
+
         spanNode.innerText = originalSentence;
 
         //initialization of optimized words array

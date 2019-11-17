@@ -6,6 +6,12 @@
 <title>
     Bullets Viewer
 </title>
+<script type="text/javascript" src="pdf.js"></script>
+<script type="text/javascript" src="import-bullets.js"></script>
+<script type="text/javascript" src="bullet-fixer.js"></script>
+<script type="text/javascript" src="./replaceTables.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/handsontable@latest/dist/handsontable.full.min.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/handsontable@7.2.2/dist/handsontable.full.min.css" rel="stylesheet" media="screen">
 <style type="text/css">
 @font-face {
   font-family: "AdobeTimes";
@@ -43,14 +49,13 @@ form{
     display:inline;
     text-rendering: geometricPrecision;
 }
+input.htCheckboxRendererInput{
+    margin: 5px auto!important;
+    display:block!important;
+}
 
 </style>
-<script type="text/javascript" src="pdf.js"></script>
-<script type="text/javascript" src="import-bullets.js"></script>
-<script type="text/javascript" src="bullet-fixer.js"></script>
-<script type="text/javascript" src="./replaceTables.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/handsontable@latest/dist/handsontable.full.min.js"></script>
-<link href="https://cdn.jsdelivr.net/npm/handsontable@7.2.2/dist/handsontable.full.min.css" rel="stylesheet" media="screen">
+
 
 
 <script type="text/javascript">
@@ -80,7 +85,10 @@ updateProcessedBullets = function(){
     updateDict('bulletInput');
     var optimWidth = document.getElementById("bulletInputSize").value + 'mm';
 
-    for (bullet of rawBullets){    
+    for (var bullet of rawBullets){
+
+        bullet = replaceAbbrs(bullet);
+        //console.log('bullet: ' + bullet)
         var bulletObj = new Bullet(bullet);
         var alreadyThere = bulletDict[sentence2Key(bullet)];
         
@@ -90,7 +98,9 @@ updateProcessedBullets = function(){
             //
         }else{
             bulletObj.optimizeSpacings(optimWidth);
-            bulletDict[sentence2Key(bullet)].optimization = bulletObj.optimization;
+            bulletDict[sentence2Key(bullet)] = {
+                'optimization': bulletObj.optimization
+            };
             //console.log(bulletDict[sentence2Key(bullet)])
         }
         bulletObj.post(outputWrapper);
@@ -165,7 +175,7 @@ window.onload = function(e){
         }
     }
 
-    window.hot = initTables();
+    window.abbrTable = initTables();
     updateWidth();
     updateProcessedBullets();
     
@@ -194,7 +204,9 @@ window.onload = function(e){
         normalizeWhiteSpace("bulletInput");
     }
     document.getElementById('importButton').onclick = importPdf;
-    
+    abbrTable.addHook('afterChange',function(){
+        updateProcessedBullets();
+    });
 };
 
 </script>
@@ -220,7 +232,7 @@ window.onload = function(e){
         <div id="outputBorder" class='border' tabindex=1><!--tabindex is needed to get select thing to work-->
         </div>
     </div>
-    <div id='hoTable'>
+    <div id='abbrTable'>
     </div>
     
 </body>

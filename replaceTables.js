@@ -1,27 +1,28 @@
 function initTables(){
-    var dataObject = [
+    var abbrData = [
     {
-        enabled: 1,
-        abbr: 'ACC',
-        value: 'Air Combat Command',
+        enabled: true,
+        abbr: 'eq',
+        value: 'equipment',
         occurrences: 0,
     },
     {
-        enabled: 1,
-        abbr: 'EW',
-        value: 'Electronic Warfare',
+        enabled: true,
+        abbr: 'tst',
+        value: 'test',
         occurrences: 0,
     }
     ];
 
-    var hotElement = document.querySelector('#hoTable');
-    var hotElementContainer = hotElement.parentNode;
-    var hotSettings = {
-        data: dataObject,
+    var abbrTableEl = document.querySelector('#abbrTable');
+    var AbbrTableElParent = abbrTableEl.parentNode;
+    var abbrTableSettings = {
+        data: abbrData,
         columns: [
             {
             data: 'enabled',
-            type: 'text',
+            type: 'checkbox',
+            disableVisualSelection: true,
             },
 
             {
@@ -55,6 +56,7 @@ function initTables(){
             'A',
             'O',
         ],
+        enterBeginsEditing:false,
         manualRowMove: true,
         manualColumnMove: true,
         columnSorting: {
@@ -63,6 +65,7 @@ function initTables(){
         autoColumnSize: {
             samplingRatio: 23
         },
+        minRows: 15,
         contextMenu: true,
         licenseKey: 'non-commercial-and-evaluation',
         search: {
@@ -80,10 +83,21 @@ function initTables(){
             },
         },
     };
-    var hot = new Handsontable(hotElement, hotSettings);
-    return hot;
+    var abbrTable = new Handsontable(abbrTableEl, abbrTableSettings);
+    return abbrTable;
     //hot.getDataAtProp('value')
     //var searchTerm = 'Air Combat Command'
     //var search = hot.getPlugin('search');
     //console.log(search.query(searchTerm))
+}
+function replaceAbbrs(sentence){
+    for (var i = 0; i < window.abbrTable.countRows();i++){
+        if(abbrTable.getDataAtRowProp(i,'enabled')){
+            var fullWord = abbrTable.getDataAtRowProp(i,'value');
+            var abbr = abbrTable.getDataAtRowProp(i,'abbr');
+            sentence = sentence.replace(
+                new RegExp("(^|[^\w])" + fullWord + "([^\w]|$)",'g'),'$1' + abbr + '$2');
+        }
+    }
+    return sentence;
 }
