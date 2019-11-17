@@ -76,25 +76,24 @@ updateProcessedBullets = function(){
     var rawBullets = rawBulletStr.split('\n');
     var outputWrapper = document.getElementById('outputBorder');
     outputWrapper.innerHTML = ''; //clear out 
-    for (bullet of rawBullets){
-        bullet = bullet.trim();
-        //console.log(bullet);
-        
-        //we want to preserve manual line breaks between both bullet input and bullet output
-        if(! bullet){bullet = " ";}
+    
+    updateDict('bulletInput');
+    var optimWidth = document.getElementById("bulletInputSize").value + 'mm';
 
-        //create double-wrapped container for bullet
-        var divNode = document.createElement("div");
-        var spanNode = document.createElement("span");
-        spanNode.className = "bullets";
-        spanNode.style.width = document.getElementById("bulletInputSize").value + 'mm';
-        divNode.style.width = document.getElementById("bulletInputSize").value + 'mm';
-     
- 
-        spanNode.innerText = bullet;
-        divNode.appendChild(spanNode);
-        outputWrapper.appendChild(divNode);
-        optimizeSpacings(spanNode)
+    for (bullet of rawBullets){    
+        var bulletObj = new Bullet(bullet);
+        var alreadyThere = bulletDict[sentence2Key(bullet)];
+        
+        //console.log(alreadyThere)
+        if(alreadyThere && alreadyThere.optimization.width == optimWidth && alreadyThere.optimization.status >= 0){
+            bulletObj.optimization = bulletDict[sentence2Key(bullet)].optimization;
+            //
+        }else{
+            bulletObj.optimizeSpacings(optimWidth);
+            bulletDict[sentence2Key(bullet)].optimization = bulletObj.optimization;
+            //console.log(bulletDict[sentence2Key(bullet)])
+        }
+        bulletObj.post(outputWrapper);
     }
 }
 
@@ -152,7 +151,7 @@ window.onload = function(e){
     //document.getElementById("bulletInputSize").value = 202.321;
     document.getElementById("bulletInputSize").value = 202.51;
     document.getElementById("bulletInput").value = '';
-    
+    window.bulletDict = {};
     try{
         if(localStorage.getItem('bullets')){
             document.getElementById("bulletInput").value = 
