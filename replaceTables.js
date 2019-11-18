@@ -46,7 +46,7 @@ function initTables(){
         width: 500,
         autoWrapRow: true,
         height: 487,
-        maxRows: 22,
+        maxRows: Infinity,
         manualRowResize: true,
         manualColumnResize: true,
         rowHeaders: true,
@@ -91,13 +91,24 @@ function initTables(){
     //console.log(search.query(searchTerm))
 }
 function replaceAbbrs(sentence){
+    
+    console.log('sentence in replaceAbbrs ' + sentence)
+    var newSentence = sentence.replace(window.abbrRegExp, function(match,p1,p2,p3){
+        console.log('p1 - ' + p1)
+        console.log('p2 - ' + p2)
+        console.log('p3 - ' + p3)
+        return p1 + window.abbrDict[p2] +  p3;
+    });
+    return newSentence;
+}
+function updateAbbrDict(){
+    window.abbrDict = {};
     for (var i = 0; i < window.abbrTable.countRows();i++){
         if(abbrTable.getDataAtRowProp(i,'enabled')){
             var fullWord = abbrTable.getDataAtRowProp(i,'value');
             var abbr = abbrTable.getDataAtRowProp(i,'abbr');
-            sentence = sentence.replace(
-                new RegExp("(^|[^\w])" + fullWord + "([^\w]|$)",'g'),'$1' + abbr + '$2');
+            window.abbrDict[fullWord] = abbr;
         }
     }
-    return sentence;
-}
+    window.abbrRegExp = new RegExp("(\\b)("+Object.keys(window.abbrDict).join("|")+")(\\b)",'g');
+} 

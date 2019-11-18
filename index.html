@@ -50,7 +50,7 @@ form{
     text-rendering: geometricPrecision;
 }
 input.htCheckboxRendererInput{
-    margin: 5px auto!important;
+    margin: 2px auto!important;
     display:block!important;
 }
 
@@ -88,7 +88,7 @@ updateProcessedBullets = function(){
     for (var bullet of rawBullets){
 
         bullet = replaceAbbrs(bullet);
-        //console.log('bullet: ' + bullet)
+        console.log('bullet: ' + bullet)
         var bulletObj = new Bullet(bullet);
         var alreadyThere = bulletDict[sentence2Key(bullet)];
         
@@ -162,6 +162,7 @@ window.onload = function(e){
     document.getElementById("bulletInputSize").value = 202.51;
     document.getElementById("bulletInput").value = '';
     window.bulletDict = {};
+    window.abbrDict = {};
     try{
         if(localStorage.getItem('bullets')){
             document.getElementById("bulletInput").value = 
@@ -176,6 +177,7 @@ window.onload = function(e){
     }
 
     window.abbrTable = initTables();
+    updateAbbrDict();
     updateWidth();
     updateProcessedBullets();
     
@@ -205,7 +207,9 @@ window.onload = function(e){
     }
     document.getElementById('importButton').onclick = importPdf;
     abbrTable.addHook('afterChange',function(){
+        updateAbbrDict();
         updateProcessedBullets();
+
     });
 };
 
