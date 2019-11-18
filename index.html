@@ -53,6 +53,9 @@ input.htCheckboxRendererInput{
     margin: 2px auto!important;
     display:block!important;
 }
+#thesaurus{
+    display:inline-block;
+}
 
 </style>
 
@@ -60,11 +63,8 @@ input.htCheckboxRendererInput{
 
 <script type="text/javascript">
 function selectText(containerid) {
-    if (document.selection) { // IE
-        var range = document.body.createTextRange();
-        range.moveToElementText(document.getElementById(containerid));
-        range.select();
-    } else if (window.getSelection) {
+    if (window.getSelection) { 
+        //this does not work with IE. oh well, I removed IE support. If you want to add it back in, go back several commits and you will see IE implementation.
         var range = document.createRange();
         range.selectNode(document.getElementById(containerid));
         window.getSelection().removeAllRanges();
@@ -154,6 +154,40 @@ function importPdf(){
 
 }
 
+function getThesaurus(){
+    var sel = window.getSelection();
+    if(sel.anchorNode.id == 'bulletsBorder'){
+        var phrase = sel.toString().trim();
+        if(phrase && phrase != window.thesaurusPhrase){
+            console.log('valid selection: ' + phrase);
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function () {
+                if(this.readyState == 4 && this.status == 200){
+                    var dat = JSON.parse(this.responseText);
+                    //console.log(dat);
+                    var words = ''
+                    for (var i of dat){
+                        words += i.word + "\n";
+                    }
+                    if(! words.trim()){
+                        words = 'no results found.'
+                    }
+                    document.querySelector('#thesaurus').innerText = words;
+                }
+            }
+
+            xhttp.open("GET","https://api.datamuse.com/words?max=25&ml=" + phrase,true)
+
+            xhttp.send();
+            document.querySelector('#thesaurus').innerText = 'loading...';
+            //lookup new phrase
+            window.thesaurusPhrase = phrase;
+
+        }
+    }
+   
+}
+
 window.onload = function(e){
     //This function runs when the window is finished loading. sort of like a main()
 
@@ -163,6 +197,7 @@ window.onload = function(e){
     document.getElementById("bulletInput").value = '';
     window.bulletDict = {};
     window.abbrDict = {};
+    window.thesaurusPhrase = '';
     try{
         if(localStorage.getItem('bullets')){
             document.getElementById("bulletInput").value = 
@@ -211,6 +246,12 @@ window.onload = function(e){
         updateProcessedBullets();
 
     });
+    document.querySelector("#bulletInput").onmouseup = function(){
+        getThesaurus();
+    }
+    document.querySelector("#bulletInput").onkeyup = function(){
+        getThesaurus();
+    }
 };
 
 </script>
@@ -233,6 +274,7 @@ window.onload = function(e){
             <textarea class='bullets' id="bulletInput">
             </textarea>
         </div>
+        <div id="thesaurus"></div>
         <div id="outputBorder" class='border' tabindex=1><!--tabindex is needed to get select thing to work-->
         </div>
     </div>
