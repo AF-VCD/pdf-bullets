@@ -34,6 +34,7 @@ textarea.bullets{
     display: inline-block;
     margin:10px;
     vertical-align:top;
+    
 }
 form{
     margin:10px
@@ -54,13 +55,17 @@ input.htCheckboxRendererInput{
     display:block!important;
 }
 #thesaurus{
-    display:inline-block;
+
     width:500px;
+    float:left;
     
 }
 #thesaurus > ul {
     columns:3;
     list-style-type:circle;
+}
+#abbrTable{
+    margin:10px;
 }
 
 </style>
@@ -161,9 +166,11 @@ function importPdf(){
 }
 
 function getThesaurus(){
-    document.getElementById('thesaurus').style.height = document.getElementById("bulletInput").style.height;
+    
+    
     var sel = window.getSelection();
-    if(sel.anchorNode.id == 'bulletsBorder'){
+    //console.log(sel)
+    if(sel.anchorNode.id == 'bulletsBorder' || sel.anchorNode.parentNode.className == 'bullets'){
         var phrase = sel.toString().trim();
         if(phrase && phrase != window.thesaurusPhrase){
             console.log('valid selection: ' + phrase);
@@ -188,7 +195,7 @@ function getThesaurus(){
                 }
             }
 
-            xhttp.open("GET","https://api.datamuse.com/words?max=50&ml=" + phrase,true)
+            xhttp.open("GET","https://api.datamuse.com/words?max=75&ml=" + phrase,true)
 
             xhttp.send();
             document.querySelector('#thesaurus').innerText = 'loading...';
@@ -210,14 +217,19 @@ window.onload = function(e){
     //initialize a default width for the textarea window
     //document.getElementById("bulletInputSize").value = 202.321;
     document.getElementById("bulletInputSize").value = 202.51;
-    document.getElementById("bulletInput").value = '';
+    document.getElementById("bulletInput").value = '\
+- Led 3-member crack software team; wrote 2K+ lines of code in 3 weeks-- boosted AF literary efficiency by 9000%\n\
+- Developed advanced text analysis program; parsed/formatted 10,000 event parameters--saved AF $5bn in time savings';
+
     window.bulletDict = {};
     window.abbrDict = {};
     window.thesaurusPhrase = '';
     try{
         if(localStorage.getItem('bullets')){
-            document.getElementById("bulletInput").value = 
-                decodeURIComponent(localStorage.getItem("bullets"));
+            var text = decodeURIComponent(localStorage.getItem("bullets")).trim();
+            if(text){
+                document.getElementById("bulletInput").value = text;
+            }
         }
     }catch(err){
         if(err.name == 'SecurityError'){
@@ -266,12 +278,10 @@ window.onload = function(e){
         updateProcessedBullets();
 
     });
-    document.querySelector("#bulletInput").onmouseup = function(){
-        getThesaurus();
-    }
-    document.querySelector("#bulletInput").onkeyup = function(){
-        getThesaurus();
-    }
+    document.querySelector("#bulletInput").onmouseup = getThesaurus;
+    document.querySelector("#bulletInput").onkeyup = getThesaurus;
+    document.querySelector("#outputBorder").onmouseup = getThesaurus;
+    document.querySelector("#outputBorder").onkeyup = getThesaurus;
 };
 
 </script>
@@ -289,17 +299,20 @@ window.onload = function(e){
     <button type="button" id="cookieButton" >save text</button>
     </form>
     
-    <div>
-        <div class="border" id="bulletsBorder">
-            <textarea class='bullets' id="bulletInput">
-            </textarea>
+    <div style="min-height:10px;overflow:auto">
+        <div style="float:left">
+            <div><div class="border" id="bulletsBorder">
+                <textarea class='bullets' id="bulletInput">
+                </textarea>
+            </div></div>
+            <div><div id="outputBorder" class='border' tabindex=1><!--tabindex is needed to get select thing to work--></div></div>
+            <div></div><div id='abbrTable'></div>
         </div>
         <div id="thesaurus"></div>
-        <div id="outputBorder" class='border' tabindex=1><!--tabindex is needed to get select thing to work-->
-        </div>
+        
     </div>
-    <div id='abbrTable'>
-    </div>
+    <br>
+
     
 </body>
 </HTML>
