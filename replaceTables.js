@@ -92,11 +92,9 @@ function initTables(){
 }
 function replaceAbbrs(sentence){
     
-    console.log('sentence in replaceAbbrs ' + sentence)
+    //console.log('sentence in replaceAbbrs ' + sentence)
     var newSentence = sentence.replace(window.abbrRegExp, function(match,p1,p2,p3){
-        console.log('p1 - ' + p1)
-        console.log('p2 - ' + p2)
-        console.log('p3 - ' + p3)
+        
         return p1 + window.abbrDict[p2] +  p3;
     });
     return newSentence;

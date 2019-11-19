@@ -57,11 +57,11 @@ class Bullet{
         }
     }
     post(parent){
-        
+        console.log(this.optimization)
         var spanNode = document.createElement("span");
         spanNode.className = "bullets";
         spanNode.style.width = this.optimization.width;
-        spanNode.innerText = this.optimization.sentence;
+        spanNode.innerText = this.optimization.sentence? this.optimization.sentence: ' ';
 
         if(this.optimization.status == 1){
             spanNode.style.color = '#DC143C';
@@ -123,8 +123,9 @@ class Bullet{
 
         while(true){
             //if the sentence is blank, do nothing.
-            if(!originalSentence.trim()){
+            if(! originalSentence.trim()){
                 this.optimization.status = 0;
+                //console.log('blank line');
                 break;
             }
            if(optWords.length <= 2){

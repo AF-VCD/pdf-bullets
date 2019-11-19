@@ -25,7 +25,7 @@ textarea.bullets{
     overflow: hidden;
     border: none;
     padding-left: 0px;
-    resize: vertical;
+    resize: none;
     /*word-break: break-all;*/
     text-rendering: geometricPrecision;
 }
@@ -55,6 +55,12 @@ input.htCheckboxRendererInput{
 }
 #thesaurus{
     display:inline-block;
+    width:500px;
+    
+}
+#thesaurus > ul {
+    columns:3;
+    list-style-type:circle;
 }
 
 </style>
@@ -95,7 +101,7 @@ updateProcessedBullets = function(){
         //console.log(alreadyThere)
         if(alreadyThere && alreadyThere.optimization.width == optimWidth && alreadyThere.optimization.status >= 0){
             bulletObj.optimization = bulletDict[sentence2Key(bullet)].optimization;
-            //
+            
         }else{
             bulletObj.optimizeSpacings(optimWidth);
             bulletDict[sentence2Key(bullet)] = {
@@ -155,6 +161,7 @@ function importPdf(){
 }
 
 function getThesaurus(){
+    document.getElementById('thesaurus').style.height = document.getElementById("bulletInput").style.height;
     var sel = window.getSelection();
     if(sel.anchorNode.id == 'bulletsBorder'){
         var phrase = sel.toString().trim();
@@ -165,18 +172,23 @@ function getThesaurus(){
                 if(this.readyState == 4 && this.status == 200){
                     var dat = JSON.parse(this.responseText);
                     //console.log(dat);
-                    var words = ''
+                    document.querySelector('#thesaurus').innerHTML = ''
+                    var list = document.createElement('ul');
+                    document.querySelector('#thesaurus').appendChild(list);
                     for (var i of dat){
-                        words += i.word + "\n";
+                        var wordNode = document.createElement("li");
+                        
+                        wordNode.innerText = i.word;
+                        list.appendChild(wordNode);
                     }
-                    if(! words.trim()){
-                        words = 'no results found.'
+                    if(dat.length == 0){
+                        document.querySelector('#thesaurus').innerText =  'no results found.'
                     }
-                    document.querySelector('#thesaurus').innerText = words;
+                    
                 }
             }
 
-            xhttp.open("GET","https://api.datamuse.com/words?max=25&ml=" + phrase,true)
+            xhttp.open("GET","https://api.datamuse.com/words?max=50&ml=" + phrase,true)
 
             xhttp.send();
             document.querySelector('#thesaurus').innerText = 'loading...';
@@ -187,7 +199,11 @@ function getThesaurus(){
     }
    
 }
-
+function autoResizeTextArea(id){
+    ta = document.getElementById(id);
+    ta.style.height = 'auto';
+    ta.style.height = ta.scrollHeight + 'px';
+}
 window.onload = function(e){
     //This function runs when the window is finished loading. sort of like a main()
 
@@ -220,8 +236,12 @@ window.onload = function(e){
         updateWidth();
         updateProcessedBullets();
     }
+
+    
+    autoResizeTextArea('bulletInput');
     document.getElementById("bulletInput").oninput = function(){
        updateProcessedBullets();
+       autoResizeTextArea('bulletInput');
        //saveCookie();
     };
     document.getElementById("cookieButton").onclick = saveCookie;
