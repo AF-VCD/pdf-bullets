@@ -57,7 +57,7 @@ class Bullet{
         }
     }
     post(parent){
-        console.log(this.optimization)
+        //console.log(this.optimization)
         var spanNode = document.createElement("span");
         spanNode.className = "bullets";
         spanNode.style.width = this.optimization.width;
