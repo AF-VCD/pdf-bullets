@@ -4,13 +4,13 @@ function initTables(){
         enabled: true,
         abbr: 'eq',
         value: 'equipment',
-        occurrences: 0,
+        
     },
     {
         enabled: true,
         abbr: 'tst',
         value: 'test',
-        occurrences: 0,
+        
     }
     ];
 
@@ -33,14 +33,14 @@ function initTables(){
             data: 'abbr',
             type: 'text'
             },
-            {
+            /*{
             data: 'occurrences',
             type: 'numeric',
             numericFormat: {
                 pattern: '0'
                 },
             editor:false
-            },
+            },*/
         ],
         stretchH: 'all',
         width: 500,
@@ -54,7 +54,7 @@ function initTables(){
             'E',
             'V',
             'A',
-            'O',
+            
         ],
         enterBeginsEditing:false,
         manualRowMove: true,
@@ -93,10 +93,12 @@ function initTables(){
 function replaceAbbrs(sentence){
     
     //console.log('sentence in replaceAbbrs ' + sentence)
-    var newSentence = sentence.replace(window.abbrRegExp, function(match,p1,p2,p3){
-        
-        return p1 + window.abbrDict[p2] +  p3;
-    });
+    var newSentence = sentence.replace(window.abbrRegExp, 
+        function(match,p1,p2,p3){
+            
+            return p1 + window.abbrDict[p2] +  p3;
+        }
+    );
     return newSentence;
 }
 function updateAbbrDict(){
