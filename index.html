@@ -279,6 +279,12 @@ window.onload = function(e){
 
     
     initTables();
+    window.abbrTable.addHook('afterChange',function(){
+        updateAbbrDict();
+        updateProcessedBullets();
+
+    });
+
     updateWidth();
     updateProcessedBullets();
     
@@ -312,11 +318,7 @@ window.onload = function(e){
         normalizeWhiteSpace("bulletInput");
     }
     document.getElementById('importButton').onclick = importPdf;
-    abbrTable.addHook('afterChange',function(){
-        updateAbbrDict();
-        updateProcessedBullets();
-
-    });
+    
     document.querySelector("#bulletInput").onmouseup = getThesaurus;
     document.querySelector("#bulletInput").onkeyup = getThesaurus;
     document.querySelector("#outputBorder").onmouseup = getThesaurus;
