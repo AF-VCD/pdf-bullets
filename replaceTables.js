@@ -1,21 +1,23 @@
-function initTables(){
-    var abbrData = [
-    {
-        enabled: true,
-        abbr: 'eq',
-        value: 'equipment',
-        
-    },
-    {
-        enabled: true,
-        abbr: 'tst',
-        value: 'test',
-        
+function initTables(abbrData){
+    if(!abbrData){
+        var abbrData = [
+        {
+            enabled: true,
+            abbr: 'eq',
+            value: 'equipment',
+            
+        },
+        {
+            enabled: true,
+            abbr: 'tst',
+            value: 'test',
+            
+        }
+        ];
     }
-    ];
-
+    
     var abbrTableEl = document.querySelector('#abbrTable');
-    var AbbrTableElParent = abbrTableEl.parentNode;
+    //var AbbrTableElParent = abbrTableEl.parentNode;
     var abbrTableSettings = {
         data: abbrData,
         columns: [
@@ -23,6 +25,7 @@ function initTables(){
             data: 'enabled',
             type: 'checkbox',
             disableVisualSelection: true,
+            width:20
             },
 
             {
@@ -45,26 +48,25 @@ function initTables(){
         stretchH: 'all',
         width: 500,
         autoWrapRow: true,
-        height: 487,
+        height: 500,
         maxRows: Infinity,
         manualRowResize: true,
         manualColumnResize: true,
         rowHeaders: true,
         colHeaders: [
-            'E',
-            'V',
-            'A',
+            'Enabled',
+            'Word',
+            'Abbreviation',
             
         ],
+        trimWhitespace: false,
         enterBeginsEditing:false,
         manualRowMove: true,
         manualColumnMove: true,
         columnSorting: {
             indicator: true
         },
-        autoColumnSize: {
-            samplingRatio: 23
-        },
+        autoColumnSize: false,
         minRows: 15,
         contextMenu: true,
         licenseKey: 'non-commercial-and-evaluation',
@@ -84,7 +86,9 @@ function initTables(){
         },
     };
     var abbrTable = new Handsontable(abbrTableEl, abbrTableSettings);
-    return abbrTable;
+    
+    window.abbrTable =  abbrTable;
+    
     //hot.getDataAtProp('value')
     //var searchTerm = 'Air Combat Command'
     //var search = hot.getPlugin('search');
@@ -92,10 +96,10 @@ function initTables(){
 }
 function replaceAbbrs(sentence){
     
-    //console.log('sentence in replaceAbbrs ' + sentence)
+    console.log('sentence in replaceAbbrs "' + sentence + '"')
     var newSentence = sentence.replace(window.abbrRegExp, 
         function(match,p1,p2,p3){
-            
+            //p2 = p2.replace(/ /g,'\\s')
             return p1 + window.abbrDict[p2] +  p3;
         }
     );
@@ -110,5 +114,6 @@ function updateAbbrDict(){
             window.abbrDict[fullWord] = abbr;
         }
     }
-    window.abbrRegExp = new RegExp("(\\b)("+Object.keys(window.abbrDict).join("|")+")(\\b)",'g');
+    window.abbrRegExp = new RegExp("(\\b)("+Object.keys(window.abbrDict).join("|")+")(\\b|$)",'g');
 } 
+

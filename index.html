@@ -12,6 +12,7 @@
 <script type="text/javascript" src="./replaceTables.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/handsontable@latest/dist/handsontable.full.min.js"></script>
 <link href="https://cdn.jsdelivr.net/npm/handsontable@7.2.2/dist/handsontable.full.min.css" rel="stylesheet" media="screen">
+<script lang="javascript" src="xlsx.full.min.js"></script>
 <style type="text/css">
 @font-face {
   font-family: "AdobeTimes";
@@ -99,7 +100,7 @@ updateProcessedBullets = function(){
     for (var bullet of rawBullets){
 
         bullet = replaceAbbrs(bullet);
-        //console.log('bullet: ' + bullet)
+        console.log('bullet: "' + bullet + '"')
         var bulletObj = new Bullet(bullet);
         var alreadyThere = bulletDict[sentence2Key(bullet)];
         
@@ -161,8 +162,45 @@ function importPdf(){
             
         });
     });
+}
 
+function importAbbrs(useDefault){
 
+    if(useDefault){
+        
+        var xhttp = new XMLHttpRequest();
+        xhttp.open('GET','https://ea-pods-team.github.io/pdf-bullets/abbrs.xlsx');
+        xhttp.responseType = 'blob';
+        xhttp.onload = function(){
+            var abbrFile = xhttp.response;
+            getDataFromXLS(abbrFile)
+        }
+        xhttp.send()
+    }else{
+        if(!document.getElementById("importAbbrs").value){
+            console.log('no file picked');
+            return;
+        }
+        var abbrFile = document.querySelector('#importAbbrs').files[0]
+        getDataFromXLS(abbrFile)
+    }
+}
+
+function getDataFromXLS(file){
+    var reader = new FileReader();
+    reader.onload = function(event){
+        var data = event.target.result;
+        var workbook = XLSX.read(data,{
+            type:'binary',
+            raw:true,
+        });
+        var rows = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]],
+            {'header':['enabled','value','abbr']});
+        window.abbrTable.clear();
+        window.abbrTable.loadData(rows);
+        
+    };
+    reader.readAsBinaryString(file)
 }
 
 function getThesaurus(){
@@ -239,8 +277,8 @@ window.onload = function(e){
         }
     }
 
-    window.abbrTable = initTables();
-    updateAbbrDict();
+    
+    initTables();
     updateWidth();
     updateProcessedBullets();
     
@@ -283,6 +321,7 @@ window.onload = function(e){
     document.querySelector("#bulletInput").onkeyup = getThesaurus;
     document.querySelector("#outputBorder").onmouseup = getThesaurus;
     document.querySelector("#outputBorder").onkeyup = getThesaurus;
+
     document.querySelector('#awdButton').onclick = function(){
         document.querySelector('#bulletInputSize').value = Forms.all['AF1206']['likelyWidth'].replace(/mm/,'');
         document.querySelector('#bulletInputSize').oninput();
@@ -295,6 +334,9 @@ window.onload = function(e){
         document.querySelector('#bulletInputSize').value = Forms.all['AF707']['likelyWidth'].replace(/mm/,'');
         document.querySelector('#bulletInputSize').oninput();
     }
+
+    document.querySelector('#importAbbrs').onchange = function(){importAbbrs(false)};
+    importAbbrs(true);
 };
 
 </script>
@@ -326,10 +368,14 @@ window.onload = function(e){
                 </textarea>
             </div></div>
             <div><div id="outputBorder" class='border' tabindex=1><!--tabindex is needed to get select thing to work--></div></div>
-            <div></div><div id='abbrTable'></div>
+            <div>
+                <form>
+                <label>import abbrs: </label><input type='file' id='importAbbrs' name='choose abbrs' >
+                <div id='abbrTable'></div>
+                </form>
+            </div>
         </div>
         <div id="thesaurus"></div>
-        
     </div>
     <br>
 
