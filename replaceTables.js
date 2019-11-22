@@ -87,7 +87,7 @@ function initTables(abbrData){
     };
     var abbrTable = new Handsontable(abbrTableEl, abbrTableSettings);
     
-    window.abbrTable =  abbrTable;
+    return abbrTable;
     
     //hot.getDataAtProp('value')
     //var searchTerm = 'Air Combat Command'
