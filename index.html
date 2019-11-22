@@ -278,7 +278,7 @@ window.onload = function(e){
     }
 
     
-    initTables();
+    window.abbrTable = initTables();
     window.abbrTable.addHook('afterChange',function(){
         updateAbbrDict();
         updateProcessedBullets();
