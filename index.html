@@ -13,7 +13,9 @@
 <script src="https://cdn.jsdelivr.net/npm/handsontable@latest/dist/handsontable.full.min.js"></script>
 <link href="https://cdn.jsdelivr.net/npm/handsontable@7.2.2/dist/handsontable.full.min.css" rel="stylesheet" media="screen">
 <script lang="javascript" src="xlsx.full.min.js"></script>
-<script src="https://unpkg.com/compromise@latest/builds/compromise.min.js"></script>
+<script src="https://unpkg.com/compromise@latest/builds/compromise.min.js"></script> 
+<!--<script src="https://cdnjs.cloudflare.com/ajax/libs/nlp_compromise/6.5.3/nlp_compromise.min.js">-->
+</script>
 <style type="text/css">
 @font-face {
   font-family: "AdobeTimes";
@@ -280,15 +282,16 @@ window.onload = function(e){
 
     
     window.abbrTable = initTables([]);
-    window.abbrTable.addHook('afterChange',function(){
-        updateAbbrDict();
-        updateProcessedBullets();
 
-    });
-
+    importAbbrs(true);
     updateWidth();
     updateProcessedBullets();
     
+    window.abbrTable.addHook('afterChange',function(){
+        updateAbbrDict();
+        updateProcessedBullets();
+    });
+
     document.getElementById("bulletInputSize").oninput = function(){
         updateWidth();
         updateProcessedBullets();
@@ -339,7 +342,7 @@ window.onload = function(e){
     }
 
     document.querySelector('#importAbbrs').onchange = function(){importAbbrs(false)};
-    importAbbrs(true);
+
 };
 
 </script>

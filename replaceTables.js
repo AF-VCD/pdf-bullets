@@ -96,22 +96,29 @@ function initTables(abbrData){
 }
 function replaceAbbrs(sentence){
     
-    console.log('sentence in replaceAbbrs "' + sentence + '"')
+    console.log('sentence in replaceAbbrs: "' + sentence + '"')
     var newSentence = sentence.replace(window.abbrRegExp, 
         function(match,p1,p2,p3){
             //p2 = p2.replace(/ /g,'\\s')
-            return p1 + window.abbrDict[p2] +  p3;
+            var abbr = window.abbrDict[p2];
+            if(!abbr){
+                abbr = '';
+            }
+            return p1 + abbr +  p3;
         }
     );
+    console.log('sentence in replaceAbbrs replaced: "' + newSentence + '"')
     return newSentence;
 }
 function updateAbbrDict(){
     window.abbrDict = {};
     for (var i = 0; i < window.abbrTable.countRows();i++){
         if(abbrTable.getDataAtRowProp(i,'enabled')){
-            var fullWord = abbrTable.getDataAtRowProp(i,'value');
+            var fullWord = String(abbrTable.getDataAtRowProp(i,'value'));
             var abbr = abbrTable.getDataAtRowProp(i,'abbr');
+            
             window.abbrDict[fullWord] = abbr;
+      
         }
     }
     window.abbrRegExp = new RegExp("(\\b)("+Object.keys(window.abbrDict).join("|")+")(\\b|$)",'g');
