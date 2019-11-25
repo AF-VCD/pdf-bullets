@@ -131,7 +131,9 @@ function saveCookie(){
     //document.cookie = cookieData +  '; expires=Thu, 18 Dec 3000 12:00:00 UTC; path=/';
     try{
         localStorage.setItem('bullets',cookieData)
-        console.log("saved to local storage with character length " + cookieData.length);
+        console.log("saved bullets to local storage with character length " + cookieData.length);
+        localStorage.setItem('abbrs',JSON.stringify(window.abbrTable.getSourceData()));
+        console.log("saved abbrs to local storage with num rows " + window.abbrTable.countRows());
     }catch(err){
         if(err.name == 'SecurityError'){
             alert("Sorry, saving to cookies does not work using the file:// interface and your browser's privacy settings")
@@ -265,25 +267,35 @@ window.onload = function(e){
     window.bulletDict = {};
     window.abbrDict = {};
     window.thesaurusPhrase = '';
+
+    window.abbrTable = initTables([]);
+
     try{
         if(localStorage.getItem('bullets')){
             var text = decodeURIComponent(localStorage.getItem("bullets")).trim();
             if(text){
                 document.getElementById("bulletInput").value = text;
             }
+            var abbrs = JSON.parse(localStorage.getItem('abbrs'));
+            if(abbrs){
+                window.abbrTable.updateSettings({data:[]});
+                window.abbrTable.loadData(abbrs);
+            }
+            
         }
     }catch(err){
         if(err.name == 'SecurityError'){
-            console.log('Was not able to get localstorage bullets due to use of file interface and browser privacy settings')
+            console.log('Was not able to get localstorage bullets due to use of file interface and browser privacy settings');
+            importAbbrs(true);
         }else{
             throw err;
         }
     }
 
     
-    window.abbrTable = initTables([]);
+    
 
-    importAbbrs(true);
+    
     updateWidth();
     updateProcessedBullets();
     
@@ -363,7 +375,7 @@ window.onload = function(e){
     <div style="margin:10px auto;">
         <button type="button" id="resetButton" >renormalize all spaces</button>
         <button type="button" onclick="selectText('outputBorder')">select perfected text</button>
-        <button type="button" id="cookieButton" >save text</button>
+        <button type="button" id="cookieButton" >save settings + text</button>
     </div>
     </form>
     
