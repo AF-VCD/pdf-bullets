@@ -250,11 +250,7 @@ window.onload = function(e){
     
 
 
-    //since the spacing is heavily font-dependent, the custom font needs to be loaded before spacing optimization is executed.
-    document.fonts.ready.then(function(){
-        updateWidth();
-        updateProcessedBullets()
-    });
+
     
 
 
@@ -264,8 +260,10 @@ window.onload = function(e){
         autoResizeTextArea('bulletInput');
     }
 
+    //since the spacing is heavily font-dependent, the custom font needs to be loaded before spacing optimization is executed.
+    document.fonts.ready.then(document.getElementById("bulletInputSize").oninput);
     
-    autoResizeTextArea('bulletInput');
+    
     document.getElementById("bulletInput").oninput = function(){
        updateProcessedBullets();
        autoResizeTextArea('bulletInput');
