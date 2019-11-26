@@ -6,6 +6,8 @@
 <title>
     Bullets Viewer
 </title>
+<link rel="preload" href="index.css" as="style">
+<link rel="stylesheet" href="./index.css">
 <script type="text/javascript" src="pdf.js"></script>
 <script type="text/javascript" src="import-bullets.js"></script>
 <script type="text/javascript" src="bullet-fixer.js"></script>
@@ -16,63 +18,7 @@
 <script src="https://unpkg.com/compromise@latest/builds/compromise.min.js"></script> 
 <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/nlp_compromise/6.5.3/nlp_compromise.min.js">-->
 </script>
-<style type="text/css">
-@font-face {
-  font-family: "AdobeTimes";
-  src: url("./TimesNewRomanPSMT.ttf");
-}
-textarea.bullets{
-    margin: 0px;
-    height: 500px;
-    white-space: pre-wrap;
-    text-indent: 0px;
-    overflow: hidden;
-    border: none;
-    padding-left: 0px;
-    resize: none;
-    /*word-break: break-all;*/
-    text-rendering: geometricPrecision;
-}
-.border{
-    border: solid black 1px;
-    display: inline-block;
-    margin:10px;
-    vertical-align:top;
-    
-}
-form{
-    margin:10px
-}
-#processedBullets{
-    display:inline-block;
-    vertical-align:top;
-}
-.bullets{
-    font-family: "AdobeTimes";
-    font-size: 12pt;
-    white-space:pre-wrap;
-    display:inline;
-    text-rendering: geometricPrecision;
-}
-input.htCheckboxRendererInput{
-    margin: 2px auto!important;
-    display:block!important;
-}
-#thesaurus{
 
-    width:500px;
-    float:left;
-    
-}
-#thesaurus > ul {
-    columns:3;
-    list-style-type:circle;
-}
-#abbrTable{
-    margin:10px;
-}
-
-</style>
 
 
 
@@ -103,7 +49,7 @@ updateProcessedBullets = function(){
     for (var bullet of rawBullets){
 
         bullet = replaceAbbrs(bullet);
-        console.log('bullet: "' + bullet + '"')
+        //console.log('bullet: "' + bullet + '"')
         var bulletObj = new Bullet(bullet);
         var alreadyThere = bulletDict[sentence2Key(bullet)];
         
@@ -169,26 +115,29 @@ function importPdf(){
     });
 }
 
-function importAbbrs(useDefault){
+function getDefaultAbbrs(){
+    return new Promise(function(resolve,reject){
+            var xhttp = new XMLHttpRequest();
+            xhttp.open('GET','https://ea-pods-team.github.io/pdf-bullets/abbrs.xlsx');
+            xhttp.responseType = 'blob';
+            xhttp.onload = function(){
+                var abbrFile = xhttp.response;
+                resolve(abbrFile)
+            };
+            xhttp.send();
+    });
+}
 
-    if(useDefault){
-        
-        var xhttp = new XMLHttpRequest();
-        xhttp.open('GET','https://ea-pods-team.github.io/pdf-bullets/abbrs.xlsx');
-        xhttp.responseType = 'blob';
-        xhttp.onload = function(){
-            var abbrFile = xhttp.response;
-            getDataFromXLS(abbrFile)
-        }
-        xhttp.send()
-    }else{
+function importAbbrs(){
+
         if(!document.getElementById("importAbbrs").value){
             console.log('no file picked');
             return;
         }
+        
         var abbrFile = document.querySelector('#importAbbrs').files[0]
-        getDataFromXLS(abbrFile)
-    }
+        return abbrFile;
+    
 }
 
 function getDataFromXLS(file){
@@ -209,7 +158,6 @@ function getDataFromXLS(file){
 }
 
 function getThesaurus(){
-    
     
     var sel = window.getSelection();
     //console.log(sel)
@@ -269,6 +217,11 @@ window.onload = function(e){
     window.thesaurusPhrase = '';
 
     window.abbrTable = initTables([]);
+    window.abbrTable.addHook('afterChange',function(){
+        updateAbbrDict();
+        updateProcessedBullets();
+    });
+
 
     try{
         if(localStorage.getItem('bullets')){
@@ -286,23 +239,24 @@ window.onload = function(e){
     }catch(err){
         if(err.name == 'SecurityError'){
             console.log('Was not able to get localstorage bullets due to use of file interface and browser privacy settings');
-            importAbbrs(true);
+            getDefaultAbbrs().then(function(file){
+                getDataFromXLS(file)
+            });
         }else{
             throw err;
         }
     }
 
     
+
+
+    //since the spacing is heavily font-dependent, the custom font needs to be loaded before spacing optimization is executed.
+    document.fonts.ready.then(function(){
+        updateWidth();
+        updateProcessedBullets()
+    });
     
 
-    
-    updateWidth();
-    updateProcessedBullets();
-    
-    window.abbrTable.addHook('afterChange',function(){
-        updateAbbrDict();
-        updateProcessedBullets();
-    });
 
     document.getElementById("bulletInputSize").oninput = function(){
         updateWidth();
@@ -353,7 +307,9 @@ window.onload = function(e){
         document.querySelector('#bulletInputSize').oninput();
     }
 
-    document.querySelector('#importAbbrs').onchange = function(){importAbbrs(false)};
+    document.querySelector('#importAbbrs').onchange = function(){
+        getDataFromXLS(importAbbrs());
+    };
 
 };
 

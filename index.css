@@ -1,0 +1,54 @@
+@font-face {
+    font-family: "AdobeTimes";
+    src: url("./TimesNewRomanPSMT.ttf");
+}
+textarea.bullets{
+    margin: 0px;
+    height: 500px;
+    white-space: pre-wrap;
+    text-indent: 0px;
+    overflow: hidden;
+    border: none;
+    padding-left: 0px;
+    resize: none;
+    /*word-break: break-all;*/
+    text-rendering: geometricPrecision;
+}
+.border{
+    border: solid black 1px;
+    display: inline-block;
+    margin:10px;
+    vertical-align:top;
+    
+}
+form{
+    margin:10px
+}
+#processedBullets{
+    display:inline-block;
+    vertical-align:top;
+}
+.bullets{
+    font-family: "AdobeTimes";
+    font-size: 12pt;
+    white-space:pre-wrap;
+    display:inline;
+    text-rendering: geometricPrecision;
+}
+input.htCheckboxRendererInput{
+    margin: 2px auto!important;
+    display:block!important;
+}
+#thesaurus{
+
+    width:500px;
+    float:left;
+    
+}
+#thesaurus > ul {
+    columns:3;
+    list-style-type:circle;
+}
+#abbrTable{
+    margin:10px;
+}

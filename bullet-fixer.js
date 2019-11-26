@@ -85,8 +85,14 @@ class Bullet{
         var divNode = document.createElement("div");
         divNode.appendChild(spanNode);
         divNode.style.width = width;
+        
+
+        //var borderNode = document.querySelector('#outputBorder');
+        //borderNode.appendChild(divNode)
+        
+        document.body.appendChild(divNode)
         //need to actually add it to the document to see how it fits
-        document.body.appendChild(divNode);
+        
 
         var smallerSpace = "\u2009";
         var largerSpace = "\u2004";
@@ -120,17 +126,19 @@ class Bullet{
         function getRandomInt(seed,max){
             return Math.floor( Math.abs((Math.floor(9*seed.hashCode()+5) % 100000) / 100000) * Math.floor(max));
         }
-
+        var finalSentence;
         while(true){
             //if the sentence is blank, do nothing.
             if(! originalSentence.trim()){
                 this.optimization.status = 0;
                 //console.log('blank line');
+                finalSentence = ' ';
                 break;
             }
            if(optWords.length <= 2){
                 console.log("\tWarning: Can't replace any more spaces");
                 this.optimization.status = 1;
+                finalSentence = previousSentence;
                 break;
             }
 
@@ -143,7 +151,7 @@ class Bullet{
                 iReplace, 2, 
                 optWords.slice(iReplace,iReplace+2).join(newSpace)
             );
-            //console.log( (addSpace?'increased':'decreased') + ' space at index ' + iReplace + " : " + optWords[iReplace]);
+            console.log( (addSpace?'increased':'decreased') + ' space at index ' + iReplace + " : " + optWords[iReplace]);
     
             //make all other spaces the normal space size
             var newSentence = optWords.join(' ');
@@ -153,13 +161,14 @@ class Bullet{
             var overflow = (spanNode.offsetHeight>singleHeight);
     
             if(addSpace && overflow){            
-                //console.log("Warning: Can't add more spaces without overflow, reverting to previous" );
-                spanNode.innerText = previousSentence;
+                console.log("Note: Can't add more spaces without overflow, reverting to previous" );
+                finalSentence = previousSentence;
                 this.optimization.status = 0;
                 break;
             
             } else if(!addSpace && !overflow){
-                //console.log("Removed enough spaces. Terminating." );     
+                console.log("Removed enough spaces. Terminating." );
+                finalSentence = newSentence;
                 this.optimization.status = 0;
                 break;
             }
@@ -167,7 +176,7 @@ class Bullet{
             previousSentence = newSentence;
         }
         //at this point, spacings should be optimized as best as possible.
-        this.optimization.sentence = spanNode.innerText;
+        this.optimization.sentence = finalSentence;
         this.optimization.width = width;
         divNode.remove();
     }   
