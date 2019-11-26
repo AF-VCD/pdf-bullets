@@ -87,10 +87,10 @@ class Bullet{
         divNode.style.width = width;
         
 
-        //var borderNode = document.querySelector('#outputBorder');
-        //borderNode.appendChild(divNode)
+        var borderNode = document.querySelector('#outputBorder');
+        borderNode.appendChild(divNode)
         
-        document.body.appendChild(divNode)
+        //document.body.appendChild(divNode)
         //need to actually add it to the document to see how it fits
         
 

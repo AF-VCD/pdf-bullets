@@ -96,7 +96,7 @@ function initTables(abbrData){
 }
 function replaceAbbrs(sentence){
     
-    console.log('sentence in replaceAbbrs: "' + sentence + '"')
+    //console.log('sentence in replaceAbbrs: "' + sentence + '"')
     var newSentence = sentence.replace(window.abbrRegExp, 
         function(match,p1,p2,p3){
             //p2 = p2.replace(/ /g,'\\s')
@@ -107,7 +107,7 @@ function replaceAbbrs(sentence){
             return p1 + abbr +  p3;
         }
     );
-    console.log('sentence in replaceAbbrs replaced: "' + newSentence + '"')
+    //console.log('sentence in replaceAbbrs replaced: "' + newSentence + '"')
     return newSentence;
 }
 function updateAbbrDict(){

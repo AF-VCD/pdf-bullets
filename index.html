@@ -216,13 +216,23 @@ window.onload = function(e){
     window.abbrDict = {};
     window.thesaurusPhrase = '';
 
-    window.abbrTable = initTables([]);
-    window.abbrTable.addHook('afterChange',function(){
-        updateAbbrDict();
+    //since the spacing is heavily font-dependent, the custom font needs to be loaded before spacing optimization is executed.
+    document.fonts.ready.then(function(){
+        updateWidth();
         updateProcessedBullets();
+        
+    }).then(function(){
+        window.abbrTable = initTables([]);
+        window.abbrTable.addHook('afterChange',function(){
+            updateAbbrDict();
+            updateProcessedBullets();
+        });
+        getSavedData();
+        setEventListeners();
+        autoResizeTextArea('bulletInput');
     });
-
-
+}
+function getSavedData(){
     try{
         if(localStorage.getItem('bullets')){
             var text = decodeURIComponent(localStorage.getItem("bullets")).trim();
@@ -246,24 +256,14 @@ window.onload = function(e){
             throw err;
         }
     }
-
-    
-
-
-
-    
-
-
+}
+function setEventListeners(){
     document.getElementById("bulletInputSize").oninput = function(){
         updateWidth();
         updateProcessedBullets();
         autoResizeTextArea('bulletInput');
     }
 
-    //since the spacing is heavily font-dependent, the custom font needs to be loaded before spacing optimization is executed.
-    document.fonts.ready.then(document.getElementById("bulletInputSize").oninput);
-    
-    
     document.getElementById("bulletInput").oninput = function(){
        updateProcessedBullets();
        autoResizeTextArea('bulletInput');
