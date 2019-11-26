@@ -121,6 +121,6 @@ function updateAbbrDict(){
       
         }
     }
-    window.abbrRegExp = new RegExp("(\\b)("+Object.keys(window.abbrDict).join("|")+")(\\b|$)",'g');
+    window.abbrRegExp = new RegExp("(\\b)("+Object.keys(window.abbrDict).join("|")+")(\\b|$|\\$)",'g');
 } 
 

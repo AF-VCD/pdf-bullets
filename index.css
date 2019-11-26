@@ -5,7 +5,7 @@
 textarea.bullets{
     margin: 0px;
     height: 500px;
-    white-space: pre-wrap;
+    white-space: nowrap;
     text-indent: 0px;
     overflow: hidden;
     border: none;
@@ -41,12 +41,13 @@ input.htCheckboxRendererInput{
 }
 #thesaurus{
 
-    width:500px;
-    float:left;
+    /*width:500px;*/
+    height:152px;
+    display:block
     
 }
 #thesaurus > ul {
-    columns:3;
+    columns:10;
     list-style-type:circle;
 }
 #abbrTable{

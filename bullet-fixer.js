@@ -136,7 +136,7 @@ class Bullet{
                 break;
             }
            if(optWords.length <= 2){
-                console.log("\tWarning: Can't replace any more spaces");
+                //console.log("\tWarning: Can't replace any more spaces");
                 this.optimization.status = 1;
                 finalSentence = previousSentence;
                 break;
@@ -151,7 +151,7 @@ class Bullet{
                 iReplace, 2, 
                 optWords.slice(iReplace,iReplace+2).join(newSpace)
             );
-            console.log( (addSpace?'increased':'decreased') + ' space at index ' + iReplace + " : " + optWords[iReplace]);
+            //console.log( (addSpace?'increased':'decreased') + ' space at index ' + iReplace + " : " + optWords[iReplace]);
     
             //make all other spaces the normal space size
             var newSentence = optWords.join(' ');
@@ -161,13 +161,13 @@ class Bullet{
             var overflow = (spanNode.offsetHeight>singleHeight);
     
             if(addSpace && overflow){            
-                console.log("Note: Can't add more spaces without overflow, reverting to previous" );
+                //console.log("Note: Can't add more spaces without overflow, reverting to previous" );
                 finalSentence = previousSentence;
                 this.optimization.status = 0;
                 break;
             
             } else if(!addSpace && !overflow){
-                console.log("Removed enough spaces. Terminating." );
+                //console.log("Removed enough spaces. Terminating." );
                 finalSentence = newSentence;
                 this.optimization.status = 0;
                 break;

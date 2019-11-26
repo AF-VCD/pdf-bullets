@@ -201,6 +201,8 @@ function autoResizeTextArea(id){
     ta = document.getElementById(id);
     ta.style.height = 'auto';
     ta.style.height = ta.scrollHeight + 'px';
+    ta.style.width = 'auto';
+    ta.style.width = ta.scrollWidth + 'px';
 }
 window.onload = function(e){
     //This function runs when the window is finished loading. sort of like a main()
@@ -332,14 +334,14 @@ function setEventListeners(){
         <button type="button" id="cookieButton" >save settings + text</button>
     </div>
     </form>
-    
+    <div id="thesaurus"></div>
     <div style="min-height:10px;overflow:auto">
         <div style="float:left">
-            <div><div class="border" id="bulletsBorder">
+            <div class="border" id="bulletsBorder">
                 <textarea class='bullets' id="bulletInput">
                 </textarea>
-            </div></div>
-            <div><div id="outputBorder" class='border' tabindex=1><!--tabindex is needed to get select thing to work--></div></div>
+            </div>
+            <div id="outputBorder" class='border' tabindex=1><!--tabindex is needed to get select thing to work--></div>
             <div>
                 <form>
                 <label>import abbrs: </label><input type='file' id='importAbbrs' name='choose abbrs' >
@@ -347,7 +349,7 @@ function setEventListeners(){
                 </form>
             </div>
         </div>
-        <div id="thesaurus"></div>
+        
     </div>
     <br>
 
