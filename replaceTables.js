@@ -114,7 +114,7 @@ function updateAbbrDict(){
     window.abbrDict = {};
     for (var i = 0; i < window.abbrTable.countRows();i++){
         if(abbrTable.getDataAtRowProp(i,'enabled')){
-            var fullWord = String(abbrTable.getDataAtRowProp(i,'value'));
+            var fullWord = String(abbrTable.getDataAtRowProp(i,'value')).replace(/\s/g,' ');
             var abbr = abbrTable.getDataAtRowProp(i,'abbr');
             
             window.abbrDict[fullWord] = abbr;
