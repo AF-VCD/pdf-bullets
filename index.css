@@ -15,7 +15,7 @@ textarea.bullets{
     text-rendering: geometricPrecision;
 }
 .border{
-    border: solid black 1px;
+    border: solid black 1.1px;
     display: inline-block;
     margin:10px;
     vertical-align:top;
@@ -42,7 +42,7 @@ input.htCheckboxRendererInput{
 #thesaurus{
 
     /*width:500px;*/
-    height:152px;
+    min-height:152px;
     display:block
     
 }
@@ -52,4 +52,10 @@ input.htCheckboxRendererInput{
 }
 #abbrTable{
     margin:10px;
+}
+#bulletIOWrapper{
+    min-height:10px;
+    overflow:auto;
+    overflow-x: scroll;
+    width:max-content;
 }
