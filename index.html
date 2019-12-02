@@ -156,7 +156,12 @@ function getDataFromXLS(file){
     };
     reader.readAsBinaryString(file)
 }
-
+function writeAbbrTableToXLS(){
+    var wb = XLSX.utils.book_new();
+    var sht  = XLSX.utils.aoa_to_sheet(abbrTable.getData());
+    XLSX.utils.book_append_sheet(wb,sht,'abbrs')
+    XLSX.writeFile(wb,'abbrs.xlsx');
+}
 function getThesaurus(){
     
     var sel = window.getSelection();
@@ -344,7 +349,8 @@ function setEventListeners(){
             <div id="outputBorder" class='border' tabindex=1><!--tabindex is needed to get select thing to work--></div>
             <div>
                 <form>
-                <label>import abbrs: </label><input type='file' id='importAbbrs' name='choose abbrs' >
+                <label>Import Abbrs: </label><input type='file' id='importAbbrs' name='Import Abbrs' >
+                <button type="button" id="exportAbbrs" onclick="writeAbbrTableToXLS()">Export Abbrs</button>
                 <div id='abbrTable'></div>
                 </form>
             </div>
