@@ -252,12 +252,15 @@ window.onload = function(e){
         
     }).then(function(){
         window.abbrTable = initTables([]);
-        window.abbrTable.addHook('afterChange',function(){
+        var tableUpdater = function(){
             updateAbbrDict();
             updateProcessedBullets();
             getThesaurus();
             //console.log('change occurred')
-        });
+        };
+        window.abbrTable.addHook('afterChange',tableUpdater);
+        window.abbrTable.addHook('afterPaste',tableUpdater);
+        window.abbrTable.addHook('afterRemoveRow',tableUpdater);
         getSavedData();
         setEventListeners();
         autoResizeTextArea('bulletInput');

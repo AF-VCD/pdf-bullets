@@ -117,7 +117,17 @@ function updateAbbrDict(){
         var fullWord = String(abbrTable.getDataAtRowProp(i,'value')).replace(/\s/g,' ');
         var abbr = abbrTable.getDataAtRowProp(i,'abbr');
         //console.log('abbr: ' + abbr)
-        if(abbrTable.getDataAtRowProp(i,'enabled')){
+        
+        boolStrTF = function(val){
+            if(isBool(val)){
+                return val
+            }else if(isString(val)){
+                return !isNull(val.match(/true/i));
+            }else{
+                return false;
+            }
+        }
+        if(boolStrTF(abbrTable.getDataAtRowProp(i,'enabled'))){
             //console.log('word enabled')
             window.abbrDict[fullWord] = abbr;
         }else{
