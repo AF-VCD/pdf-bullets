@@ -162,7 +162,20 @@ function writeAbbrTableToXLS(){
     XLSX.utils.book_append_sheet(wb,sht,'abbrs')
     XLSX.writeFile(wb,'abbrs.xlsx');
 }
-
+function addWordWithAbbrs(word, topNode){
+    var fullWordNode = document.createElement('span');
+    var abbrNode = document.createElement('span');
+    fullWordNode.innerText = word;
+    if(window.abbrDict[word]){
+        abbrNode.style.fontWeight = 'bold';
+        abbrNode.innerText = ' (' + window.abbrDict[word] + ')';
+    }else if(window.abbrDictDisabled[word]){
+        fullWordNode.style.fontWeight = 'bold';
+        abbrNode.innerText += ' (' + window.abbrDictDisabled[word] + ')'
+    }
+    topNode.appendChild(fullWordNode);
+    topNode.appendChild(abbrNode);
+}
 function getThesaurus(){
     
     var sel = window.getSelection();
@@ -179,16 +192,8 @@ function getThesaurus(){
                     //console.log(dat);
 
                     document.querySelector('#thesaurus').innerHTML = ''
-
                     var phraseNode = document.createElement('div');
-                    phraseNode.innerText = phrase;
-                    if(window.abbrDict[phrase]){
-                        phraseNode.style.fontWeight = 'bold';
-                        phraseNode.innerText += ' (' + window.abbrDict[phrase] + ')';
-                    }else if(window.abbrDictDisabled[phrase]){
-                        phraseNode.style.fontStyle = 'italic';
-                        phraseNode.innerText += ' (' + window.abbrDictDisabled[phrase] + ')'
-                    }
+                    addWordWithAbbrs(phrase, phraseNode)
                     document.querySelector('#thesaurus').appendChild(phraseNode);
                     var list = document.createElement('ul');
                     document.querySelector('#thesaurus').appendChild(list);
@@ -196,15 +201,7 @@ function getThesaurus(){
                     
                     for (var i of dat){
                         var wordNode = document.createElement("li");
-                        
-                        wordNode.innerText = i.word;
-                        if(window.abbrDict[i.word]){
-                            wordNode.style.fontWeight = 'bold';
-                            wordNode.innerText += ' (' + window.abbrDict[i.word] + ')';
-                        }else if(window.abbrDictDisabled[i.word]){
-                            wordNode.style.fontStyle = 'italic';
-                            wordNode.innerText += ' (' + window.abbrDictDisabled[i.word] + ')'
-                        }
+                        addWordWithAbbrs(i.word, wordNode)
                         list.appendChild(wordNode);
                     }
 
