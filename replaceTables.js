@@ -112,13 +112,17 @@ function replaceAbbrs(sentence){
 }
 function updateAbbrDict(){
     window.abbrDict = {};
+    window.abbrDictDisabled = {};
     for (var i = 0; i < window.abbrTable.countRows();i++){
+        var fullWord = String(abbrTable.getDataAtRowProp(i,'value')).replace(/\s/g,' ');
+        var abbr = abbrTable.getDataAtRowProp(i,'abbr');
+        //console.log('abbr: ' + abbr)
         if(abbrTable.getDataAtRowProp(i,'enabled')){
-            var fullWord = String(abbrTable.getDataAtRowProp(i,'value')).replace(/\s/g,' ');
-            var abbr = abbrTable.getDataAtRowProp(i,'abbr');
-            
+            //console.log('word enabled')
             window.abbrDict[fullWord] = abbr;
-      
+        }else{
+            //console.log('word disabled')
+            window.abbrDictDisabled[fullWord] = abbr;
         }
     }
     window.abbrRegExp = new RegExp("(\\b)("+Object.keys(window.abbrDict).join("|")+")(\\b|$|\\$)",'g');

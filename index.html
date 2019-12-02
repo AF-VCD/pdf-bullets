@@ -166,9 +166,10 @@ function getThesaurus(){
     
     var sel = window.getSelection();
     //console.log(sel)
-    if(sel.anchorNode.id == 'bulletsBorder' || sel.anchorNode.parentNode.className == 'bullets'){
+    if(sel.type != 'None' && (sel.anchorNode.id == 'bulletsBorder' || sel.anchorNode.parentNode.className == 'bullets')){
         var phrase = sel.toString().trim();
-        if(phrase && phrase != window.thesaurusPhrase){
+        //if(phrase && phrase != window.thesaurusPhrase){
+            if(phrase){
             console.log('valid selection: ' + phrase);
             var xhttp = new XMLHttpRequest();
             xhttp.onreadystatechange = function () {
@@ -182,6 +183,13 @@ function getThesaurus(){
                         var wordNode = document.createElement("li");
                         
                         wordNode.innerText = i.word;
+                        if(window.abbrDict[i.word]){
+                            wordNode.style.fontWeight = 'bold';
+                            wordNode.innerText += ' (' + window.abbrDict[i.word] + ')';
+                        }else if(window.abbrDictDisabled[i.word]){
+                            wordNode.style.fontStyle = 'italic';
+                            wordNode.innerText += ' (' + window.abbrDictDisabled[i.word] + ')'
+                        }
                         list.appendChild(wordNode);
                     }
                     if(dat.length == 0){
@@ -220,6 +228,7 @@ window.onload = function(e){
 - Developed advanced text analysis program; parsed/formatted 10,000 event parameters--saved AF $5bn in time savings';
 
     window.bulletDict = {};
+    window.abbrDictDisabled = {};
     window.abbrDict = {};
     window.thesaurusPhrase = '';
 
@@ -233,6 +242,8 @@ window.onload = function(e){
         window.abbrTable.addHook('afterChange',function(){
             updateAbbrDict();
             updateProcessedBullets();
+            getThesaurus();
+            //console.log('change occurred')
         });
         getSavedData();
         setEventListeners();
