@@ -162,6 +162,7 @@ function writeAbbrTableToXLS(){
     XLSX.utils.book_append_sheet(wb,sht,'abbrs')
     XLSX.writeFile(wb,'abbrs.xlsx');
 }
+
 function getThesaurus(){
     
     var sel = window.getSelection();
@@ -176,9 +177,23 @@ function getThesaurus(){
                 if(this.readyState == 4 && this.status == 200){
                     var dat = JSON.parse(this.responseText);
                     //console.log(dat);
+
                     document.querySelector('#thesaurus').innerHTML = ''
+
+                    var phraseNode = document.createElement('div');
+                    phraseNode.innerText = phrase;
+                    if(window.abbrDict[phrase]){
+                        phraseNode.style.fontWeight = 'bold';
+                        phraseNode.innerText += ' (' + window.abbrDict[phrase] + ')';
+                    }else if(window.abbrDictDisabled[phrase]){
+                        phraseNode.style.fontStyle = 'italic';
+                        phraseNode.innerText += ' (' + window.abbrDictDisabled[phrase] + ')'
+                    }
+                    document.querySelector('#thesaurus').appendChild(phraseNode);
                     var list = document.createElement('ul');
                     document.querySelector('#thesaurus').appendChild(list);
+                    // add original word thesarus display
+                    
                     for (var i of dat){
                         var wordNode = document.createElement("li");
                         
@@ -192,6 +207,7 @@ function getThesaurus(){
                         }
                         list.appendChild(wordNode);
                     }
+
                     if(dat.length == 0){
                         document.querySelector('#thesaurus').innerText =  'no results found.'
                     }

@@ -40,16 +40,17 @@ input.htCheckboxRendererInput{
     display:block!important;
 }
 #thesaurus{
-
     /*width:500px;*/
     min-height:190px;
-    display:block
-    
+    display:block;
+    padding: 10px;
 }
 #thesaurus > ul {
     columns:10;
     list-style-type:circle;
+    margin: 5px auto;
 }
+
 #abbrTable{
     margin:10px;
 }
