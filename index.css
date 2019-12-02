@@ -51,6 +51,11 @@ input.htCheckboxRendererInput{
     margin: 5px auto;
 }
 
+#thesaurus > ul > li {
+    margin:auto 5px;
+}
+
+
 #abbrTable{
     margin:10px;
 }
