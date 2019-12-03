@@ -2,10 +2,14 @@
     font-family: "AdobeTimes";
     src: url("./TimesNewRomanPSMT.ttf");
 }
+body{
+    margin:15px;
+}
 textarea.bullets{
     margin: 0px;
     height: 500px;
-    white-space: nowrap;
+    width:255mm;
+    white-space: pre-line;
     text-indent: 0px;
     overflow: hidden;
     border: none;
@@ -17,12 +21,12 @@ textarea.bullets{
 .border{
     border: solid black 1.1px;
     display: inline-block;
-    margin:10px;
+    margin:10px 10px 0px 0px;
     vertical-align:top;
     
 }
 form{
-    margin:10px
+    margin:10px 10px 0px 0px
 }
 #processedBullets{
     display:inline-block;
@@ -40,8 +44,9 @@ input.htCheckboxRendererInput{
     display:block!important;
 }
 #thesaurus{
-    /*width:500px;*/
-    min-height:190px;
+    /*width:auto;
+    min-width:500px;*/
+    min-height:172px;
     display:block;
     padding: 10px;
 }
@@ -57,11 +62,29 @@ input.htCheckboxRendererInput{
 
 
 #abbrTable{
-    margin:10px;
+    margin:10px 10px 0px 0px;
 }
 #bulletIOWrapper{
     min-height:10px;
     overflow:auto;
     overflow-x: scroll;
     width:max-content;
+    /*margin-top: 300px;*/
+}
+.red{
+    color:red;
+}
+h1{
+    font-family:monospace;
+}
+
+#topStuff{
+    /*position: fixed;
+    top: 0;
+    width: 100%;
+    margin-right:10px;*/
+    background-color: white;
+}
+#importForm, #resizeForm, #toolsForm{
+    display:inline-block;
 }

@@ -202,8 +202,8 @@ function autoResizeTextArea(id){
     ta = document.getElementById(id);
     ta.style.height = 'auto';
     ta.style.height = ta.scrollHeight + 'px';
-    ta.style.width = 'auto';
-    ta.style.width = ta.scrollWidth + 'px';
+    //ta.style.width = 'auto';
+    //ta.style.width = ta.scrollWidth + 'px';
 }
 window.onload = function(e){
     //This function runs when the window is finished loading. sort of like a main()
@@ -222,7 +222,7 @@ window.onload = function(e){
 
     //since the spacing is heavily font-dependent, the custom font needs to be loaded before spacing optimization is executed.
     document.fonts.ready.then(function(){
-        updateWidth();
+        //updateWidth();
         updateProcessedBullets();
         
     }).then(function(){
@@ -268,7 +268,7 @@ function getSavedData(){
 }
 function setEventListeners(){
     document.getElementById("bulletInputSize").oninput = function(){
-        updateWidth();
+        //updateWidth();
         updateProcessedBullets();
         autoResizeTextArea('bulletInput');
     }
@@ -294,7 +294,7 @@ function setEventListeners(){
     document.getElementById('resetButton').onclick = function(){
         normalizeWhiteSpace("bulletInput");
     }
-    document.getElementById('importButton').onclick = importPdf;
+    document.getElementById('importPdf').onchange = importPdf;
     
     document.querySelector("#bulletInput").onmouseup = getThesaurus;
     document.querySelector("#bulletInput").onkeyup = getThesaurus;
