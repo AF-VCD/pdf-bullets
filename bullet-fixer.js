@@ -47,7 +47,7 @@ function updateDict(textAreaId){
 }
 
 class Bullet{
-    static MAX_UNDERFLOW = -4 //9px is around one i
+    static MAX_UNDERFLOW = -4 //4px is around one i
     static OPTIMIZED = 0;
     static ADD_SPACE = 1;
     static REM_SPACE = -1;
