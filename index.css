@@ -85,6 +85,6 @@ h1{
     margin-right:10px;*/
     background-color: white;
 }
-#importForm, #resizeForm, #toolsForm{
+#topStuff form{
     display:inline-block;
 }

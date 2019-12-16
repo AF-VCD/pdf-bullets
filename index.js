@@ -26,18 +26,22 @@ updateProcessedBullets = function(){
         bullet = replaceAbbrs(bullet);
         //console.log('bullet: "' + bullet + '"')
         var bulletObj = new Bullet(bullet);
-        var alreadyThere = bulletDict[sentence2Key(bullet)];
-        
-        //console.log(alreadyThere)
-        if(alreadyThere && alreadyThere.optimization.width == optimWidth && alreadyThere.optimization.status >= 0){
-            bulletObj.optimization = bulletDict[sentence2Key(bullet)].optimization;
-            
+
+        if(document.getElementById('toggleSpaces').checked == true){
+            var alreadyThere = bulletDict[sentence2Key(bullet)].optimizations[optimWidth];
+            //console.log(alreadyThere)
+            if(alreadyThere && 
+                (alreadyThere.status == Bullet.OPTIMIZED || alreadyThere.status == Bullet.FAILED_OPT)){
+                //console.log('optimization already exists')
+                bulletObj.optimization = alreadyThere;
+                
+            }else{
+                bulletObj.optimizeSpacings(optimWidth);
+                bulletDict[sentence2Key(bullet)].optimizations[optimWidth] = bulletObj.optimization;
+                //console.log(bulletDict[sentence2Key(bullet)])
+            }
         }else{
-            bulletObj.optimizeSpacings(optimWidth);
-            bulletDict[sentence2Key(bullet)] = {
-                'optimization': bulletObj.optimization
-            };
-            //console.log(bulletDict[sentence2Key(bullet)])
+            bulletObj.optimization.width = optimWidth;
         }
         bulletObj.post(outputWrapper);
     }
@@ -156,7 +160,7 @@ function getThesaurus(){
     var sel = window.getSelection();
     //console.log(sel)
     if(sel.type != 'None' && (sel.anchorNode.id == 'bulletsBorder' || sel.anchorNode.parentNode.className == 'bullets')){
-        var phrase = sel.toString().trim();
+        var phrase = sel.toString().trim().split(/\s+/).slice(0,8).join(' ');
         //if(phrase && phrase != window.thesaurusPhrase){
             if(phrase){
             console.log('valid selection: ' + phrase);
@@ -317,5 +321,16 @@ function setEventListeners(){
     document.querySelector('#importAbbrs').onchange = function(){
         getDataFromXLS(importAbbrs());
     };
+    document.getElementById('toggleSpaces').onchange = function(){
+        console.log('check');
+        updateProcessedBullets()
+    };
 
+    document.getElementById('outputBorder').oncopy = function(e){
+        var text = Bullet.Untweak(document.getSelection().toString())
+        text = text.replace(/\n/g,'\r\n');
+        //console.log('Copy event: ' + text)
+        e.clipboardData.setData('text/plain',text);
+        e.preventDefault();
+    }
 };
