@@ -6,7 +6,7 @@ body{
     margin:15px;
 }
 textarea.bullets{
-    margin: 0px;
+    margin: 0px 0px 0px 1px;
     height: 500px;
     width:255mm;
     white-space: pre-line;
@@ -71,8 +71,8 @@ input.htCheckboxRendererInput{
     width:max-content;
     /*margin-top: 300px;*/
 }
-.red{
-    color:red;
+.highlight{
+    color: #bd460d;
 }
 h1{
     font-family:monospace;
