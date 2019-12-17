@@ -94,17 +94,17 @@ function importPdf(){
     });
 }
 
-function getDefaultAbbrs(){
-    return new Promise(function(resolve,reject){
-            var xhttp = new XMLHttpRequest();
-            xhttp.open('GET','https://ea-pods-team.github.io/pdf-bullets/abbrs.xlsx');
-            xhttp.responseType = 'blob';
-            xhttp.onload = function(){
-                var abbrFile = xhttp.response;
-                resolve(abbrFile)
-            };
-            xhttp.send();
-    });
+function getSampleAbbrs(callback){
+    //for some reason, Promises did not work. Will utilize function callback instead
+    var xhttp = new XMLHttpRequest();
+
+    xhttp.responseType = 'blob';
+    xhttp.onload = function(){
+        callback(this.response)
+    }
+    xhttp.open('GET','/abbrs.xlsx',true);
+    xhttp.send();
+    
 }
 
 function importAbbrs(){
@@ -113,7 +113,6 @@ function importAbbrs(){
             console.log('no file picked');
             return;
         }
-        
         var abbrFile = document.querySelector('#importAbbrs').files[0]
         return abbrFile;
     
@@ -264,7 +263,7 @@ function getSavedData(){
     }catch(err){
         if(err.name == 'SecurityError'){
             console.log('Was not able to get localstorage bullets due to use of file interface and browser privacy settings');
-            getDefaultAbbrs().then(function(file){
+            getSampleAbbrs().then(function(file){
                 getDataFromXLS(file)
             });
         }else{
@@ -325,7 +324,7 @@ function setEventListeners(){
         document.querySelector('#importAbbrs').value = '';
     };
     document.getElementById('toggleSpaces').onchange = function(){
-        console.log('check');
+        //console.log('check');
         updateProcessedBullets()
     };
 
@@ -335,5 +334,13 @@ function setEventListeners(){
         //console.log('Copy event: ' + text)
         e.clipboardData.setData('text/plain',text);
         e.preventDefault();
+    }
+
+    document.getElementById('sampleAbbrs').onclick = function(){
+        if(confirm("Are you sure you want to remove all existing acronyms and replace with a sample list?")){
+            getSampleAbbrs(function(file){
+                getDataFromXLS(file)
+            });
+        }
     }
 };
