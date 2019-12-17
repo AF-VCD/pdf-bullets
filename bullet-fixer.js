@@ -204,7 +204,7 @@ class Bullet{
         var newSpace = (initResults.direction == Bullet.ADD_SPACE)? largerSpace: smallerSpace;
         
         console.log('Sentence: ' + originalSentence)
-        console.log(initResults)
+        //console.log(initResults)
         //console.log('\tspan node height: ' + spanNode.offsetHeight)
         //console.log('\tdesired height: ' + singleHeight)
        
