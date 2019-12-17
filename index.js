@@ -160,9 +160,11 @@ function getThesaurus(){
     var sel = window.getSelection();
     //console.log(sel)
     if(sel.type != 'None' && (sel.anchorNode.id == 'bulletsBorder' || sel.anchorNode.parentNode.className == 'bullets')){
-        var phrase = sel.toString().trim().split(/\s+/).slice(0,8).join(' ');
-        //if(phrase && phrase != window.thesaurusPhrase){
-            if(phrase){
+        // limit phrase sent to API to 8 words. Should work fine if phrase is less than 8 words
+        var maxWords = 8;
+        var phrase = sel.toString().trim().split(/\s+/).slice(0,maxWords).join(' ');
+        
+        if(phrase){
             console.log('valid selection: ' + phrase);
             var xhttp = new XMLHttpRequest();
             xhttp.onreadystatechange = function () {
@@ -194,9 +196,10 @@ function getThesaurus(){
             xhttp.open("GET","https://api.datamuse.com/words?max=75&ml=" + phrase,true)
 
             xhttp.send();
+            //loading text will be replaced when xhttp request is fulfilled
             document.querySelector('#thesaurus').innerText = 'loading...';
-            //lookup new phrase
-            window.thesaurusPhrase = phrase;
+            
+
 
         }
     }
@@ -222,7 +225,6 @@ window.onload = function(e){
     window.bulletDict = {};
     window.abbrDictDisabled = {};
     window.abbrDict = {};
-    window.thesaurusPhrase = '';
 
     //since the spacing is heavily font-dependent, the custom font needs to be loaded before spacing optimization is executed.
     document.fonts.ready.then(function(){
@@ -328,7 +330,7 @@ function setEventListeners(){
 
     document.getElementById('outputBorder').oncopy = function(e){
         var text = Bullet.Untweak(document.getSelection().toString())
-        text = text.replace(/\n/g,'\r\n');
+        text = text.replace(/\n/g,'\r\n'); //need this for WINDOWS!
         //console.log('Copy event: ' + text)
         e.clipboardData.setData('text/plain',text);
         e.preventDefault();
