@@ -102,7 +102,7 @@ function getSampleAbbrs(callback){
     xhttp.onload = function(){
         callback(this.response)
     }
-    xhttp.open('GET','/abbrs.xlsx',true);
+    xhttp.open('GET','./abbrs.xlsx',true);
     xhttp.send();
     
 }
