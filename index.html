@@ -13,7 +13,7 @@
 <script type="text/javascript" src="./import-bullets.js"></script>
 <script type="text/javascript" src="./bullet-fixer.js"></script>
 <script type="text/javascript" src="./replaceTables.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/handsontable@latest/dist/handsontable.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/handsontable@7.2.2/dist/handsontable.full.min.js"></script>
 <link href="https://cdn.jsdelivr.net/npm/handsontable@7.2.2/dist/handsontable.full.min.css" rel="stylesheet" media="screen">
 <script lang="javascript" src="./xlsx.full.min.js"></script>
 <script src="https://unpkg.com/compromise@latest/builds/compromise.min.js"></script> 
@@ -26,11 +26,11 @@
 </head>
 <body>
     <div id="topStuff">
-        <h1><span class='highlight'>AF</span>
-            <span class='highlight'>Bull</span>et 
-            <span class='highlight'>Sh</span>aping & 
-            <span class='highlight'>i</span>teration 
-            <span class='highlight'>t</span>ool</h1>
+        <h1><span class='logo'>AF</span>
+            <span class='logo'>Bull</span>et 
+            <span class='logo'>Sh</span>aping & 
+            <span class='logo'>i</span>teration 
+            <span class='logo'>t</span>ool</h1>
         <div>    
             <form id="importForm" >
                 <input type='file' id='importPdf' name='choose pdf' accept="application/pdf" style="display:none">
@@ -76,8 +76,8 @@
                 <input type='file' id='importAbbrs' name='Import Abbrs' style="display:none">
                 <button type="button" id="importAbbrsButton" onclick="document.querySelector('#importAbbrs').click()">Import Abbrs</button>
                 <button type="button" id="exportAbbrs" onclick="writeAbbrTableToXLS()">Export Abbrs</button>
-                <div id='abbrTable'></div>
                 </form>
+                <div id='abbrTable'></div>
             </div>
         </div>
         

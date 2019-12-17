@@ -70,11 +70,11 @@ input.htCheckboxRendererInput{
 #bulletIOWrapper{
     min-height:10px;
     overflow:auto;
-    overflow-x: scroll;
+    overflow-x: auto;
     width:max-content;
     /*margin-top: 300px;*/
 }
-.highlight{
+.logo{
     color: #6b2706;
 }
 h1{
