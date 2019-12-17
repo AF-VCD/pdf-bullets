@@ -322,6 +322,7 @@ function setEventListeners(){
 
     document.querySelector('#importAbbrs').onchange = function(){
         getDataFromXLS(importAbbrs());
+        document.querySelector('#importAbbrs').value = '';
     };
     document.getElementById('toggleSpaces').onchange = function(){
         console.log('check');
