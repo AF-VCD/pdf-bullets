@@ -55,16 +55,23 @@
             
             </form>
         </div>
-        <div id="thesaurus" class="border">double-click a word to show synonyms in this box</div>
+        <div id="thesaurus" class="border">Auto-thesaurus box - highlight a word or phrase below to show synonyms in this box</div>
     </div>
     <div id='bulletIOWrapper'>
         <div style="float:left;margin-left:1px;">
-            <div class="border" id="bulletsBorder">
-                <textarea class='bullets' id="bulletInput">
-                </textarea>
+            <div class='bulletContainer'>
+                <h2>Input Bullets Here: </h2>
+                <div class="border" id="bulletsBorder">
+                    <textarea class='bullets' id="bulletInput">
+                    </textarea>
+                </div>
             </div>
-            <div id="outputBorder" class='border' tabindex=1><!--tabindex is needed to get select thing to work--></div>
+            <div class='bulletContainer'>
+                <h2>View Output Here: </h2>
+                <div id="outputBorder" class='border' tabindex=1><!--tabindex is needed to get select thing to work--></div>
+            </div>
             <div>
+                <h2>Abbreviations List</h2>
                 <form>
                 <input type='file' id='importAbbrs' name='Import Abbrs' style="display:none">
                 <button type="button" id="importAbbrsButton" onclick="document.querySelector('#importAbbrs').click()">Import Abbrs</button>

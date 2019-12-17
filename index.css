@@ -20,14 +20,16 @@ textarea.bullets{
 }
 .border{
     border: solid black 1.1px;
+}
+.bulletContainer{
     display: inline-block;
     margin:10px 10px 0px 0px;
     vertical-align:top;
-    
 }
 form{
     margin:10px 10px 0px 0px
 }
+
 #processedBullets{
     display:inline-block;
     vertical-align:top;
@@ -49,6 +51,7 @@ input.htCheckboxRendererInput{
     min-height:172px;
     display:block;
     padding: 10px;
+    margin:10px 10px 0px 0px;
 }
 #thesaurus > ul {
     columns:10;
@@ -76,6 +79,9 @@ input.htCheckboxRendererInput{
 }
 h1{
     font-family:monospace;
+}
+h2{
+    font-family: monospace;
 }
 
 #topStuff{
