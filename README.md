@@ -15,7 +15,7 @@ Those formatting rules lead to the following
 - Information compression is prioritized over legibility
 - Time is wasted on acronym/abbreviation revision
 - Bullet "appearance" becomes highly valued; some examples of arbitrary bullet appearance rules:
--- any sort of repetition = bad
--- bullets near flush with page boundaries = good
+  - any sort of repetition = bad
+  - bullets near flush with page boundaries = good
 
 The purpose of this repository is to develop a set of tools to automate the pointless aspects of bullet-writing so that an officer/enlisted member can focus more on writing actual content rather than worry about irrelevant formatting.
