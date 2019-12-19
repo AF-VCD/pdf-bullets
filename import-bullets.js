@@ -1,5 +1,6 @@
-class Forms{ 
-static all = {
+// could not do a static class property because of MS edge
+Forms  = { 
+ all : {
         'AF707': {
             'fields': ['S2DutyTitleDesc','S4Assessment','S5Assessment','S6Assessment'],
             'likelyWidth':'201.041mm'
@@ -17,7 +18,7 @@ static all = {
             'likelyWidth':'202.321mm'
         },
     }
-}
+};
 
 
 function getBulletsFromPdf(filedata){

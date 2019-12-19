@@ -31,7 +31,7 @@ updateProcessedBullets = function(){
             var alreadyThere = bulletDict[sentence2Key(bullet)].optimizations[optimWidth];
             //console.log(alreadyThere)
             if(alreadyThere && 
-                (alreadyThere.status == Bullet.OPTIMIZED || alreadyThere.status == Bullet.FAILED_OPT)){
+                (alreadyThere.status == BULLET.OPTIMIZED || alreadyThere.status == BULLET.FAILED_OPT)){
                 //console.log('optimization already exists')
                 bulletObj.optimization = alreadyThere;
                 
@@ -157,11 +157,22 @@ function addWordWithAbbrs(word, topNode){
 function getThesaurus(){
     
     var sel = window.getSelection();
+    
     //console.log(sel)
     if(sel.type != 'None' && (sel.anchorNode.id == 'bulletsBorder' || sel.anchorNode.parentNode.className == 'bullets')){
+        
+        var selString = sel.toString();
+        
+        //this stupid stuff is to fix MS Edge, because sel.toString doesn't work right for textareas.
+        if(selString == '' && sel.anchorNode.nodeName != '#text'){
+            var textAreaNode = sel.anchorNode.querySelector('textarea');
+            selString = textAreaNode.value.substring(textAreaNode.selectionStart, textAreaNode.selectionEnd)
+            //console.log('edge fix:' + selString)
+        }
+        //console.log('selected string: ' + selString)
         // limit phrase sent to API to 8 words. Should work fine if phrase is less than 8 words
         var maxWords = 8;
-        var phrase = sel.toString().trim().split(/\s+/).slice(0,maxWords).join(' ');
+        var phrase = selString.trim().split(/\s+/).slice(0,maxWords).join(' ');
         
         if(phrase){
             console.log('valid selection: ' + phrase);
@@ -225,8 +236,19 @@ window.onload = function(e){
     window.abbrDictDisabled = {};
     window.abbrDict = {};
 
+    
+    // implementing fontReady as a promise (instead of using document.fonts.ready) to make it Edge compatible
+    var fontReady = new Promise(function(resolve,rej){
+        WebFont.load({
+            custom: {
+              families: ['AdobeTimes']
+            }
+        });
+        resolve();
+    });
+
     //since the spacing is heavily font-dependent, the custom font needs to be loaded before spacing optimization is executed.
-    document.fonts.ready.then(function(){
+    fontReady.then(function(){
         //updateWidth();
         updateProcessedBullets();
         
@@ -245,6 +267,8 @@ window.onload = function(e){
         setEventListeners();
         autoResizeTextArea('bulletInput');
     });
+    fontReady.resolve();
+    
 }
 function getSavedData(){
     try{

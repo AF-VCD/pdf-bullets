@@ -45,24 +45,25 @@ function updateDict(textAreaId){
     //return bulletDict;
     window.bulletDict = newBulletDict;
 }
-
+// optimization status codes
+// status codes for optimization direction 
+// had to move this to a floating object because MS Edge doesn't support static variables
+var BULLET = {
+    OPTIMIZED: 0,
+    FAILED_OPT: 1,
+    NOT_OPT: -1,
+    ADD_SPACE: 1,
+    REM_SPACE: -1,
+    MAX_UNDERFLOW: -4
+}
 class Bullet{
-    static MAX_UNDERFLOW = -4 //4px is around one "i"
-    // optimization status codes
-    static OPTIMIZED = 0;
-    static FAILED_OPT = 1;
-    static NOT_OPT = -1;
-    // status codes for optimization direction 
-    static ADD_SPACE = 1;
-    static REM_SPACE = -1;
-
     
     constructor(bullet){
         var bullet = bullet.trim();
         if(! bullet){bullet = " ";}
         this.words = tokenize(bullet);
         this.optimization = {
-            "status": Bullet.NOT_OPT,
+            "status": BULLET.NOT_OPT,
             "sentence": this.words.join(" "),
             "width": "0mm",
         }
@@ -141,15 +142,15 @@ class Bullet{
         //  but there are cases where the browser will fit a wider element into a smaller one,
         //  WITHOUT wrapping the line... 
         if(madeNewLine){
-            results.direction = Bullet.REM_SPACE;
+            results.direction = BULLET.REM_SPACE;
         }else{
-            results.direction = Bullet.ADD_SPACE;
+            results.direction = BULLET.ADD_SPACE;
         }
 
-        if(overflow > Bullet.MAX_UNDERFLOW && ! madeNewLine){
-            results.optimization.status = Bullet.OPTIMIZED;
+        if(overflow > BULLET.MAX_UNDERFLOW && ! madeNewLine){
+            results.optimization.status = BULLET.OPTIMIZED;
         }else {
-            results.optimization.status = Bullet.FAILED_OPT;
+            results.optimization.status = BULLET.FAILED_OPT;
         }
         return results;
                 
@@ -165,13 +166,13 @@ class Bullet{
         
         var warningColor = '#DC143C';
         
-        if(this.optimization.status == Bullet.FAILED_OPT){
+        if(this.optimization.status == BULLET.FAILED_OPT){
             //for cases when the optimizer tried but was not able to get a perfect solution
             spanNode.style.color = warningColor;
-        }else if(this.optimization.status == Bullet.NOT_OPT){
+        }else if(this.optimization.status == BULLET.NOT_OPT){
             // for cases when the optimizer was not run, check the sentence once and color appropriately
             var results = Bullet.EvaluateSentence(this.optimization.sentence, this.optimization.width);
-            if(results.optimization.status != Bullet.OPTIMIZED){ 
+            if(results.optimization.status != BULLET.OPTIMIZED){ 
                 spanNode.style.color = warningColor;
             }
         }
@@ -201,7 +202,7 @@ class Bullet{
         //initial instantiation of previousResults
         var previousResults = initResults;
 
-        var newSpace = (initResults.direction == Bullet.ADD_SPACE)? largerSpace: smallerSpace;
+        var newSpace = (initResults.direction == BULLET.ADD_SPACE)? largerSpace: smallerSpace;
         
         console.log('Sentence: ' + originalSentence)
         //console.log(initResults)
@@ -215,7 +216,7 @@ class Bullet{
         
         //if the sentence is blank, do nothing.
         if(! originalSentence.trim()){
-            this.optimization.status = Bullet.OPTIMIZED;
+            this.optimization.status = BULLET.OPTIMIZED;
             this.optimization.sentence = " ";
             this.optimization.width = width;
             //console.log('blank line');
@@ -239,11 +240,11 @@ class Bullet{
                 // check to see how sentence fits
                 var newResults = Bullet.EvaluateSentence(newSentence, width);
                 //console.log(newResults)
-                if(initResults.direction == Bullet.ADD_SPACE && newResults.direction == Bullet.REM_SPACE){            
+                if(initResults.direction == BULLET.ADD_SPACE && newResults.direction == BULLET.REM_SPACE){            
                     //console.log("Note: Can't add more spaces without overflow, reverting to previous" );
                     this.optimization = previousResults.optimization;
                     break;
-                } else if(initResults.direction == Bullet.REM_SPACE && newResults.direction == Bullet.ADD_SPACE){
+                } else if(initResults.direction == BULLET.REM_SPACE && newResults.direction == BULLET.ADD_SPACE){
                     //console.log("Removed enough spaces. Terminating." );
                     this.optimization = newResults.optimization;
                     break;
