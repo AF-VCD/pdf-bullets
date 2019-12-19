@@ -12,39 +12,59 @@ updateWidth = function(){
         document.getElementById("bulletInput").style.width = newWidth;        
 }
 
-updateProcessedBullets = function(){
+function updateProcessedBullets(){
     var rawBulletStr = document.getElementById("bulletInput").value;
     var rawBullets = rawBulletStr.split('\n');
-    var outputWrapper = document.getElementById('outputBorder');
-    outputWrapper.innerHTML = ''; //clear out 
-    
+
     updateDict('bulletInput');
     var optimWidth = document.getElementById("bulletInputSize").value + 'mm';
 
-    for (var bullet of rawBullets){
+    var bulletObjs = [];
+    for(var bulletText of rawBullets){
+        bulletText = replaceAbbrs(bulletText);
+        bulletObjs.push(new Bullet(bulletText))
+    }
 
-        bullet = replaceAbbrs(bullet);
-        //console.log('bullet: "' + bullet + '"')
-        var bulletObj = new Bullet(bullet);
+    var bulletPromises = [];
 
+    for (var i=0; i<bulletObjs.length;i++){
+        //console.log('adding promise')
+        var bulletObj = bulletObjs[i];
+            
         if(document.getElementById('toggleSpaces').checked == true){
-            var alreadyThere = bulletDict[sentence2Key(bullet)].optimizations[optimWidth];
+            var alreadyThere = bulletDict[sentence2Key(bulletObj.words.join(' '))].optimizations[optimWidth];
             //console.log(alreadyThere)
             if(alreadyThere && 
                 (alreadyThere.status == BULLET.OPTIMIZED || alreadyThere.status == BULLET.FAILED_OPT)){
                 //console.log('optimization already exists')
                 bulletObj.optimization = alreadyThere;
-                
+
             }else{
-                bulletObj.optimizeSpacings(optimWidth);
-                bulletDict[sentence2Key(bullet)].optimizations[optimWidth] = bulletObj.optimization;
-                //console.log(bulletDict[sentence2Key(bullet)])
+                var bulletPromise = new Promise(function(resolve,reject){
+                    bulletObj.optimizeSpacings(optimWidth);
+                    bulletDict[sentence2Key(bulletObj.words.join(' '))].optimizations[optimWidth] = bulletObj.optimization;
+                    resolve();
+                    //console.log(bulletDict[sentence2Key(bulletText)])
+                });
+                bulletPromises.push(bulletPromise);      
             }
         }else{
+            //what to do if space optimization is disabled
             bulletObj.optimization.width = optimWidth;
         }
-        bulletObj.post(outputWrapper);
     }
+    
+    var outputWrapper = document.getElementById('outputBorder');
+    outputWrapper.innerHTML = 'LOADING'; //clear out 
+    
+    Promise.all(bulletPromises).then(function(e){
+        //console.log(bulletPromises)
+        outputWrapper.innerHTML = ''; //clear out 
+        for (bulletObj of bulletObjs){
+            bulletObj.post(outputWrapper)
+        }
+    });
+
 }
 
 //technically not a cookie, but localStorage now.
@@ -228,14 +248,13 @@ window.onload = function(e){
     //initialize a default width for the textarea window
     //document.getElementById("bulletInputSize").value = 202.321;
     document.getElementById("bulletInputSize").value = 202.51;
-    document.getElementById("bulletInput").value = '\
-- Led 3-member crack software team; wrote 2K+ lines of code in 3 weeks-- boosted AF literary efficiency by 9000%\n\
-- Developed advanced text analysis program; parsed/formatted 10,000 event parameters--saved AF $5bn in time savings';
+    document.getElementById("bulletInput").value = 'Input Bullets Here';
 
     window.bulletDict = {};
     window.abbrDictDisabled = {};
     window.abbrDict = {};
 
+    window.prevUpdate = (new Date()).getTime();
     
     // implementing fontReady as a promise (instead of using document.fonts.ready) to make it Edge compatible
     var fontReady = new Promise(function(resolve,rej){
@@ -249,9 +268,8 @@ window.onload = function(e){
 
     //since the spacing is heavily font-dependent, the custom font needs to be loaded before spacing optimization is executed.
     fontReady.then(function(){
-        //updateWidth();
-        updateProcessedBullets();
-        
+        console.log('font loaded')
+        autoResizeTextArea('bulletInput');
     }).then(function(){
         window.abbrTable = initTables([]);
         var tableUpdater = function(){
@@ -267,9 +285,11 @@ window.onload = function(e){
         setEventListeners();
         autoResizeTextArea('bulletInput');
     });
-    fontReady.resolve();
     
+
+
 }
+
 function getSavedData(){
     try{
         if(localStorage.getItem('bullets')){
@@ -297,13 +317,14 @@ function getSavedData(){
 }
 function setEventListeners(){
     document.getElementById("bulletInputSize").oninput = function(){
-        //updateWidth();
         updateProcessedBullets();
         autoResizeTextArea('bulletInput');
     }
 
     document.getElementById("bulletInput").oninput = function(){
+        
        updateProcessedBullets();
+            
        autoResizeTextArea('bulletInput');
        //saveCookie();
     };
@@ -353,7 +374,9 @@ function setEventListeners(){
     };
 
     document.getElementById('outputBorder').oncopy = function(e){
-        var text = Bullet.Untweak(document.getSelection().toString())
+        temp = e;
+        var text = Bullet.Untweak(window.getSelection().toString())
+        //console.log('Copy event: ' + text)
         text = text.replace(/\n/g,'\r\n'); //need this for WINDOWS!
         //console.log('Copy event: ' + text)
         e.clipboardData.setData('text/plain',text);

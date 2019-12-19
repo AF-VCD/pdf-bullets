@@ -249,7 +249,7 @@ class Bullet{
                     this.optimization = newResults.optimization;
                     break;
                 } else if(optWords.length <= 2){ //this conditional needs to be last
-                    console.log("\tWarning: Can't replace any more spaces");
+                    //console.log("\tWarning: Can't replace any more spaces");
                     this.optimization = newResults.optimization;
                     break;
                 }

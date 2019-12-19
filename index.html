@@ -2,7 +2,7 @@
 <HTML>
 <head>
     <!--This is important! needs to be UTF-8 to be compatible with adobe acceptable text-->
-    <!-- python -m http.server 8021 --cgi -->
+    <!-- python -m http.server 8021 cgi -->
     <meta charset="UTF-8">
 <title>
     Bullets Viewer
@@ -13,8 +13,8 @@
 <script type="text/javascript" src="./import-bullets.js"></script>
 <script type="text/javascript" src="./bullet-fixer.js"></script>
 <script type="text/javascript" src="./replaceTables.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/handsontable@7.2.2/dist/handsontable.full.min.js"></script>
-<link href="https://cdn.jsdelivr.net/npm/handsontable@7.2.2/dist/handsontable.full.min.css" rel="stylesheet" media="screen">
+<script src="./handsontable.full.min.js"></script>
+<link href="./handsontable.full.min.css" rel="stylesheet" media="screen">
 <script lang="javascript" src="./xlsx.full.min.js"></script>
 <!-- <script src="https://unpkg.com/compromise@latest/builds/compromise.min.js"></script> -->
 <link rel="shortcut icon" href="./favicon.ico" type="image/x-icon">
@@ -52,7 +52,7 @@
                     <button type="button" id="cookieButton" >save settings + text</button>
             </form>
             <form id='fmtForm'>
-                <input type="checkbox" id="toggleSpaces" checked><label> space optimization</label> </form>
+                <input type="checkbox" id="toggleSpaces" checked><label> space optimization</label> 
             
             </form>
         </div>
@@ -69,7 +69,7 @@
             </div>
             <div class='bulletContainer'>
                 <h2>View Output Here: </h2>
-                <div id="outputBorder" class='border' tabindex=1><!--tabindex is needed to get select thing to work--></div>
+                <div id="outputBorder" class='border' tabindex=1><!--tabindex is needed to get select thing to work-->Loading...</div>
             </div>
             <div>
                 <h2>Abbreviations List</h2>

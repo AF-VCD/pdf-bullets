@@ -465,7 +465,7 @@ var ChunkedStreamManager = (function ChunkedStreamManagerClosure() {
     this.requestsByChunk = {};
     this.callbacksByRequest = {};
 
-    this.loadedStream = new Promise();
+    this.loadedStream = new PDFJSPromise();
   }
 
   ChunkedStreamManager.prototype = {
@@ -753,7 +753,7 @@ var LocalPdfManager = (function LocalPdfManagerClosure() {
   function LocalPdfManager(data, password) {
     var stream = new Stream(data);
     this.pdfModel = new PDFDocument(this, stream, password);
-    this.loadedStream = new Promise();
+    this.loadedStream = new PDFJSPromise();
     this.loadedStream.resolve(stream);
   }
 
@@ -762,7 +762,7 @@ var LocalPdfManager = (function LocalPdfManagerClosure() {
 
   LocalPdfManager.prototype.ensure =
       function LocalPdfManager_ensure(obj, prop, args) {
-    var promise = new Promise();
+    var promise = new PDFJSPromise();
     try {
       var value = obj[prop];
       var result;
@@ -781,7 +781,7 @@ var LocalPdfManager = (function LocalPdfManagerClosure() {
 
   LocalPdfManager.prototype.requestRange =
       function LocalPdfManager_requestRange(begin, end) {
-    var promise = new Promise();
+    var promise = new PDFJSPromise();
     promise.resolve();
     return promise;
   };
@@ -824,7 +824,7 @@ var NetworkPdfManager = (function NetworkPdfManagerClosure() {
 
   NetworkPdfManager.prototype.ensure =
       function NetworkPdfManager_ensure(obj, prop, args) {
-    var promise = new Promise();
+    var promise = new PDFJSPromise();
     this.ensureHelper(promise, obj, prop, args);
     return promise;
   };
@@ -855,7 +855,7 @@ var NetworkPdfManager = (function NetworkPdfManagerClosure() {
 
   NetworkPdfManager.prototype.requestRange =
       function NetworkPdfManager_requestRange(begin, end) {
-    var promise = new Promise();
+    var promise = new PDFJSPromise();
     this.streamManager.requestRange(begin, end, function() {
       promise.resolve();
     });
@@ -993,7 +993,7 @@ var Page = (function PageClosure() {
         // TODO: add async inheritPageProp and remove this.
         this.resourcesPromise = this.pdfManager.ensure(this, 'resources');
       }
-      var promise = new Promise();
+      var promise = new PDFJSPromise();
       this.resourcesPromise.then(function resourceSuccess() {
         var objectLoader = new ObjectLoader(this.resources.map,
                                             keys,
@@ -1006,13 +1006,13 @@ var Page = (function PageClosure() {
     },
     getOperatorList: function Page_getOperatorList(handler) {
       var self = this;
-      var promise = new Promise();
+      var promise = new PDFJSPromise();
 
       function reject(e) {
         promise.reject(e);
       }
 
-      var pageListPromise = new Promise();
+      var pageListPromise = new PDFJSPromise();
 
       var pdfManager = this.pdfManager;
       var contentStreamPromise = pdfManager.ensure(this, 'getContentStream',
@@ -1033,7 +1033,7 @@ var Page = (function PageClosure() {
             this.pageIndex, 'p' + this.pageIndex + '_',
             this.idCounters);
 
-      var dataPromises = Promise.all(
+      var dataPromises = PDFJSPromise.all(
           [contentStreamPromise, resourcesPromise], reject);
       dataPromises.then(function(data) {
         var contentStream = data[0];
@@ -1050,7 +1050,7 @@ var Page = (function PageClosure() {
       });
 
       var annotationsPromise = pdfManager.ensure(this, 'annotations');
-      Promise.all([pageListPromise, annotationsPromise]).then(function(datas) {
+      PDFJSPromise.all([pageListPromise, annotationsPromise]).then(function(datas) {
         var pageOpList = datas[0];
         var annotations = datas[1];
 
@@ -1080,7 +1080,7 @@ var Page = (function PageClosure() {
 
       var self = this;
 
-      var textContentPromise = new Promise();
+      var textContentPromise = new PDFJSPromise();
 
       var pdfManager = this.pdfManager;
       var contentStreamPromise = pdfManager.ensure(this, 'getContentStream',
@@ -1092,7 +1092,7 @@ var Page = (function PageClosure() {
         'Font'
       ]);
 
-      var dataPromises = Promise.all([contentStreamPromise,
+      var dataPromises = PDFJSPromise.all([contentStreamPromise,
                                       resourcesPromise]);
       dataPromises.then(function(data) {
         var contentStream = data[0];
@@ -2023,7 +2023,7 @@ function isPDFFunction(v) {
  * Based off of the work in:
  * https://bugzilla.mozilla.org/show_bug.cgi?id=810490
  */
-var Promise = PDFJS.Promise = (function PromiseClosure() {
+var PDFJSPromise = PDFJS.Promise = (function PromiseClosure() {
   var STATUS_PENDING = 0;
   var STATUS_RESOLVED = 1;
   var STATUS_REJECTED = 2;
@@ -2131,18 +2131,18 @@ var Promise = PDFJS.Promise = (function PromiseClosure() {
     }
   };
 
-  function Promise() {
+  function PDFJSPromise() {
     this._status = STATUS_PENDING;
     this._handlers = [];
   }
   /**
    * Builds a promise that is resolved when all the passed in promises are
    * resolved.
-   * @param {Promise[]} promises Array of promises to wait for.
-   * @return {Promise} New dependant promise.
+   * @param {PDFJSPromise[]} promises Array of promises to wait for.
+   * @return {PDFJSPromise} New dependant promise.
    */
-  Promise.all = function Promise_all(promises) {
-    var deferred = new Promise();
+  PDFJSPromise.all = function Promise_all(promises) {
+    var deferred = new PDFJSPromise();
     var unresolved = promises.length;
     var results = [];
     if (unresolved === 0) {
@@ -2173,7 +2173,7 @@ var Promise = PDFJS.Promise = (function PromiseClosure() {
     return deferred;
   };
 
-  Promise.prototype = {
+  PDFJSPromise.prototype = {
     _status: null,
     _value: null,
     _handlers: null,
@@ -2220,7 +2220,7 @@ var Promise = PDFJS.Promise = (function PromiseClosure() {
     },
 
     then: function Promise_then(onResolve, onReject) {
-      var nextPromise = new Promise();
+      var nextPromise = new PDFJSPromise();
       this._handlers.push({
         thisPromise: this,
         onResolve: onResolve,
@@ -2232,7 +2232,7 @@ var Promise = PDFJS.Promise = (function PromiseClosure() {
     }
   };
 
-  return Promise;
+  return PDFJSPromise;
 })();
 
 var StatTimer = (function StatTimerClosure() {
@@ -2328,7 +2328,7 @@ PDFJS.maxImageSize = PDFJS.maxImageSize === undefined ? -1 : PDFJS.maxImageSize;
  * parameters: function that needs to be called with new password and reason
  * (see {PasswordResponses}).
  *
- * @return {Promise} A promise that is resolved with {PDFDocumentProxy} object.
+ * @return {PDFJSPromise} A promise that is resolved with {PDFDocumentProxy} object.
  */
 PDFJS.getDocument = function getDocument(source,
                                          pdfDataRangeTransport,
@@ -2401,21 +2401,21 @@ var PDFDocumentProxy = (function PDFDocumentProxyClosure() {
     },
     /**
      * @param {number} The page number to get. The first page is 1.
-     * @return {Promise} A promise that is resolved with a {PDFPageProxy}
+     * @return {PDFJSPromise} A promise that is resolved with a {PDFPageProxy}
      * object.
      */
     getPage: function PDFDocumentProxy_getPage(number) {
       return this.transport.getPage(number);
     },
     /**
-     * @return {Promise} A promise that is resolved with a lookup table for
+     * @return {PDFJSPromise} A promise that is resolved with a lookup table for
      * mapping named destinations to reference numbers.
      */
     getDestinations: function PDFDocumentProxy_getDestinations() {
       return this.transport.getDestinations();
     },
     /**
-     * @return {Promise} A promise that is resolved with an array of all the
+     * @return {PDFJSPromise} A promise that is resolved with an array of all the
      * JavaScript strings in the name tree.
      */
     getJavaScript: function PDFDocumentProxy_getDestinations() {
@@ -2425,7 +2425,7 @@ var PDFDocumentProxy = (function PDFDocumentProxyClosure() {
       return promise;
     },
     /**
-     * @return {Promise} A promise that is resolved with an {array} that is a
+     * @return {PDFJSPromise} A promise that is resolved with an {array} that is a
      * tree outline (if it has one) of the PDF. The tree is in the format of:
      * [
      *  {
@@ -2446,7 +2446,7 @@ var PDFDocumentProxy = (function PDFDocumentProxyClosure() {
       return promise;
     },
     /**
-     * @return {Promise} A promise that is resolved with an {object} that has
+     * @return {PDFJSPromise} A promise that is resolved with an {object} that has
      * info and metadata properties.  Info is an {object} filled with anything
      * available in the information dictionary and similarly metadata is a
      * {Metadata} object with information from the metadata section of the PDF.
@@ -2467,7 +2467,7 @@ var PDFDocumentProxy = (function PDFDocumentProxyClosure() {
       return promise;
     },
     /**
-     * @return {Promise} A promise that is resolved with a TypedArray that has
+     * @return {PDFJSPromise} A promise that is resolved with a TypedArray that has
      * the raw data from the PDF.
      */
     getData: function PDFDocumentProxy_getData() {
@@ -2476,7 +2476,7 @@ var PDFDocumentProxy = (function PDFDocumentProxyClosure() {
       return promise;
     },
     /**
-     * @return {Promise} A promise that is resolved when the document's data
+     * @return {PDFJSPromise} A promise that is resolved when the document's data
      * is loaded
      */
     dataLoaded: function PDFDocumentProxy_dataLoaded() {
@@ -2542,7 +2542,7 @@ var PDFPageProxy = (function PDFPageProxyClosure() {
       return new PDFJS.PageViewport(this.view, scale, rotate, 0, 0);
     },
     /**
-     * @return {Promise} A promise that is resolved with an {array} of the
+     * @return {PDFJSPromise} A promise that is resolved with an {array} of the
      * annotation objects.
      */
     getAnnotations: function PDFPageProxy_getAnnotations() {
@@ -2583,7 +2583,7 @@ var PDFPageProxy = (function PDFPageProxyClosure() {
       // requested before. Make the request and create the promise.
       if (!this.displayReadyPromise) {
         this.receivingOperatorList = true;
-        this.displayReadyPromise = new Promise();
+        this.displayReadyPromise = new PDFJSPromise();
         this.operatorList = {
           fnArray: [],
           argsArray: [],
@@ -2641,7 +2641,7 @@ var PDFPageProxy = (function PDFPageProxyClosure() {
       return renderTask;
     },
     /**
-     * @return {Promise} That is resolved with the a {string} that is the text
+     * @return {PDFJSPromise} That is resolved with the a {string} that is the text
      * content from the page.
      */
     getTextContent: function PDFPageProxy_getTextContent() {
@@ -3079,10 +3079,10 @@ var WorkerTransport = (function WorkerTransportClosure() {
 var RenderTask = (function RenderTaskClosure() {
   function RenderTask(internalRenderTask) {
     this.internalRenderTask = internalRenderTask;
-    Promise.call(this);
+    PDFJSPromise.call(this);
   }
 
-  RenderTask.prototype = Object.create(Promise.prototype);
+  RenderTask.prototype = Object.create(PDFJSPromise.prototype);
 
   /**
    * Cancel the rendering task. If the task is curently rendering it will not be
@@ -5124,7 +5124,7 @@ var Dict = (function DictClosure() {
         if (xref) {
           return xref.fetchIfRefAsync(value);
         }
-        promise = new Promise();
+        promise = new PDFJSPromise();
         promise.resolve(value);
         return promise;
       }
@@ -5133,7 +5133,7 @@ var Dict = (function DictClosure() {
         if (xref) {
           return xref.fetchIfRefAsync(value);
         }
-        promise = new Promise();
+        promise = new PDFJSPromise();
         promise.resolve(value);
         return promise;
       }
@@ -5141,7 +5141,7 @@ var Dict = (function DictClosure() {
       if (xref) {
         return xref.fetchIfRefAsync(value);
       }
-      promise = new Promise();
+      promise = new PDFJSPromise();
       promise.resolve(value);
       return promise;
     },
@@ -5436,7 +5436,7 @@ var Catalog = (function CatalogClosure() {
 
     getPage: function Catalog_getPage(pageIndex) {
       if (!(pageIndex in this.pagePromises)) {
-        this.pagePromises[pageIndex] = new Promise();
+        this.pagePromises[pageIndex] = new PDFJSPromise();
       }
       return this.pagePromises[pageIndex];
     },
@@ -5464,7 +5464,7 @@ var Catalog = (function CatalogClosure() {
           var page = new Page(this.pdfManager, this.xref, pageIndex, kid,
                               kidRef);
           if (!(pageIndex in this.pagePromises)) {
-            this.pagePromises[pageIndex] = new Promise();
+            this.pagePromises[pageIndex] = new PDFJSPromise();
           }
           this.pagePromises[pageIndex].resolve(page);
 
@@ -6035,14 +6035,14 @@ var XRef = (function XRefClosure() {
     },
     fetchIfRefAsync: function XRef_fetchIfRefAsync(obj) {
       if (!isRef(obj)) {
-        var promise = new Promise();
+        var promise = new PDFJSPromise();
         promise.resolve(obj);
         return promise;
       }
       return this.fetchAsync(obj);
     },
     fetchAsync: function XRef_fetchAsync(ref, suppressEncryption) {
-      var promise = new Promise();
+      var promise = new PDFJSPromise();
       var tryFetch = function (promise) {
         try {
           promise.resolve(this.fetch(ref, suppressEncryption));
@@ -6138,7 +6138,7 @@ var PDFObjects = (function PDFObjectsClosure() {
         return this.objs[objId];
 
       var obj = {
-        promise: new Promise(objId),
+        promise: new PDFJSPromise(objId),
         data: null,
         resolved: false
       };
@@ -6272,7 +6272,7 @@ var ObjectLoader = (function() {
 
     load: function ObjectLoader_load() {
       var keys = this.keys;
-      this.promise = new Promise();
+      this.promise = new PDFJSPromise();
       // Don't walk the graph if all the data is already loaded.
       if (!(this.xref.stream instanceof ChunkedStream) ||
           this.xref.stream.getMissingChunks().length === 0) {
@@ -6486,7 +6486,7 @@ var Annotation = (function AnnotationClosure() {
     },
 
     loadResources: function(keys) {
-      var promise = new Promise();
+      var promise = new PDFJSPromise();
       this.appearance.dict.getAsync('Resources').then(function(resources) {
         if (!resources) {
           promise.resolve();
@@ -6505,7 +6505,7 @@ var Annotation = (function AnnotationClosure() {
 
     getOperatorList: function Annotation_getToOperatorList(evaluator) {
 
-      var promise = new Promise();
+      var promise = new PDFJSPromise();
 
       if (!this.appearance) {
         promise.resolve(new OperatorList());
@@ -6622,13 +6622,13 @@ var Annotation = (function AnnotationClosure() {
       annotationsReadyPromise.reject(e);
     }
 
-    var annotationsReadyPromise = new Promise();
+    var annotationsReadyPromise = new PDFJSPromise();
 
     var annotationPromises = [];
     for (var i = 0, n = annotations.length; i < n; ++i) {
       annotationPromises.push(annotations[i].getOperatorList(partialEvaluator));
     }
-    Promise.all(annotationPromises).then(function(datas) {
+    PDFJSPromise.all(annotationPromises).then(function(datas) {
       opList.addOp('beginAnnotations', []);
       for (var i = 0, n = datas.length; i < n; ++i) {
         var annotOpList = datas[i];
@@ -6781,7 +6781,7 @@ var TextWidgetAnnotation = (function TextWidgetAnnotationClosure() {
 
     getOperatorList: function TextWidgetAnnotation_getOperatorList(evaluator) {
 
-      var promise = new Promise();
+      var promise = new PDFJSPromise();
       var opList = new OperatorList();
       var data = this.data;
 
@@ -6858,7 +6858,7 @@ var TextAnnotation = (function TextAnnotationClosure() {
   Util.inherit(TextAnnotation, Annotation, {
 
     getOperatorList: function TextAnnotation_getOperatorList(evaluator) {
-      var promise = new Promise();
+      var promise = new PDFJSPromise();
       promise.resolve(new OperatorList());
       return promise;
     },
@@ -16823,7 +16823,7 @@ var PartialEvaluator = (function PartialEvaluatorClosure() {
       // dictionary
       var parser = new Parser(new Lexer(stream, OP_MAP), false, xref);
 
-      var promise = new Promise();
+      var promise = new PDFJSPromise();
       var args = [];
       nextOp:
       while (true) {
@@ -30080,12 +30080,12 @@ var PDFImage = (function PDFImageClosure() {
    */
   PDFImage.buildImage = function PDFImage_buildImage(callback, handler, xref,
                                                      res, image, inline) {
-    var imageDataPromise = new Promise();
-    var smaskPromise = new Promise();
-    var maskPromise = new Promise();
+    var imageDataPromise = new PDFJSPromise();
+    var smaskPromise = new PDFJSPromise();
+    var maskPromise = new PDFJSPromise();
     // The image data and smask data may not be ready yet, wait till both are
     // resolved.
-    Promise.all([imageDataPromise, smaskPromise, maskPromise]).then(
+    PDFJSPromise.all([imageDataPromise, smaskPromise, maskPromise]).then(
         function(results) {
       var imageData = results[0], smaskData = results[1], maskData = results[2];
       var image = new PDFImage(xref, res, imageData, inline, smaskData,
@@ -36894,7 +36894,7 @@ function MessageHandler(name, comObj) {
     } else if (data.action in ah) {
       var action = ah[data.action];
       if (data.callbackId) {
-        var promise = new Promise();
+        var promise = new PDFJSPromise();
         promise.then(function(resolvedData) {
           comObj.postMessage({
             isReply: true,
@@ -36945,7 +36945,7 @@ var WorkerMessageHandler = {
     var pdfManager;
 
     function loadDocument(recoveryMode) {
-      var loadDocumentPromise = new Promise();
+      var loadDocumentPromise = new PDFJSPromise();
 
       var parseSuccess = function parseSuccess() {
         var numPagesPromise = pdfManager.ensureModel('numPages');
@@ -36955,7 +36955,7 @@ var WorkerMessageHandler = {
         var metadataPromise = pdfManager.ensureCatalog('metadata');
         var encryptedPromise = pdfManager.ensureXRef('encrypt');
         var javaScriptPromise = pdfManager.ensureCatalog('javaScript');
-        Promise.all([numPagesPromise, fingerprintPromise, outlinePromise,
+        PDFJSPromise.all([numPagesPromise, fingerprintPromise, outlinePromise,
           infoPromise, metadataPromise, encryptedPromise,
           javaScriptPromise]).then(
             function onDocReady(results) {
@@ -36989,7 +36989,7 @@ var WorkerMessageHandler = {
     }
 
     function getPdfManager(data) {
-      var pdfManagerPromise = new Promise();
+      var pdfManagerPromise = new PDFJSPromise();
 
       var source = data.source;
       var disableRange = data.disableRange;
@@ -37150,7 +37150,7 @@ var WorkerMessageHandler = {
             if (ex instanceof PasswordException) {
               // after password exception prepare to receive a new password
               // to repeat loading
-              pdfManager.passwordChangedPromise = new Promise();
+              pdfManager.passwordChangedPromise = new PDFJSPromise();
               pdfManager.passwordChangedPromise.then(pdfManagerReady);
             }
 
@@ -37173,7 +37173,7 @@ var WorkerMessageHandler = {
         var refPromise = pdfManager.ensure(page, 'ref');
         var viewPromise = pdfManager.ensure(page, 'view');
 
-        Promise.all([rotatePromise, refPromise, viewPromise]).then(
+        PDFJSPromise.all([rotatePromise, refPromise, viewPromise]).then(
             function(results) {
           var page = {
             pageIndex: data.pageIndex,
