@@ -1,91 +1,23 @@
 <!DOCTYPE html>
-<HTML>
+<html lang="en">
 <head>
-    <!--This is important! needs to be UTF-8 to be compatible with adobe acceptable text-->
-    <!-- python -m http.server 8021 cgi -->
     <meta charset="UTF-8">
-<title>
-    Bullets Viewer
-</title>
-<link rel="preload" href="./index.css" as="style">
-<link rel="stylesheet" href="./index.css">
-<script type="text/javascript" src="./pdf.js"></script>
-<script type="text/javascript" src="./import-bullets.js"></script>
-<script type="text/javascript" src="./bullet-fixer.js"></script>
-<script type="text/javascript" src="./replaceTables.js"></script>
-<script src="./handsontable.full.min.js"></script>
-<link href="./handsontable.full.min.css" rel="stylesheet" media="screen">
-<script lang="javascript" src="./xlsx.full.min.js"></script>
-<!-- <script src="https://unpkg.com/compromise@latest/builds/compromise.min.js"></script> -->
-<link rel="shortcut icon" href="./favicon.ico" type="image/x-icon">
-<!--<script src="https://cdnjs.cloudflare.com/ajax/libs/nlp_compromise/6.5.3/nlp_compromise.min.js">
-</script>-->
-<script src="./webfont.js"></script>
-<script type="text/javascript" src="./index.js"></script>
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>PDF Bullets with Angular</title>
+      <!-- Load React. -->
+    <!-- Note: when deploying, replace "development.js" with "production.min.js". -->
+    <script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js" crossorigin></script>
+    <!-- for JSX dev support-->
+    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+    <!-- Load our React component. -->
+    <script src="sentence.js" type='text/babel'></script>
+    <style>
+        input{width:500px;}
+    </style>
 </head>
 <body>
-    <div id="topStuff">
-        <h1><span class='logo'>AF</span>
-            <span class='logo'>Bull</span>et 
-            <span class='logo'>Sh</span>aping & 
-            <span class='logo'>i</span>teration 
-            <span class='logo'>t</span>ool</h1>
-        <div>    
-            <form id="importForm" >
-                <input type='file' id='importPdf' name='choose pdf' accept="application/pdf" style="display:none">
-                <button type="button" id=importPdfButton onclick="document.querySelector('#importPdf').click()">Import from PDF</button>
-            </form>
-            <form id="resizeForm">
-            
-                <label>Enter form width in mm or click preset: </label>
-                <input type="number" id="bulletInputSize" name="width" min="100" max="500" step=".001">
-                
-                <button type="button" id="awdButton" >AWD</button>
-                <button type="button" id="eprButton" >EPR</button>
-                <button type="button" id="oprButton" >OPR</button>
-            
-            </form>
-            <form id='toolsForm'>
-                    <button type="button" id="resetButton" >renormalize all spaces</button>
-                    <button type="button" onclick="selectText('outputBorder')">select formatted text</button>
-                    <button type="button" id="cookieButton" >save settings + text</button>
-            </form>
-            <form id='fmtForm'>
-                <input type="checkbox" id="toggleSpaces" checked><label> space optimization</label> 
-            
-            </form>
-        </div>
-        <div id="thesaurus" class="border">Auto-thesaurus box - highlight a word or phrase below to show synonyms in this box</div>
-    </div>
-    <div id='bulletIOWrapper'>
-        <div style="float:left;margin-left:1px;">
-            <div class='bulletContainer'>
-                <h2>Input Bullets Here: </h2>
-                <div class="border" id="bulletsBorder">
-                    <textarea class='bullets' id="bulletInput">
-                    </textarea>
-                </div>
-            </div>
-            <div class='bulletContainer'>
-                <h2>View Output Here: </h2>
-                <div id="outputBorder" class='border' tabindex=1><!--tabindex is needed to get select thing to work-->Loading...</div>
-            </div>
-            <div>
-                <h2>Abbreviations List</h2>
-                <form>
-                <input type='file' id='importAbbrs' name='Import Abbrs' style="display:none">
-                <button type="button" id="importAbbrsButton" onclick="document.querySelector('#importAbbrs').click()">Import Abbrs</button>
-                <button type="button" id="exportAbbrs" onclick="writeAbbrTableToXLS()">Export Abbrs</button>
-                <button type="button" id="sampleAbbrs">Load Sample Abbrs</button>
-                </form>
-                <div id='abbrTable'></div>
-            </div>
-        </div>
-        
-    </div>
-    <br>
-
-    
+    <div id="stuff"></div>
 </body>
-</HTML>
+</html>
