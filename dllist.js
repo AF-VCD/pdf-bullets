@@ -1,0 +1,66 @@
+class DoublyLinkedList {
+    constructor() {
+       this.head = null;
+       this.tail = null;
+       this.length = 0;
+    }
+    append(data, position) {
+       let node = new this.Node(data);
+       // List is currently empty
+       this.length++;
+       if (this.head === null) {
+          this.head = node;
+          this.tail = node;
+          return this.head;
+       }
+       if(position === null){
+           position = this.tail;
+       }
+       if(position == this.tail){
+           position.next = node;
+           node.prev = position;
+           node.next = null;
+           this.tail = node;
+       }else {
+            node.prev = position;
+            node.next = position.next;
+            node.next.prev = node;
+            position.next = node;
+       }
+       return node;
+    }
+    remove(position = this.tail) {
+       if (this.length === 0) {
+          console.log("List is already empty");
+          return;
+       }
+       this.length--;
+       if (position == this.head) {
+          this.head = this.head.next;
+          this.head.prev = null;
+       } else if (position == this.tail) {
+          this.tail = this.tail.prev;
+          this.tail.next = null;
+       } else {
+          position.prev.next = position.next;
+          position.next.prev = position.prev;
+       }
+       return position;
+    }
+    * get() {
+       let currNode = this.head;
+       while (currNode != null) {
+          //console.log(currNode.data + " <-> ");
+          yield currNode.data;
+          currNode = currNode.next;
+       }
+    }
+ }
+ 
+ DoublyLinkedList.prototype.Node = class {
+    constructor(data) {
+       this.data = data;
+       this.next = null;
+       this.prev = null;
+    }
+ };
