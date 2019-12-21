@@ -29,7 +29,7 @@ class BulletEditable extends Bullet{
                     value={this.props.text} 
                     onChange={this.handleChange} 
                     onKeyDown={this.handleKeyDown} 
-                    onFocus={this.handleFocus}/>
+                    onFocus={this.handleFocus} />
             </div>
         );
     }
@@ -37,9 +37,9 @@ class BulletEditable extends Bullet{
 class BulletComparator extends Bullet {
     constructor(props){
         super(props);
-       
         this.handleKeyDown = props.onKeyDown.bind(this);
-        this.handleFocus = props.onFocus.bind(this)
+        this.handleFocus = props.onFocus.bind(this);
+        
         this.state = { 
             text: this.props.text,
             optimText: this.optimize(this.props.text)
@@ -52,7 +52,7 @@ class BulletComparator extends Bullet {
     focus(){
         this.inputElRef.current.focus()
     }
-    bulletEdited(e) {
+    bulletEdited = (e) => {
         this.setState({ 
             text: e.target.value,
             optimText: this.optimize(e.target.value)
@@ -74,14 +74,12 @@ class BulletComparator extends Bullet {
 class BulletsList extends React.Component{
     constructor(props){
         super(props);
-        this.handleKeyDown = this.handleKeyDown.bind(this)
-        this.handleFocus = this.handleFocus.bind(this)
-        this.create = this.create.bind(this)
+
         const initialList = new DoublyLinkedList();
 
-        this.props.items.map((text)=>{
-            const listRef = initialList.append(null, null);
-            listRef.data = this.create(text, listRef);
+        this.props.items.map((text) => {
+            const listNode = initialList.append(null, null);
+            listNode.data = this.create(text, listNode);
         })
         
         this.state = { 
@@ -90,17 +88,17 @@ class BulletsList extends React.Component{
         };
        
     }
-    create(bulletText, listRef){
+    create = (bulletText, listNode) => {
         return <BulletComparator 
                     onKeyDown={(e) => (this.handleKeyDown(e))} 
-                    onFocus={(e) => (this.handleFocus(e,listRef))} 
+                    onFocus={(e) => (this.handleFocus(e,listNode))} 
                     text={bulletText} 
                     key={Math.random().toString()} 
                     ref={React.createRef()} 
                     />
     }
     
-    handleKeyDown(e){
+    handleKeyDown = (e) => {
         //console.log(this.state.BulletComparators);
         const focusRef = this.state.focusRef;
         console.log(focusRef)
@@ -117,8 +115,8 @@ class BulletsList extends React.Component{
             }
         } else if(e.keyCode == 13) {
             this.setState((state)=>{
-                const listRef = state.items.append(null, focusRef);
-                listRef.data = this.create('', listRef);
+                const listNode = state.items.append(null, focusRef);
+                listNode.data = this.create('', listNode);
                 return {
                     items: state.items
                 };
@@ -128,9 +126,9 @@ class BulletsList extends React.Component{
         }
         // still need to implement: enter on a partial line, as well as delete on beginning of line
     }
-    handleFocus(e,ref){       
+    handleFocus = (e,ref) => {       
         //this keeps track of what bullet is currently in focus
-        console.log(ref)
+        //console.log(ref)
         this.setState({ 
             focusRef: ref
         });
