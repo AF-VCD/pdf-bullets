@@ -10,67 +10,8 @@ class Bullet extends React.Component{
         );
     }
 }
-class BulletEditable extends Bullet{
-    constructor(props){
-        super(props);
-        this.handleChange = props.onChange;
-        this.handleKeyDown = props.onKeyDown;
-        this.handleFocus = props.onFocus;
-        this.inputRef = React.createRef();
-    }
-    focus(){
-        this.inputRef.current.focus();
-    }
-    render(){
-        return(
-            <div className={this.props.class}>
-                <input type="text" 
-                    ref={this.inputRef}
-                    value={this.props.text} 
-                    onChange={this.handleChange} 
-                    onKeyDown={this.handleKeyDown} 
-                    onFocus={this.handleFocus} />
-            </div>
-        );
-    }
-}
-class BulletComparator extends Bullet {
-    constructor(props){
-        super(props);
-        this.handleKeyDown = props.onKeyDown.bind(this);
-        this.handleFocus = props.onFocus.bind(this);
-        
-        this.state = { 
-            text: this.props.text,
-            optimText: this.optimize(this.props.text)
-        };
-        this.inputElRef = React.createRef();
-    }
-    optimize(sentence){
-        return sentence + '!';
-    }
-    focus(){
-        this.inputElRef.current.focus()
-    }
-    bulletEdited = (e) => {
-        this.setState({ 
-            text: e.target.value,
-            optimText: this.optimize(e.target.value)
-        });
-    }
-    render() {
-        return (
-            <div>
-                <BulletEditable text={this.state.text} 
-                    onChange={this.bulletEdited} 
-                    onKeyDown={this.handleKeyDown} 
-                    onFocus={this.handleFocus} class='bullet editable' 
-                    ref={this.inputElRef} />
-                <Bullet text={this.state.optimText} class='bullet optimized' />
-            </div>
-        );
-    }
-}
+
+
 class BulletsList extends React.Component{
     constructor(props){
         super(props);
@@ -141,8 +82,73 @@ class BulletsList extends React.Component{
         )
     }
 }
+class BulletEditor extends React.Component{
+    constructor(props){
+        super(props);
+    }
+    handleChange = (e) => {
+        this.props.handleTextChange(e)
+    }
+    render(){
+        return (
+            <div>
+                <textarea onChange={this.handleChange} value={this.props.text}></textarea>
+            </div>
+        )
+    }
+}
+//how do i get lines to line up between the output and editor?
+class BulletOutputViewer extends React.Component{
+    constructor(props){
+        super(props)
+    }
+    optimize = (text) => {
+        return text + "!!!!!";
+    }
+    render(){
+        return (
+            <div>
+                {this.props.text.split('\n').map(
+                (line,i)=>{
+                    const lineOpt = this.optimize(line)
+                    return <Bullet text={lineOpt} key={i+line} class='bullet optimized' />
+                })}
+            </div>
+        )
+    }
 
-const data = ['- Saved Air Force moneys', '- Engineered 900 airplanes'];
+}
+
+class BulletComparator extends Bullet {
+    constructor(props){
+        super(props);
+        
+        this.state = { 
+            text: this.props.initialText,
+        };
+        
+    }
+    optimize(sentence){
+        return sentence + '!';
+    }
+    handleTextChange = (e) => {
+        this.setState({
+            text: e.target.value
+        })
+    }
+    render() {
+        return (
+            <div>
+                <BulletEditor text={this.state.text} handleTextChange={this.handleTextChange}/>
+                <BulletOutputViewer text={this.state.text} handleTextChange={this.handleTextChange} />
+            </div>
+        );
+    }
+}
+
+const data = '- Saved Air Force moneys \n\
+- Engineered 900 airplanes';
+
 ReactDOM.render(
-    <BulletsList items={data} />, document.getElementById('stuff')
+    <BulletComparator initialText={data} />, document.getElementById('stuff')
     );
