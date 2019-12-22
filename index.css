@@ -7,7 +7,7 @@ body{
 }
 textarea.bullets{
     margin: 0px 0px 0px 1px;
-    height: 500px;
+    height: 200px;
     width:255mm;
     white-space: pre-line;
     text-indent: 0px;
