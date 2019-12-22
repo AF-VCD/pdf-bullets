@@ -78,3 +78,10 @@ class DoublyLinkedList {
        }, delay);
    }
 }
+
+clog = (message, bool) => {
+   if(typeof bool == 'undefined' || bool){
+      console.log(message)
+   }
+}
+
