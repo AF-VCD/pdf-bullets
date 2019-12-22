@@ -159,7 +159,7 @@ class OptimizedBullet extends React.PureComponent{
         this.ref = this.props.optimRef;
         this.bulletRef=React.createRef();
         this.renderRef=React.createRef();
-        clog("constructed: " + this.state.text)
+        clog("constructed: " + this.state.text, false)
     }
     optimExists = (sentence) => {
         if(this.props.optims[sentence] && this.props.optims[sentence][this.props.width]){
@@ -171,7 +171,7 @@ class OptimizedBullet extends React.PureComponent{
     update = () => {
         const sentence = this.state.text;
         if(this.optimExists(sentence)){
-            clog('optimization already exists for ' + sentence)
+            clog('optimization already exists for ' + sentence, false)
             if(sentence !=  this.props.optims[sentence][this.props.width]){
                 this.setState({
                     text: this.props.optims[sentence][this.props.width],
@@ -184,7 +184,7 @@ class OptimizedBullet extends React.PureComponent{
             this.setState({
                 loading:true
             })
-            clog('Optimization loading for ' + sentence)
+            clog('Optimization loading for ' + sentence, false)
             this.bufferedOptimize(500);
         }
     }
@@ -231,7 +231,7 @@ class OptimizedBullet extends React.PureComponent{
                 status: optimization.status,
                 loading:false
             })
-        }).then(()=>{clog("optimization finished")})
+        }).then(()=>{clog("optimization finished",false)})
         
     }
     optimizer = () =>{
@@ -314,17 +314,17 @@ class OptimizedBullet extends React.PureComponent{
         })
     };
     componentDidMount(){
-        clog('component mounted for ' + this.state.text)
+        clog('component mounted for ' + this.state.text, false)
         clog(this.state)
         clog(this.ref)
         this.update()
     }
     componentWillUnmount(){
-        clog('component unmounted ')
+        clog('component unmounted ', false)
         clearTimeout(this.state.updating)
     }
     render(){
-        clog('component rendered: '+ this.state.text)
+        clog('component rendered: '+ this.state.text, false)
         let newColor = "inherit";
         if(this.state.loading){
             newColor = "gray"
