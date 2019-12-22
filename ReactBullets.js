@@ -84,13 +84,16 @@ class BulletOutputViewer extends React.Component{
             <div className="bulletContainer border">
                 {this.props.bullets.map(
                 (line,i)=>{
+                    const optimRef = React.createRef();
                     return <OptimizedBullet text={line} 
                         width={this.props.width}
                         key={i+Bullet.tokenize(line).join(" ")} 
                         class='bullet optimized' 
                         optims={this.props.optims}
                         onOptim={this.props.onOptim}
-                        optimizer={this.props.optimizer}/>
+                        optimizer={this.props.optimizer}
+                        ref={optimRef} 
+                        optimRef={optimRef}/>
                 })}
             </div>
         )
@@ -104,8 +107,10 @@ class OptimizedBullet extends React.PureComponent{
             text: this.props.text,
             loading: true,
             updating: null,
+            status: -1,
         }
-        this.ref=React.createRef();
+        this.ref = this.props.optimRef;
+        this.bulletRef=React.createRef();
         this.renderRef=React.createRef();
         clog("constructed: " + this.state.text)
     }
@@ -165,15 +170,17 @@ class OptimizedBullet extends React.PureComponent{
     }
     optimize = () => {
         const sentence = Bullet.clean(this.state.text);
-        return this.props.optimizer(this.ref.current).then((optimized) => {
+        //clog(this.ref)
+        return this.props.optimizer(this.ref.current).then((optimization) => {
             this.props.onOptim({
                 "sentence":sentence,
                 "width": this.props.width,
-                "optimized": optimized});
-            return optimized;
-        }).then((sentence) => {
+                "optimized": optimization.sentence});
+            return optimization;
+        }).then((optimization) => {
             this.setState({
-                text:sentence,
+                text:optimization.sentence,
+                status: optimization.status,
                 loading:false
             })
         }).then(()=>{clog("optimization finished")})
@@ -189,18 +196,23 @@ class OptimizedBullet extends React.PureComponent{
     componentWillUnmount(){
         clog('component unmounted ')
         clearTimeout(this.state.updating)
-        
     }
     render(){
         clog('component rendered: '+ this.state.text)
+        let newColor = "inherit";
+        if(this.state.loading){
+            newColor = "gray"
+        }else if(this.state.status == BULLET.FAILED_OPT){
+            newColor = "red"
+        }
         return (
             <Bullet text={this.state.text} 
-                ref={this.ref}
+                ref={this.bulletRef}
                 renderRef={this.renderRef}
                 width={this.props.width} 
                 class='bullet optimized' 
                 style={{
-                    color: this.state.loading?"gray":"inherit",
+                    color: newColor,
                     display:'inline-block',
                     wordBreak:'break-word',
                 }}/>
@@ -228,17 +240,90 @@ class BulletComparator extends Bullet {
             res(sentence+'!!!!'+i);
         });
     }
-    optimizer = (bullet) =>{
+    optimizer = (ref) =>{
         return new Promise((res)=>{
-            //clog(bullet)
-            clog(this.evaluate(bullet))
-            res(bullet.props.text)
+            clog(ref)
+            //clog(this.evaluate(bullet))
+                
+            const smallerSpace = "\u2009";
+            const largerSpace = "\u2004";
+        
+            const origSentence = Bullet.clean(ref.props.text);
+
+            //initialization of optimized words array
+            let optWords = Bullet.tokenize(origSentence);
+            //initial instantiation of previousSentence
+            let prevSentence = origSentence;
+
+            const initResults = this.evaluate(ref.bulletRef.current);
+            
+            //initial instantiation of previousResults
+            let prevResults = initResults;
+            let finalResults = initResults;
+            const newSpace = (initResults.direction == BULLET.ADD_SPACE)? largerSpace: smallerSpace;
+            
+            console.log('Sentence: ' + origSentence)
+            //console.log(initResults)
+            //console.log('\tspan node height: ' + spanNode.offsetHeight)
+            //console.log('\tdesired height: ' + singleHeight)
+        
+        
+            function getRandomInt(seed,max){
+                return Math.floor( Math.abs((Math.floor(9*seed.hashCode()+5) % 100000) / 100000) * Math.floor(max));
+            }
+            
+            let status = BULLET.NOT_OPT;
+
+            //if the sentence is blank, do nothing.
+            if(! origSentence.trim()){
+                finalResults.optimization.status = BULLET.OPTIMIZED;
+            } else{
+
+                while(true){
+                    //don't select the first space after the dash- that would be noticeable and look wierd.
+                    // also don't select the last word, don't want to add a space after that.
+                    let iReplace = getRandomInt(optWords.join(''), optWords.length -1 -1) + 1;
+                    
+                    //merges two elements together, joined by the space
+                    optWords.splice( 
+                        iReplace, 2, 
+                        optWords.slice(iReplace,iReplace+2).join(newSpace)
+                    );
+            
+                    //make all other spaces the normal space size
+                    let newSentence = optWords.join(' ');
+                    ref.setState({
+                        text: newSentence
+                    })
+                    // check to see how sentence fits
+                    let newResults = this.evaluate(ref.bulletRef.current);
+                    //console.log(newResults)
+                    if(initResults.direction == BULLET.ADD_SPACE && newResults.direction == BULLET.REM_SPACE){            
+                        //console.log("Note: Can't add more spaces without overflow, reverting to previous" );
+                        finalResults.optimization = prevResults.optimization;
+                        break;
+                    } else if(initResults.direction == BULLET.REM_SPACE && newResults.direction == BULLET.ADD_SPACE){
+                        //console.log("Removed enough spaces. Terminating." );
+                        finalResults.optimization = newResults.optimization;
+                        break;
+                    } else if(optWords.length <= 2){ //this conditional needs to be last
+                        //console.log("\tWarning: Can't replace any more spaces");
+                        finalResults.optimization = newResults.optimization;
+                        break;
+                    }
+                    prevResults = newResults;
+                    prevSentence = newSentence;
+                } 
+            } 
+
+            res(finalResults.optimization)
         })
     };
 
     evaluate = (bullet) => {
+        clog(bullet)
         const dispNode = bullet.props.renderRef.current;
-        
+
         dispNode.style.whiteSpace = "nowrap";
         const parentWidth = dispNode.parentNode.getBoundingClientRect().width;
         const singleWidth = dispNode.getBoundingClientRect().width;
@@ -260,6 +345,7 @@ class BulletComparator extends Bullet {
         
         var results = {
             "optimization": {
+                "sentence": bullet.props.renderRef.current.innerText,
                 "status":false,
             },
             "direction": false
