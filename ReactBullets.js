@@ -1,3 +1,7 @@
+// booleans for debugging
+const checkOptims = true;
+
+
 // optimization status codes
 // status codes for optimization direction 
 // had to move this to a floating object because MS Edge doesn't support static variables
@@ -147,6 +151,7 @@ class BulletOutputViewer extends React.Component{
     }
 
 }
+
 class OptimizedBullet extends React.PureComponent{
     constructor(props){
         super(props);
@@ -171,26 +176,25 @@ class OptimizedBullet extends React.PureComponent{
     update = () => {
         const sentence = this.state.text;
         if(this.optimExists(sentence)){
-            clog('optimization already exists for ' + sentence, false)
-            if(sentence !=  this.props.optims[sentence][this.props.width]){
-                this.setState({
-                    text: this.props.optims[sentence][this.props.width],
-                    loading:false
-                });
-            }else{
-                this.setState({loading:false})
-            }
+            clog('optimization already exists for ' + sentence, checkOptims)
+            clog(this.props.optims[sentence][this.props.width],checkOptims)
+            this.setState({
+                text: this.props.optims[sentence][this.props.width].result,
+                status: this.props.optims[sentence][this.props.width].status,
+                loading:false
+            });
+        
         }else{
             this.setState({
                 loading:true
             })
-            clog('Optimization loading for ' + sentence, false)
+            clog('Optimization loading for ' + sentence, checkOptims)
             this.bufferedOptimize(500);
         }
     }
    
     bufferedOptimize = (delay) => { 
-        if(this.state.updating){
+        if(this.state.updating && this.state.loading){
             clearTimeout(this.state.updating)
         }
         this.setState({
@@ -223,7 +227,9 @@ class OptimizedBullet extends React.PureComponent{
             this.props.onOptim({
                 "sentence":sentence,
                 "width": this.props.width,
-                "optimized": optimization.sentence});
+                "optimized": optimization.sentence,
+                "status": optimization.status,
+            });
             return optimization;
         }).then((optimization) => {
             this.setState({
@@ -231,7 +237,7 @@ class OptimizedBullet extends React.PureComponent{
                 status: optimization.status,
                 loading:false
             })
-        }).then(()=>{clog("optimization finished",false)})
+        }).then(()=>{clog("optimization finished",checkOptims)})
         
     }
     optimizer = () =>{
@@ -256,7 +262,7 @@ class OptimizedBullet extends React.PureComponent{
             let finalResults = initResults;
             const newSpace = (initResults.direction == BULLET.ADD_SPACE)? largerSpace: smallerSpace;
             
-            console.log('Sentence: ' + origSentence)
+            clog('Sentence: ' + origSentence, checkOptims)
             //console.log(initResults)
             //console.log('\tspan node height: ' + spanNode.offsetHeight)
             //console.log('\tdesired height: ' + singleHeight)
@@ -315,8 +321,8 @@ class OptimizedBullet extends React.PureComponent{
     };
     componentDidMount(){
         clog('component mounted for ' + this.state.text, false)
-        clog(this.state)
-        clog(this.ref)
+        clog(this.state, false)
+        clog(this.ref, false)
         this.update()
     }
     componentWillUnmount(){
@@ -324,7 +330,7 @@ class OptimizedBullet extends React.PureComponent{
         clearTimeout(this.state.updating)
     }
     render(){
-        clog('component rendered: '+ this.state.text, false)
+        clog('component rendered: '+ this.state.text, checkOptims)
         let newColor = "inherit";
         if(this.state.loading){
             newColor = "gray"
@@ -357,22 +363,13 @@ class BulletComparator extends Bullet {
 
     }
     
-    testOptimizer = (sentence) => {
-        return new Promise((res)=>{
-            let i=0;
-            for(let j=0;j<10000000;j++){
-                i += Math.random();
-            }
-            res(sentence+'!!!!'+i);
-        });
-    }
-
-
-
     updateOptims = (params) => {
         this.setState((state) => {
             state.optims[params.sentence] = state.optims[params.sentence] || {};
-            state.optims[params.sentence][params.width] = params.optimized;
+            state.optims[params.sentence][params.width] = {
+                result: params.optimized,
+                status: params.status
+            };
             return state
         });
     }
@@ -392,7 +389,7 @@ class BulletComparator extends Bullet {
                     handleTextChange={this.handleTextChange} 
                     width={this.props.width}
                     minHeight={100}/>
-                <BulletOutputViewer bullets={this.state.text.split('\n')} 
+                <BulletOutputViewer bullets={this.state.text.split('\n').map(this.props.abbrReplacer)} 
                     handleTextChange={this.handleTextChange}  width={this.props.width} 
                     optims={this.state.optims} 
                     optimizer={this.optimizer}
@@ -402,9 +399,3 @@ class BulletComparator extends Bullet {
     }
 }
 
-const data = '- Saved Air Force moneys; Saved Air Force moneys; Saved Air Force moneys; Saved Air Force moneys; Saved Air Force moneys; Saved Air Force moneys;  \n\
-- Engineered 900 airplanes; Engineered 900 airplanes; Engineered 900 airplanes; Engineered 900 airplanes; Engineered 900 airplanes; Engineered 900 airplanes;';
-
-ReactDOM.render(
-    <BulletComparator initialText={data} width="202.51mm"/>, document.getElementById('stuff')
-    );

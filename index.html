@@ -5,24 +5,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>PDF Bullets with Angular</title>
-      <!-- Load React. -->
-    <!-- Note: when deploying, replace "development.js" with "production.min.js". -->
-    <script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin></script>
-    <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js" crossorigin></script>
     <!-- for JSX dev support-->
     <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
-    <!-- Load our React component. -->
+
+    <!-- Load React. -->
+    <!-- Note: when deploying, replace "development.js" with "production.min.js". -->
+    <script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js" crossorgin></script>
+
+    <!--base handsontable stuffs-->
+    <script src="https://unpkg.com/handsontable@7.3.0/dist/handsontable.full.min.js" type="text/javascript"></script>
+    <script src="https://unpkg.com/react-handsontable@0.3.2/dist/react-handsontable.min.js" type="text/javascript"></script>
+    <link rel="stylesheet" href="https://unpkg.com/handsontable@7.3.0/dist/handsontable.full.min.css">
+
     <script src='./utils.js'></script>
-    <script src="./handsontable.full.min.js"></script>
-    <link href="./handsontable.full.min.css" rel="stylesheet" media="screen">
-    <script src="abbreviations.js"></script>
-    
-    <script src="ReactBullets.js" type='text/babel'></script>
+    <!-- Load our React components. -->
+    <script src="./ReactBullets.js" type='text/babel'></script>
+    <script src="./ReactAbbrs.js" type='text/babel'></script>
+    <script src="./ReactMain.js" type='text/babel'></script>
     
     <link rel='stylesheet' href='./index.css' type='text/css'>
 </head>
 <body>
     <div id="stuff"></div>
-    <div id="abbrTable"></div>
+    <div id="abbrs"></div>
 </body>
 </html>
