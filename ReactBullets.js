@@ -42,6 +42,53 @@ class Bullet extends React.PureComponent{
         sentence =  sentence.replace(/[\u2011]/g,'-');
         return sentence;
     }
+    evaluate = () => {
+        const dispNode = this.props.renderRef.current;
+
+        dispNode.style.whiteSpace = "nowrap";
+        const parentWidth = dispNode.parentNode.getBoundingClientRect().width;
+        const singleWidth = dispNode.getBoundingClientRect().width;
+        
+        //This checks to see what the single line height of the ref nodeis.
+        const singleHeight = dispNode.getBoundingClientRect().height;
+        //console.log(singleHeight);
+
+        // This makes the node go back to normal wrapping, and we can run getBoundingClientRect() 
+        //  again to see the height again
+        dispNode.style.whiteSpace = "inherit";
+        dispNode.style.wordBreak = "break-word";
+
+        const trueHeight = dispNode.getBoundingClientRect().height;
+        //dispNode.style.wordBreak = 'inherit';
+        var overflow = (singleWidth - parentWidth);
+    
+        var madeNewLine = trueHeight > singleHeight;
+        
+        var results = {
+            "optimization": {
+                "sentence": this.props.text,
+                "status":false,
+            },
+            "direction": false
+        }
+
+        // you may be wondering, 'why do you have to check width and height? couldn't you 
+        //  just check to see if overflow is greater than or less than 0? You would think so,
+        //  but there are cases where the browser will fit a wider element into a smaller one,
+        //  WITHOUT wrapping the line... 
+        if(madeNewLine){
+            results.direction = BULLET.REM_SPACE;
+        }else{
+            results.direction = BULLET.ADD_SPACE;
+        }
+
+        if(overflow > BULLET.MAX_UNDERFLOW && ! madeNewLine){
+            results.optimization.status = BULLET.OPTIMIZED;
+        }else {
+            results.optimization.status = BULLET.FAILED_OPT;
+        }
+        return results;
+    }
 }
 
 class BulletEditor extends React.Component{
@@ -151,6 +198,7 @@ class OptimizedBullet extends React.PureComponent{
                 this.optimize();
                 this.setState({
                     updating:null,
+                    loading:false,
                 });
             }, delay),
         })
@@ -171,7 +219,7 @@ class OptimizedBullet extends React.PureComponent{
     optimize = () => {
         const sentence = Bullet.clean(this.state.text);
         //clog(this.ref)
-        return this.props.optimizer(this.ref.current).then((optimization) => {
+        return this.optimizer(this.ref.current).then((optimization) => {
             this.props.onOptim({
                 "sentence":sentence,
                 "width": this.props.width,
@@ -186,7 +234,85 @@ class OptimizedBullet extends React.PureComponent{
         }).then(()=>{clog("optimization finished")})
         
     }
-  
+    optimizer = () =>{
+        return new Promise((res)=>{
+            //clog(ref)
+            //clog(this.evaluate(bullet))
+                
+            const smallerSpace = "\u2009";
+            const largerSpace = "\u2004";
+        
+            const origSentence = Bullet.clean(this.props.text);
+
+            //initialization of optimized words array
+            let optWords = Bullet.tokenize(origSentence);
+            //initial instantiation of previousSentence
+            let prevSentence = origSentence;
+
+            const initResults = this.bulletRef.current.evaluate();
+            
+            //initial instantiation of previousResults
+            let prevResults = initResults;
+            let finalResults = initResults;
+            const newSpace = (initResults.direction == BULLET.ADD_SPACE)? largerSpace: smallerSpace;
+            
+            console.log('Sentence: ' + origSentence)
+            //console.log(initResults)
+            //console.log('\tspan node height: ' + spanNode.offsetHeight)
+            //console.log('\tdesired height: ' + singleHeight)
+        
+        
+            function getRandomInt(seed,max){
+                return Math.floor( Math.abs((Math.floor(9*seed.hashCode()+5) % 100000) / 100000) * Math.floor(max));
+            }
+            
+            let status = BULLET.NOT_OPT;
+
+            //if the sentence is blank, do nothing.
+            if(! origSentence.trim()){
+                finalResults.optimization.status = BULLET.OPTIMIZED;
+            } else{
+
+                while(true){
+                    //don't select the first space after the dash- that would be noticeable and look wierd.
+                    // also don't select the last word, don't want to add a space after that.
+                    let iReplace = getRandomInt(optWords.join(''), optWords.length -1 -1) + 1;
+                    
+                    //merges two elements together, joined by the space
+                    optWords.splice( 
+                        iReplace, 2, 
+                        optWords.slice(iReplace,iReplace+2).join(newSpace)
+                    );
+            
+                    //make all other spaces the normal space size
+                    let newSentence = optWords.join(' ');
+                    this.setState({
+                        text: newSentence
+                    })
+                    // check to see how sentence fits
+                    let newResults = this.bulletRef.current.evaluate();
+                    //console.log(newResults)
+                    if(initResults.direction == BULLET.ADD_SPACE && newResults.direction == BULLET.REM_SPACE){            
+                        //console.log("Note: Can't add more spaces without overflow, reverting to previous" );
+                        finalResults.optimization = prevResults.optimization;
+                        break;
+                    } else if(initResults.direction == BULLET.REM_SPACE && newResults.direction == BULLET.ADD_SPACE){
+                        //console.log("Removed enough spaces. Terminating." );
+                        finalResults.optimization = newResults.optimization;
+                        break;
+                    } else if(optWords.length <= 2){ //this conditional needs to be last
+                        //console.log("\tWarning: Can't replace any more spaces");
+                        finalResults.optimization = newResults.optimization;
+                        break;
+                    }
+                    prevResults = newResults;
+                    prevSentence = newSentence;
+                } 
+            } 
+
+            res(finalResults.optimization)
+        })
+    };
     componentDidMount(){
         clog('component mounted for ' + this.state.text)
         clog(this.state)
@@ -240,134 +366,9 @@ class BulletComparator extends Bullet {
             res(sentence+'!!!!'+i);
         });
     }
-    optimizer = (ref) =>{
-        return new Promise((res)=>{
-            clog(ref)
-            //clog(this.evaluate(bullet))
-                
-            const smallerSpace = "\u2009";
-            const largerSpace = "\u2004";
-        
-            const origSentence = Bullet.clean(ref.props.text);
 
-            //initialization of optimized words array
-            let optWords = Bullet.tokenize(origSentence);
-            //initial instantiation of previousSentence
-            let prevSentence = origSentence;
 
-            const initResults = this.evaluate(ref.bulletRef.current);
-            
-            //initial instantiation of previousResults
-            let prevResults = initResults;
-            let finalResults = initResults;
-            const newSpace = (initResults.direction == BULLET.ADD_SPACE)? largerSpace: smallerSpace;
-            
-            console.log('Sentence: ' + origSentence)
-            //console.log(initResults)
-            //console.log('\tspan node height: ' + spanNode.offsetHeight)
-            //console.log('\tdesired height: ' + singleHeight)
-        
-        
-            function getRandomInt(seed,max){
-                return Math.floor( Math.abs((Math.floor(9*seed.hashCode()+5) % 100000) / 100000) * Math.floor(max));
-            }
-            
-            let status = BULLET.NOT_OPT;
 
-            //if the sentence is blank, do nothing.
-            if(! origSentence.trim()){
-                finalResults.optimization.status = BULLET.OPTIMIZED;
-            } else{
-
-                while(true){
-                    //don't select the first space after the dash- that would be noticeable and look wierd.
-                    // also don't select the last word, don't want to add a space after that.
-                    let iReplace = getRandomInt(optWords.join(''), optWords.length -1 -1) + 1;
-                    
-                    //merges two elements together, joined by the space
-                    optWords.splice( 
-                        iReplace, 2, 
-                        optWords.slice(iReplace,iReplace+2).join(newSpace)
-                    );
-            
-                    //make all other spaces the normal space size
-                    let newSentence = optWords.join(' ');
-                    ref.setState({
-                        text: newSentence
-                    })
-                    // check to see how sentence fits
-                    let newResults = this.evaluate(ref.bulletRef.current);
-                    //console.log(newResults)
-                    if(initResults.direction == BULLET.ADD_SPACE && newResults.direction == BULLET.REM_SPACE){            
-                        //console.log("Note: Can't add more spaces without overflow, reverting to previous" );
-                        finalResults.optimization = prevResults.optimization;
-                        break;
-                    } else if(initResults.direction == BULLET.REM_SPACE && newResults.direction == BULLET.ADD_SPACE){
-                        //console.log("Removed enough spaces. Terminating." );
-                        finalResults.optimization = newResults.optimization;
-                        break;
-                    } else if(optWords.length <= 2){ //this conditional needs to be last
-                        //console.log("\tWarning: Can't replace any more spaces");
-                        finalResults.optimization = newResults.optimization;
-                        break;
-                    }
-                    prevResults = newResults;
-                    prevSentence = newSentence;
-                } 
-            } 
-
-            res(finalResults.optimization)
-        })
-    };
-
-    evaluate = (bullet) => {
-        clog(bullet)
-        const dispNode = bullet.props.renderRef.current;
-
-        dispNode.style.whiteSpace = "nowrap";
-        const parentWidth = dispNode.parentNode.getBoundingClientRect().width;
-        const singleWidth = dispNode.getBoundingClientRect().width;
-        
-        //This checks to see what the single line height of the ref nodeis.
-        const singleHeight = dispNode.getBoundingClientRect().height;
-        //console.log(singleHeight);
-
-        // This makes the node go back to normal wrapping, and we can run getBoundingClientRect() 
-        //  again to see the height again
-        dispNode.style.whiteSpace = "inherit";
-        dispNode.style.wordBreak = "break-word";
-
-        const trueHeight = dispNode.getBoundingClientRect().height;
-        //dispNode.style.wordBreak = 'inherit';
-        var overflow = (singleWidth - parentWidth);
-    
-        var madeNewLine = trueHeight > singleHeight;
-        
-        var results = {
-            "optimization": {
-                "sentence": bullet.props.renderRef.current.innerText,
-                "status":false,
-            },
-            "direction": false
-        }
-
-        // you may be wondering, 'why do you have to check width and height? couldn't you 
-        //  just check to see if overflow is greater than or less than 0? You would think so,
-        //  but there are cases where the browser will fit a wider element into a smaller one,
-        //  WITHOUT wrapping the line... 
-        if(madeNewLine){
-            results.direction = BULLET.REM_SPACE;
-        }else{
-            results.direction = BULLET.ADD_SPACE;
-        }
-
-        if(overflow > BULLET.MAX_UNDERFLOW && ! madeNewLine){
-            results.optimization.status = BULLET.OPTIMIZED;
-        }else {
-            results.optimization.status = BULLET.FAILED_OPT;
-        }
-        return results;
-    }
     updateOptims = (params) => {
         this.setState((state) => {
             state.optims[params.sentence] = state.optims[params.sentence] || {};
