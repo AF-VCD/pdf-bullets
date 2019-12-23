@@ -115,6 +115,7 @@ class BulletApp extends React.Component {
     render(){
         return (
             <div>
+                <DocumentTools />
                 <SynonymViewer word={this.state.selection} abbrDict={this.state.abbrDict} abbrReplacer={this.state.abbrReplacer} />
                 <BulletComparator initialText={this.props.initialText} 
                     abbrReplacer={this.state.abbrReplacer} 

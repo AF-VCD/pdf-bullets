@@ -19,7 +19,7 @@ class Bullet extends React.PureComponent{
     }
     render(){
         return(
-            <div style={{width: this.props.width}} onMouseUp={this.props.onMouseUp}>
+            <div style={{width: this.props.width}} onMouseUp={this.props.onHighlight} >
                 <span className={this.props.class} style={this.props.style} ref={this.props.renderRef} >
                     {this.props.text}
                 </span>
@@ -119,7 +119,8 @@ class BulletEditor extends React.Component{
                     style={{
                         width: this.props.width,
                     }}
-                    onMouseUp={this.props.onMouseUp}
+                    onMouseUp={this.props.onHighlight}
+                    onKeyUp={this.props.onHighlight}
                     className="bullets"></textarea>
             </div>
         )
@@ -129,11 +130,24 @@ class BulletEditor extends React.Component{
 class BulletOutputViewer extends React.Component{
     constructor(props){
         super(props);
+        this.outputRef = React.createRef();
     }
-    
+    selectOutput = (e)=>{
+        if(e.ctrlKey && e.keyCode == 65){
+            e.preventDefault();
+            //clog('control-a')
+            //clog(this.outputRef.current)
+            if (window.getSelection) { 
+                const range = document.createRange();
+                range.selectNode(this.outputRef.current);
+                window.getSelection().removeAllRanges();
+                window.getSelection().addRange(range);
+            }
+        }
+    }
     render(){
         return (
-            <div className="bulletContainer border">
+            <div className="bulletContainer border" tabIndex="1" onKeyDown={this.selectOutput} onKeyUp={this.props.onHighlight} ref={this.outputRef}>
                 {this.props.bullets.map(
                 (line,i)=>{
                     const optimRef = React.createRef();
@@ -144,7 +158,7 @@ class BulletOutputViewer extends React.Component{
                         optims={this.props.optims}
                         onOptim={this.props.onOptim}
                         optimizer={this.props.optimizer}
-                        onMouseUp={this.props.onMouseUp}
+                        onHighlight={this.props.onHighlight}
                         ref={optimRef} 
                         optimRef={optimRef}/>
                 })}
@@ -344,7 +358,7 @@ class OptimizedBullet extends React.PureComponent{
                 ref={this.bulletRef}
                 renderRef={this.renderRef}
                 width={this.props.width} 
-                onMouseUp={this.props.onMouseUp}
+                onHighlight={this.props.onHighlight}
                 class='bullet optimized' 
                 style={{
                     color: newColor,
@@ -396,14 +410,14 @@ class BulletComparator extends Bullet {
                     text={this.state.text} 
                     handleTextChange={this.handleTextChange} 
                     width={this.props.width}
-                    onMouseUp={this.handleSelect}
+                    onHighlight={this.handleSelect}
                     minHeight={100}/>
                 <BulletOutputViewer bullets={this.state.text.split('\n').map(this.props.abbrReplacer)} 
                     handleTextChange={this.handleTextChange}  width={this.props.width} 
                     optims={this.state.optims} 
                     optimizer={this.optimizer}
                     onOptim={this.updateOptims}
-                    onMouseUp={this.handleSelect}/>
+                    onHighlight={this.handleSelect}/>
             </div>
         );
     }
