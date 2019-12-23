@@ -69,7 +69,8 @@ class BulletApp extends React.Component {
         super(props);
         this.state={
             abbrDict: {},
-            abbrReplacer: (sentence)=>{return sentence;}
+            abbrReplacer: (sentence)=>{return sentence;},
+            selection: ""
         }
     }
     handleAbbrChange = (newAbbrDict)=>{
@@ -93,16 +94,24 @@ class BulletApp extends React.Component {
             }
         })
     }
-
+    handleSelect = (newSel)=>{
+        clog('selection registered');
+        const maxWords = 8;
+        this.setState({
+            selection: Bullet.tokenize(newSel.trim()).slice(0,maxWords).join(' ')
+        });
+        
+    }
     render(){
         return (
             <div>
+                <SynonymViewer word={this.state.selection} abbrDict={this.state.abbrDict} />
                 <BulletComparator initialText={this.props.initialText} 
                     abbrReplacer={this.state.abbrReplacer} 
-                    width="202.51mm"/>
+                    width="202.51mm" onSelect={this.handleSelect}/>
                 <AbbrsViewer settings={this.props.tableSettings} 
-                initialData={this.props.initialData} 
-                onAbbrChange={this.handleAbbrChange} />
+                    initialData={this.props.initialData} 
+                    onAbbrChange={this.handleAbbrChange} />
             </div>
         );
     }

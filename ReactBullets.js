@@ -19,8 +19,8 @@ class Bullet extends React.PureComponent{
     }
     render(){
         return(
-            <div style={{width: this.props.width}}>
-                <span className={this.props.class} style={this.props.style} ref={this.props.renderRef}>
+            <div style={{width: this.props.width}} onMouseUp={this.props.onMouseUp}>
+                <span className={this.props.class} style={this.props.style} ref={this.props.renderRef} >
                     {this.props.text}
                 </span>
             </div>
@@ -119,6 +119,7 @@ class BulletEditor extends React.Component{
                     style={{
                         width: this.props.width,
                     }}
+                    onMouseUp={this.props.onMouseUp}
                     className="bullets"></textarea>
             </div>
         )
@@ -143,6 +144,7 @@ class BulletOutputViewer extends React.Component{
                         optims={this.props.optims}
                         onOptim={this.props.onOptim}
                         optimizer={this.props.optimizer}
+                        onMouseUp={this.props.onMouseUp}
                         ref={optimRef} 
                         optimRef={optimRef}/>
                 })}
@@ -342,6 +344,7 @@ class OptimizedBullet extends React.PureComponent{
                 ref={this.bulletRef}
                 renderRef={this.renderRef}
                 width={this.props.width} 
+                onMouseUp={this.props.onMouseUp}
                 class='bullet optimized' 
                 style={{
                     color: newColor,
@@ -375,10 +378,15 @@ class BulletComparator extends Bullet {
     }
 
     handleTextChange = (e) => {
-        
         this.setState({
             text: e.target.value,
         });
+    }
+    handleSelect = (e) =>{
+        const selection = window.getSelection().toString();
+        if(selection != ""){
+            this.props.onSelect(selection);
+        }
     }
     render() {
         //clog(this.state)
@@ -388,12 +396,14 @@ class BulletComparator extends Bullet {
                     text={this.state.text} 
                     handleTextChange={this.handleTextChange} 
                     width={this.props.width}
+                    onMouseUp={this.handleSelect}
                     minHeight={100}/>
                 <BulletOutputViewer bullets={this.state.text.split('\n').map(this.props.abbrReplacer)} 
                     handleTextChange={this.handleTextChange}  width={this.props.width} 
                     optims={this.state.optims} 
                     optimizer={this.optimizer}
-                    onOptim={this.updateOptims}/>
+                    onOptim={this.updateOptims}
+                    onMouseUp={this.handleSelect}/>
             </div>
         );
     }

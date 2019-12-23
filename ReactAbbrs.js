@@ -56,7 +56,11 @@ class AbbrTools extends React.PureComponent{
                 <input type="file" onChange={this.importAbbrs} ref={this.fileInputRef} style={{display:"none"}}></input>
                 <button onClick={this.importAbbrs}>Import Abbrs</button>
                 <button onClick={this.exportToXLS}>Export Abbrs</button>
-                <button onClick={this.importSampleAbbrs}>Load Sample Abbrs</button>
+                <button onClick={() => {
+                    if(confirm("Are you sure you want to remove all existing acronyms and replace with a sample list?")){
+                        this.importSampleAbbrs();
+                    }
+                }}>Load Sample Abbrs</button>
             </div>
         );
     }
@@ -65,7 +69,7 @@ class AbbrsViewer extends React.PureComponent {
     constructor(props) {
         super(props);
         this.tableRef = React.createRef();
-        clog(this.props)
+        clog(this.props, checkAbbrs)
         this.state = {
             tableData: this.props.initialData,
             abbrDict: {},
