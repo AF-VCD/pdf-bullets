@@ -95,7 +95,7 @@ class Bullet extends React.PureComponent{
     }
 }
 
-class BulletEditor extends React.Component{
+class BulletEditor extends React.PureComponent{
     constructor(props){
         super(props);
         this.ref = React.createRef();
@@ -127,7 +127,7 @@ class BulletEditor extends React.Component{
     }
 }
 //how do i get lines to line up between the output and editor?
-class BulletOutputViewer extends React.Component{
+class BulletOutputViewer extends React.PureComponent{
     constructor(props){
         super(props);
         this.outputRef = React.createRef();
@@ -158,6 +158,7 @@ class BulletOutputViewer extends React.Component{
                         optims={this.props.optims}
                         onOptim={this.props.onOptim}
                         optimizer={this.props.optimizer}
+                        enableOptim={this.props.enableOptim}
                         onHighlight={this.props.onHighlight}
                         ref={optimRef} 
                         optimRef={optimRef}/>
@@ -175,7 +176,7 @@ class OptimizedBullet extends React.PureComponent{
             text: this.props.text,
             loading: true,
             updating: null,
-            status: -1,
+            status: BULLET.NOT_OPT,
         }
         this.ref = this.props.optimRef;
         this.bulletRef=React.createRef();
@@ -191,7 +192,14 @@ class OptimizedBullet extends React.PureComponent{
     }
     update = () => {
         const sentence = this.state.text;
-        if(this.optimExists(sentence)){
+        if(!this.props.enableOptim){
+            clog('no optimization done because it is disabled', checkOptims)
+            this.setState({
+                text: this.props.text,
+                status: BULLET.NOT_OPT,
+                loading:false
+            })
+        }else if(this.optimExists(sentence)){
             clog('optimization already exists for ' + sentence, checkOptims)
             clog(this.props.optims[sentence][this.props.width],checkOptims)
             this.setState({
@@ -260,7 +268,8 @@ class OptimizedBullet extends React.PureComponent{
         return new Promise((res)=>{
             //clog(ref)
             //clog(this.evaluate(bullet))
-                
+            const bulletRef = this.bulletRef.current;
+            
             const smallerSpace = "\u2009";
             const largerSpace = "\u2004";
         
@@ -271,7 +280,7 @@ class OptimizedBullet extends React.PureComponent{
             //initial instantiation of previousSentence
             let prevSentence = origSentence;
 
-            const initResults = this.bulletRef.current.evaluate();
+            const initResults = bulletRef.evaluate();
             
             //initial instantiation of previousResults
             let prevResults = initResults;
@@ -288,7 +297,6 @@ class OptimizedBullet extends React.PureComponent{
                 return Math.floor( Math.abs((Math.floor(9*seed.hashCode()+5) % 100000) / 100000) * Math.floor(max));
             }
             
-            let status = BULLET.NOT_OPT;
 
             //if the sentence is blank, do nothing.
             if(! origSentence.trim()){
@@ -312,7 +320,7 @@ class OptimizedBullet extends React.PureComponent{
                         text: newSentence
                     })
                     // check to see how sentence fits
-                    let newResults = this.bulletRef.current.evaluate();
+                    let newResults = bulletRef.evaluate();
                     //console.log(newResults)
                     if(initResults.direction == BULLET.ADD_SPACE && newResults.direction == BULLET.REM_SPACE){            
                         //console.log("Note: Can't add more spaces without overflow, reverting to previous" );
@@ -336,23 +344,34 @@ class OptimizedBullet extends React.PureComponent{
         })
     };
     componentDidMount(){
-        clog('component mounted for ' + this.state.text, false)
+        clog('component mounted for ' + this.state.text, checkOptims)
         clog(this.state, false)
         clog(this.ref, false)
         this.update()
     }
     componentWillUnmount(){
-        clog('component unmounted ', false)
+        clog('component unmounted ', checkOptims)
         clearTimeout(this.state.updating)
     }
+    componentDidUpdate(prevProps){
+        clog('component updated', checkOptims);
+        if(this.props.enableOptim != prevProps.enableOptim){
+             this.update()
+        }
+        
+    }
+
     render(){
-        clog('component rendered: '+ this.state.text, checkOptims)
+        clog('component rendering: '+ this.state.text, checkOptims)
         let newColor = "inherit";
+   
         if(this.state.loading){
             newColor = "gray"
         }else if(this.state.status == BULLET.FAILED_OPT){
             newColor = "red"
         }
+        
+
         return (
             <Bullet text={this.state.text} 
                 ref={this.bulletRef}
@@ -369,7 +388,7 @@ class OptimizedBullet extends React.PureComponent{
     }
 
 }
-class BulletComparator extends Bullet {
+class BulletComparator extends React.PureComponent {
     constructor(props){
         super(props);
         
@@ -403,7 +422,9 @@ class BulletComparator extends Bullet {
         }
     }
     render() {
-        //clog(this.state)
+        clog('rendering bullet comparator', checkOptims)
+        clog(this.state, checkOptims)
+        clog(this.props, checkOptims)
         return (
             <div>
                 <BulletEditor 
@@ -415,6 +436,7 @@ class BulletComparator extends Bullet {
                 <BulletOutputViewer bullets={this.state.text.split('\n').map(this.props.abbrReplacer)} 
                     handleTextChange={this.handleTextChange}  width={this.props.width} 
                     optims={this.state.optims} 
+                    enableOptim={this.props.enableOptim} 
                     optimizer={this.optimizer}
                     onOptim={this.updateOptims}
                     onHighlight={this.handleSelect}/>

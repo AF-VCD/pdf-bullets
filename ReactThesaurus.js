@@ -1,4 +1,4 @@
-const checkThesaurus = true;
+const checkThesaurus = false;
 class SynonymViewer extends React.PureComponent{
     constructor(props){
         super(props)
@@ -7,7 +7,7 @@ class SynonymViewer extends React.PureComponent{
         }
     }
     getSynonyms = (phrase)=>{
-        clog('finding synonyms for '+ phrase);
+        clog('finding synonyms for '+ phrase, checkThesaurus);
         const xhttp = new XMLHttpRequest();
         xhttp.onreadystatechange =  () => {
             if(xhttp.readyState == 4 && xhttp.status == 200){

@@ -25,6 +25,7 @@ class OutputTools extends React.PureComponent{
                 <button>AWD</button>
                 <button>EPR</button>
                 <button>OPR</button>
+                <input type="checkbox"  checked={this.props.enableOptim} onChange={this.props.onOptimChange} id="enableOptim" /><label htmlFor='enableOptim'>space optimization</label>
             </div>
         );
     }
@@ -35,7 +36,11 @@ class InputTools extends React.PureComponent{
         super(props);
     }
     render(){
-        return <div />;
+        return (
+            <div>
+                <button>renormalize input spaces</button>
+            </div>
+        );
     }
 }
 // saving settings
@@ -55,7 +60,7 @@ class DocumentTools extends React.PureComponent{
         return (
             <div>
                 <PDFTools />
-                <OutputTools />
+                <OutputTools enableOptim={this.props.enableOptim} onOptimChange={this.props.onOptimChange}/>
                 <InputTools />
                 <SaveTools />
             </div>
