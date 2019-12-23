@@ -98,15 +98,22 @@ class AbbrsViewer extends React.PureComponent {
             let abbr = abbrTable.getDataAtRowProp(i,'abbr');
             //console.log('abbr: ' + abbr)
             let enabled = abbrTable.getDataAtRowProp(i,'enabled')
+            newAbbrDict[fullWord] = newAbbrDict[fullWord] || [];
+            
             if(enabled){
-                newAbbrDict[fullWord] = abbr;
+                newAbbrDict[fullWord].enabled = newAbbrDict[fullWord].enabled || [];
+                newAbbrDict[fullWord].enabled.push(abbr)
+            }else{
+                newAbbrDict[fullWord].disabled = newAbbrDict[fullWord].disabled || [];
+                newAbbrDict[fullWord].disabled.push(abbr)
             }
+
         }
         this.setState((state)=>{
             state.abbrDict = newAbbrDict;
             return state;
         })
-        clog(new RegExp("(\\b)("+Object.keys(this.state.abbrDict).join("|")+")(\\b|$|\\$)",'g'),checkAbbrs)
+        //clog(new RegExp("(\\b)("+Object.keys(this.state.abbrDict).join("|")+")(\\b|$|\\$)",'g'),checkAbbrs)
 
         this.props.onAbbrChange(this.state.abbrDict);
         

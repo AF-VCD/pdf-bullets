@@ -77,12 +77,22 @@ class BulletApp extends React.Component {
         this.setState({
             abbrDict: newAbbrDict,
             abbrReplacer: (sentence) => {
-                //console.log('sentence in replaceAbbrs: "' + sentence + '"')
-                const regExp = new RegExp("(\\b)("+Object.keys(newAbbrDict).join("|")+")(\\b|$|\\$)",'g');
+                const finalAbbrDict = {};
+                Object.keys(newAbbrDict).map(
+                    (word)=>{
+                        const abbrs = newAbbrDict[word]; //an array
+                        //if there is at least one enabled abbreviation, take the lowest most element of it.
+                        if(abbrs.enabled) {
+                            finalAbbrDict[word] = abbrs.enabled[abbrs.enabled.length-1]
+                        }
+                    }
+                )
+                clog(finalAbbrDict, false)
+                const regExp = new RegExp("(\\b)("+Object.keys(finalAbbrDict).join("|")+")(\\b|$|\\$)",'g');
                 const newSentence = sentence.replace(regExp, 
                     (match,p1,p2,p3) => {
                         //p2 = p2.replace(/ /g,'\\s')
-                        let abbr = this.state.abbrDict[p2];
+                        let abbr = finalAbbrDict[p2];
                         if(!abbr){
                             abbr = '';
                         }
@@ -105,7 +115,7 @@ class BulletApp extends React.Component {
     render(){
         return (
             <div>
-                <SynonymViewer word={this.state.selection} abbrDict={this.state.abbrDict} />
+                <SynonymViewer word={this.state.selection} abbrDict={this.state.abbrDict} abbrReplacer={this.state.abbrReplacer} />
                 <BulletComparator initialText={this.props.initialText} 
                     abbrReplacer={this.state.abbrReplacer} 
                     width="202.51mm" onSelect={this.handleSelect}/>
