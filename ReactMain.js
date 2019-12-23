@@ -1,6 +1,6 @@
 
 const initialText = '- Saved Air Force moneys; Saved Air Force moneys; Saved Air Force moneys; Saved Air Force moneys; Saved Air Force moneys; Saved Air Force moneys;  \n\
-- Engineered 900 airplanes; Engineered 900 airplanes; Engineered 900 airplanes; Engineered 900 airplanes; Engineered 900 airplanes; Engineered 900 airplanes;';
+- Engineered 900 airplanes; Engineered 900 airplanes; Engineered 900 airplanes; Engineered 900 airplanes; Engineered 900 airplanes; Engineered 900 airplanes;equipment test';
 
 const tableData = [{
     enabled: true,
@@ -13,7 +13,6 @@ const tableData = [{
     },];
 
 const tableSettings = {
-    data: tableData,
     columns: [{
         data: 'enabled',
         type: 'checkbox',
@@ -101,10 +100,23 @@ class BulletApp extends React.Component {
                 <BulletComparator initialText={this.props.initialText} 
                     abbrReplacer={this.state.abbrReplacer} 
                     width="202.51mm"/>
-                <AbbrsViewer settings={this.props.tableSettings} onAbbrChange={this.handleAbbrChange} />
+                <AbbrsViewer settings={this.props.tableSettings} 
+                initialData={this.props.initialData} 
+                onAbbrChange={this.handleAbbrChange} />
             </div>
         );
     }
 }
+// implementing fontReady as a promise (instead of using document.fonts.ready) to make it Edge compatible
+var fontReady = new Promise(function(resolve,rej){
+    WebFont.load({
+        custom: {
+            families: ['AdobeTimes']
+        }
+    });
+    resolve();
+});
 
-ReactDOM.render( <BulletApp tableSettings={tableSettings} initialText={initialText}/>, document.getElementById('stuff'));
+fontReady.then( ()=>{
+    ReactDOM.render( <BulletApp tableSettings={tableSettings} initialData={tableData} initialText={initialText}/>, document.getElementById('stuff'));
+});

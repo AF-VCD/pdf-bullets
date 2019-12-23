@@ -2,12 +2,72 @@
 //import ReactDOM from 'react-dom';
 //import { HotTable } from '@handsontable/react';
 //import Handsontable from 'handsontable';
+const checkAbbrs = false;
+class AbbrTools extends React.PureComponent{
+    constructor(props){
+        super(props);
+        this.fileInputRef = React.createRef();
+    }
+    importSampleAbbrs = ()=>{
+        return new Promise((res,rej)=>{
+            const xhttp = new XMLHttpRequest();
+            xhttp.responseType = 'blob';
+            xhttp.onload = ()=>{
+                res(xhttp.response);
+            }
+            xhttp.open('GET','./abbrs.xlsx',true);
+            xhttp.send();
+        }).then(this.getDataFromXLS);        
+    }
+    importAbbrs = (e) => {
+        this.fileInputRef.current.click();
+        if(!this.fileInputRef.current.value){
+            clog('no file picked');
+            return;
+        }else{
+            return Promise.resolve(this.fileInputRef.current.files[0]).then(this.getDataFromXLS);
+        }
+        
+    }
+    getDataFromXLS = (file) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const data = e.target.result;
+            const workbook = XLSX.read(data,{
+                type:'binary',
+                raw:true,
+            });
+            const rows = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]],
+                {'header':['enabled','value','abbr']});
+            this.props.updater(rows)
+        };
+        reader.readAsBinaryString(file)
+    }
+    exportToXLS = ()=>{
+        const wb = XLSX.utils.book_new();
+        const sht  = XLSX.utils.aoa_to_sheet(this.props.getter());
+        XLSX.utils.book_append_sheet(wb,sht,'abbrs')
+        XLSX.writeFile(wb,'abbrs.xlsx');
+    }
+    render(){
 
+        return (
+            <div>
+                <input type="file" onChange={this.importAbbrs} ref={this.fileInputRef} style={{display:"none"}}></input>
+                <button onClick={this.importAbbrs}>Import Abbrs</button>
+                <button onClick={this.exportToXLS}>Export Abbrs</button>
+                <button onClick={this.importSampleAbbrs}>Load Sample Abbrs</button>
+            </div>
+        );
+    }
+}
 class AbbrsViewer extends React.PureComponent {
     constructor(props) {
         super(props);
         this.tableRef = React.createRef();
+        clog(this.props)
         this.state = {
+            tableData: this.props.initialData,
             abbrDict: {},
         }
     }
@@ -21,9 +81,9 @@ class AbbrsViewer extends React.PureComponent {
 
     handleAbbrChange = ()=>{
         //this.props.onAbbrChange(e);
-        clog(this.props,false)
-        clog(this.state,false)
-        clog(this.tableRef.current,false)
+        clog(this.props,checkAbbrs)
+        clog(this.state,checkAbbrs)
+        clog(this.tableRef.current,checkAbbrs)
 
         if(this.tableRef.current == null ){return}
         const abbrTable = this.tableRef.current.hotInstance;
@@ -42,16 +102,25 @@ class AbbrsViewer extends React.PureComponent {
             state.abbrDict = newAbbrDict;
             return state;
         })
-        clog(new RegExp("(\\b)("+Object.keys(this.state.abbrDict).join("|")+")(\\b|$|\\$)",'g'))
+        clog(new RegExp("(\\b)("+Object.keys(this.state.abbrDict).join("|")+")(\\b|$|\\$)",'g'),checkAbbrs)
 
         this.props.onAbbrChange(this.state.abbrDict);
         
     }
+    reloadData = (rows)=>{
+        this.tableRef.current.hotInstance.updateSettings({data:[]});
+        this.tableRef.current.hotInstance.loadData(rows);
+    }
+    getData = ()=>{
+        return this.tableRef.current.hotInstance.getData();
+    }
     render() {
-        
+
         return (
             <div>
-                <HotTable settings={this.props.settings} ref={this.tableRef} 
+                <AbbrTools updater={this.reloadData} getter={this.getData}/>
+                <HotTable settings={this.props.settings}  data={this.state.tableData}
+                ref={this.tableRef} 
                 afterChange={this.handleAbbrChange}
                 afterPaste={this.handleAbbrChange}
                 afterRemoveRow={this.handleAbbrChange}

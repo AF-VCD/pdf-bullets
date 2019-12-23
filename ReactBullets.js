@@ -1,5 +1,5 @@
 // booleans for debugging
-const checkOptims = true;
+const checkOptims = false;
 
 
 // optimization status codes
