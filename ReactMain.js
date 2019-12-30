@@ -73,7 +73,7 @@ class BulletApp extends React.Component {
             selection: "",
             enableOptim: true,
         }
-        this.bulletComparatorRef = react.createRef();
+        this.bulletComparatorRef = React.createRef();
     }
     handleAbbrChange = (newAbbrDict)=>{
         this.setState({
@@ -141,5 +141,5 @@ var fontReady = new Promise(function(resolve,rej){
 });
 
 fontReady.then( ()=>{
-    ReactDOM.render( <BulletApp tableSettings={tableSettings} initialData={tableData} initialText={initialText}/>, document.getElementById('stuff'));
+    ReactDOM.render( <BulletApp tableSettings={tableSettings} initialData={tableData} initialText={initialText} />, document.getElementById('stuff'));
 });
