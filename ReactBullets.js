@@ -121,6 +121,7 @@ class BulletEditor extends React.PureComponent{
                     }}
                     onMouseUp={this.props.onHighlight}
                     onKeyUp={this.props.onHighlight}
+                    
                     className="bullets"></textarea>
             </div>
         )
@@ -394,6 +395,7 @@ class BulletComparator extends React.PureComponent {
         
         this.state = { 
             text: this.props.initialText,
+            enableOptim: true,
             optims: {}
         };
 
@@ -416,10 +418,26 @@ class BulletComparator extends React.PureComponent {
         });
     }
     handleSelect = (e) =>{
+        clog('selection registered in reactBullets', false)
         const selection = window.getSelection().toString();
         if(selection != ""){
             this.props.onSelect(selection);
+        }else if(e.target.selectionStart){
+            //this hack is for microsoft edge, which sucks at window.getSelection()
+            const textAreaSelection = e.target.value.substring(e.target.selectionStart, e.target.selectionEnd);
+            clog("selection: " + textAreaSelection, false);
+            this.props.onSelect(textAreaSelection);
         }
+    }
+    handleOptimChange = (e) =>{
+        
+        this.setState({
+            enableOptim: e.target.checked
+        },()=>{
+            clog(this.state.enableOptim, checkOptims)
+        });
+        
+        
     }
     render() {
         clog('rendering bullet comparator', checkOptims)
@@ -436,7 +454,7 @@ class BulletComparator extends React.PureComponent {
                 <BulletOutputViewer bullets={this.state.text.split('\n').map(this.props.abbrReplacer)} 
                     handleTextChange={this.handleTextChange}  width={this.props.width} 
                     optims={this.state.optims} 
-                    enableOptim={this.props.enableOptim} 
+                    enableOptim={this.state.enableOptim} 
                     optimizer={this.optimizer}
                     onOptim={this.updateOptims}
                     onHighlight={this.handleSelect}/>

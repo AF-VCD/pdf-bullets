@@ -26,14 +26,6 @@ textarea.bullets{
     margin:10px 10px 0px 0px;
     vertical-align:top;
 }
-form{
-    margin:10px 10px 0px 0px
-}
-
-#processedBullets{
-    display:inline-block;
-    vertical-align:top;
-}
 .bullets{
     font-family: "AdobeTimes";
     font-size: 12pt;
@@ -91,6 +83,7 @@ h2{
     margin-right:10px;*/
     background-color: white;
 }
-#topStuff form{
+
+.toolbox{
     display:inline-block;
 }

@@ -42,7 +42,7 @@ class SynonymViewer extends React.PureComponent{
         const replacedWord = this.props.abbrReplacer(this.props.word);
         const otherAbbrs = this.props.abbrDict[this.props.word];
         return (
-            <div id='thesaurus'>
+            <div id='thesaurus' className="border">
                 <Synonym word={this.props.word} 
                             abbr={replacedWord==this.props.word ? "" : replacedWord} 
                             otherAbbrs={otherAbbrs}/>

@@ -73,6 +73,7 @@ class BulletApp extends React.Component {
             selection: "",
             enableOptim: true,
         }
+        this.bulletComparatorRef = react.createRef();
     }
     handleAbbrChange = (newAbbrDict)=>{
         this.setState({
@@ -106,29 +107,22 @@ class BulletApp extends React.Component {
         })
     }
     handleSelect = (newSel)=>{
-        clog('selection registered');
+        clog('selection registered',false);
         const maxWords = 8;
         this.setState({
             selection: Bullet.tokenize(newSel.trim()).slice(0,maxWords).join(' ')
         });
         
     }
-    handleOptimChange = (e) =>{
-        
-        this.setState({
-            enableOptim: e.target.checked
-        },()=>{clog(this.state.enableOptim)})
-        
-        
-    }
+    
     render(){
         return (
             <div>
-                <DocumentTools enableOptim={this.state.enableOptim} onOptimChange={this.handleOptimChange}/>
+                <DocumentTools enableOptim={this.state.enableOptim} onOptimChange={this.handleOptimChange} bulletComparator={this.bulletComparatorRef.current} />
                 <SynonymViewer word={this.state.selection} abbrDict={this.state.abbrDict} abbrReplacer={this.state.abbrReplacer} />
                 <BulletComparator initialText={this.props.initialText} 
                     abbrReplacer={this.state.abbrReplacer} 
-                    width="202.51mm" onSelect={this.handleSelect} enableOptim={this.state.enableOptim}/>
+                    width="202.51mm" onSelect={this.handleSelect} enableOptim={this.state.enableOptim} ref={this.bulletComparatorRef}/>
                 <AbbrsViewer settings={this.props.tableSettings} 
                     initialData={this.props.initialData} 
                     onAbbrChange={this.handleAbbrChange} />
