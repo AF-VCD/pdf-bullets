@@ -95,3 +95,6 @@ String.prototype.hashCode = function() {
    }
    return hash;
  };
+
+ // booleans for debugging
+const checkOptims = false;

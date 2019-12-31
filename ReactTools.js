@@ -26,8 +26,8 @@ class OutputTools extends React.PureComponent{
                 <button>EPR</button>
                 <button>OPR</button>
                 <input type="checkbox" 
-                    checked={this.props.bulletComparator.state.enableOptim} 
-                    onChange={this.props.bulletComparator.handleOptimChange} id="enableOptim" /><label htmlFor='enableOptim'>space optimization</label>
+                    checked={this.props.enableOptim} 
+                    onChange={this.props.onOptimChange} id="enableOptim" /><label htmlFor='enableOptim'>space optimization</label>
             </div>
         );
     }
@@ -68,10 +68,10 @@ class DocumentTools extends React.PureComponent{
     render(){
         return (
             <div>
-                <PDFTools bulletComparator={this.props.bulletComparator}/>
-                <OutputTools bulletComparator={this.props.bulletComparator}
+                <PDFTools />
+                <OutputTools 
                     enableOptim={this.props.enableOptim} onOptimChange={this.props.onOptimChange}/>
-                <InputTools bulletComparator={this.props.bulletComparator}/>
+                <InputTools />
                 <SaveTools />
             </div>
         );

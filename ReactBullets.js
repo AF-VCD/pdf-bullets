@@ -1,5 +1,4 @@
-// booleans for debugging
-const checkOptims = false;
+
 
 
 // optimization status codes
@@ -154,7 +153,7 @@ class BulletOutputViewer extends React.PureComponent{
                     const optimRef = React.createRef();
                     return <OptimizedBullet text={line} 
                         width={this.props.width}
-                        key={i+Bullet.tokenize(line).join(" ")} 
+                        key={i+Bullet.tokenize(line).join(" ")+this.props.enableOptim} 
                         class='bullet optimized' 
                         optims={this.props.optims}
                         onOptim={this.props.onOptim}
@@ -181,7 +180,7 @@ class OptimizedBullet extends React.PureComponent{
         }
         this.ref = this.props.optimRef;
         this.bulletRef=React.createRef();
-        this.renderRef=React.createRef();
+        this.renderRef=React.createRef(); //this is a reference to the actual tag inside bullet in which the text is placed
         clog("constructed: " + this.state.text, false)
     }
     optimExists = (sentence) => {
@@ -354,13 +353,6 @@ class OptimizedBullet extends React.PureComponent{
         clog('component unmounted ', checkOptims)
         clearTimeout(this.state.updating)
     }
-    componentDidUpdate(prevProps){
-        clog('component updated', checkOptims);
-        if(this.props.enableOptim != prevProps.enableOptim){
-             this.update()
-        }
-        
-    }
 
     render(){
         clog('component rendering: '+ this.state.text, checkOptims)
@@ -429,16 +421,7 @@ class BulletComparator extends React.PureComponent {
             this.props.onSelect(textAreaSelection);
         }
     }
-    handleOptimChange = (e) =>{
-        
-        this.setState({
-            enableOptim: e.target.checked
-        },()=>{
-            clog(this.state.enableOptim, checkOptims)
-        });
-        
-        
-    }
+
     render() {
         clog('rendering bullet comparator', checkOptims)
         clog(this.state, checkOptims)
@@ -452,9 +435,9 @@ class BulletComparator extends React.PureComponent {
                     onHighlight={this.handleSelect}
                     minHeight={100}/>
                 <BulletOutputViewer bullets={this.state.text.split('\n').map(this.props.abbrReplacer)} 
-                    handleTextChange={this.handleTextChange}  width={this.props.width} 
+                    width={this.props.width} 
                     optims={this.state.optims} 
-                    enableOptim={this.state.enableOptim} 
+                    enableOptim={this.props.enableOptim} 
                     optimizer={this.optimizer}
                     onOptim={this.updateOptims}
                     onHighlight={this.handleSelect}/>
