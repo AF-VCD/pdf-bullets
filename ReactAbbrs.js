@@ -2,7 +2,7 @@
 //import ReactDOM from 'react-dom';
 //import { HotTable } from '@handsontable/react';
 //import Handsontable from 'handsontable';
-const checkAbbrs = false;
+
 class AbbrTools extends React.PureComponent{
     constructor(props){
         super(props);

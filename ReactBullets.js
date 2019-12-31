@@ -386,7 +386,6 @@ class BulletComparator extends React.PureComponent {
         super(props);
         
         this.state = { 
-            text: this.props.initialText,
             enableOptim: true,
             optims: {}
         };
@@ -429,12 +428,12 @@ class BulletComparator extends React.PureComponent {
         return (
             <div>
                 <BulletEditor 
-                    text={this.state.text} 
-                    handleTextChange={this.handleTextChange} 
+                    text={this.props.text} 
+                    handleTextChange={this.props.handleTextChange} 
                     width={this.props.width}
                     onHighlight={this.handleSelect}
                     minHeight={100}/>
-                <BulletOutputViewer bullets={this.state.text.split('\n').map(this.props.abbrReplacer)} 
+                <BulletOutputViewer bullets={this.props.text.split('\n').map(this.props.abbrReplacer)} 
                     width={this.props.width} 
                     optims={this.state.optims} 
                     enableOptim={this.props.enableOptim} 

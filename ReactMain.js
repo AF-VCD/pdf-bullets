@@ -72,6 +72,7 @@ class BulletApp extends React.Component {
             abbrReplacer: (sentence)=>{return sentence;},
             selection: "",
             enableOptim: true,
+            text: this.props.initialText,
         }
         this.bulletComparatorRef = React.createRef();
     }
@@ -107,14 +108,11 @@ class BulletApp extends React.Component {
         })
     }
     handleOptimChange = (e) =>{
-        
         this.setState({
             enableOptim: e.target.checked
         },()=>{
             clog("optimization toggle: "+ this.state.enableOptim, checkOptims)
         });
-        
-        
     }
     handleSelect = (newSel)=>{
         clog('selection registered',false);
@@ -124,14 +122,19 @@ class BulletApp extends React.Component {
         });
         
     }
+    handleTextChange = (e) => {
+        this.setState({
+            text: e.target.value,
+        });
+    }
     
     render(){
         return (
             <div>
                 <DocumentTools enableOptim={this.state.enableOptim} onOptimChange={this.handleOptimChange} />
                 <SynonymViewer word={this.state.selection} abbrDict={this.state.abbrDict} abbrReplacer={this.state.abbrReplacer} />
-                <BulletComparator initialText={this.props.initialText} 
-                    abbrReplacer={this.state.abbrReplacer} 
+                <BulletComparator text={this.state.text} 
+                    abbrReplacer={this.state.abbrReplacer} handleTextChange={this.handleTextChange}
                     width="202.51mm" onSelect={this.handleSelect} enableOptim={this.state.enableOptim} />
                 <AbbrsViewer settings={this.props.tableSettings} 
                     initialData={this.props.initialData} 
