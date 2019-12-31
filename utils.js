@@ -99,3 +99,4 @@ String.prototype.hashCode = function() {
  // booleans for debugging
 const checkOptims = false;
 const checkAbbrs = false;
+const checkPDF = true;

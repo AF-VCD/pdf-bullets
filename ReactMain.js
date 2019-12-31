@@ -73,6 +73,7 @@ class BulletApp extends React.Component {
             selection: "",
             enableOptim: true,
             text: this.props.initialText,
+            width: this.props.initialWidth,
         }
         this.bulletComparatorRef = React.createRef();
     }
@@ -127,15 +128,44 @@ class BulletApp extends React.Component {
             text: e.target.value,
         });
     }
-    
+    handleWidthChange = (e) => {
+        this.setState({
+            width: e.target.value + 'mm',
+        });
+    }
+    handleTextNorm = () => {
+        this.setState((state) => {
+            state.text = state.text.split('\n').map((line)=>{
+                return line.replace(/\s+/g,' ')
+            }).join('\n');
+            return state
+        });
+    }
+    handleTextUpdate = (newText)=>{
+        return () => this.setState({
+            text: newText,
+        });
+    }
+    handleWidthUpdate = (newWidth) =>{
+        return () => {
+            this.setState({width: newWidth})
+        };
+    } 
     render(){
         return (
             <div>
-                <DocumentTools enableOptim={this.state.enableOptim} onOptimChange={this.handleOptimChange} />
+                <DocumentTools 
+                    enableOptim={this.state.enableOptim}
+                    onOptimChange={this.handleOptimChange} 
+                    width={this.state.width} onWidthChange={this.handleWidthChange} 
+                    onWidthUpdate={this.handleWidthUpdate}
+                    onTextNorm={this.handleTextNorm}
+                    onTextUpdate={this.handleTextUpdate}
+                    />
                 <SynonymViewer word={this.state.selection} abbrDict={this.state.abbrDict} abbrReplacer={this.state.abbrReplacer} />
                 <BulletComparator text={this.state.text} 
                     abbrReplacer={this.state.abbrReplacer} handleTextChange={this.handleTextChange}
-                    width="202.51mm" onSelect={this.handleSelect} enableOptim={this.state.enableOptim} />
+                    width={this.state.width} onSelect={this.handleSelect} enableOptim={this.state.enableOptim} />
                 <AbbrsViewer settings={this.props.tableSettings} 
                     initialData={this.props.initialData} 
                     onAbbrChange={this.handleAbbrChange} />
@@ -154,5 +184,5 @@ var fontReady = new Promise(function(resolve,rej){
 });
 
 fontReady.then( ()=>{
-    ReactDOM.render( <BulletApp tableSettings={tableSettings} initialData={tableData} initialText={initialText} />, document.getElementById('stuff'));
+    ReactDOM.render( <BulletApp tableSettings={tableSettings} initialData={tableData} initialText={initialText} initialWidth={"202.321mm"}/>, document.getElementById('stuff'));
 });

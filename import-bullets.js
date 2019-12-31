@@ -1,5 +1,5 @@
 // could not do a static class property because of MS edge
-Forms  = { 
+const Forms  = { 
  all : {
         'AF707': {
             'fields': ['S2DutyTitleDesc','S4Assessment','S5Assessment','S6Assessment'],

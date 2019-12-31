@@ -20,7 +20,7 @@ class AbbrTools extends React.PureComponent{
         }).then(this.getDataFromXLS);        
     }
     importAbbrs = (e) => {
-        this.fileInputRef.current.click();
+        
         if(!this.fileInputRef.current.value){
             clog('no file picked');
             return;
@@ -49,12 +49,15 @@ class AbbrTools extends React.PureComponent{
         XLSX.utils.book_append_sheet(wb,sht,'abbrs')
         XLSX.writeFile(wb,'abbrs.xlsx');
     }
+    inputClick = () => {
+        this.fileInputRef.current.click();
+    }
     render(){
 
         return (
             <div>
                 <input type="file" onChange={this.importAbbrs} ref={this.fileInputRef} style={{display:"none"}}></input>
-                <button onClick={this.importAbbrs}>Import Abbrs</button>
+                <button onClick={this.inputClick}>Import Abbrs</button>
                 <button onClick={this.exportToXLS}>Export Abbrs</button>
                 <button onClick={() => {
                     if(confirm("Are you sure you want to remove all existing acronyms and replace with a sample list?")){

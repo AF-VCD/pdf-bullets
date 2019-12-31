@@ -87,3 +87,7 @@ h2{
 .toolbox{
     display:inline-block;
 }
+
+.toolbox button{
+    margin:5px;
+}
