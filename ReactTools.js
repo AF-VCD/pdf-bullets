@@ -29,10 +29,8 @@ class PDFTools extends React.PureComponent{
             // This is needed to convert the bullets HTML into normal text. It gets rid of things like &amp;
            const bullets = 
                 new DOMParser().parseFromString(bulletsHTML,'text/html').documentElement.textContent;
-            clog(bullets,checkPDF)
-            
+            clog(bullets,checkPDF) 
             textUpdater(bullets)();
-            
         });
 
         tasks.getPageInfo.then(function(data){
@@ -89,10 +87,27 @@ class SaveTools extends React.PureComponent{
     constructor(props){
         super(props);
     }
+    onSave = ()=>{
+        const settings = this.props.onSave();
+        //JSON stringifying an array for future growth
+        clog(settings, checkSave)
+        const storedData = JSON.stringify([settings]);
+        clog(storedData, checkSave)
+        try{
+            localStorage.setItem('bullet-settings',storedData);
+            console.log("saved settings/data to local storage with character length " + storedData.length);
+        }catch(err){
+            if(err.name == 'SecurityError'){
+                alert("Sorry, saving to cookies does not work using the file:// interface and/or your browser's privacy settings")
+            }else{
+                throw err;
+            }
+        }
+    }
     render(){
         return (
             <div className='toolbox'>
-                <button>Save Text + Settings</button>
+                <button onClick={this.onSave}>Save Text + Settings</button>
             </div>
         );
     }
@@ -110,7 +125,7 @@ class DocumentTools extends React.PureComponent{
                     width={this.props.width} onWidthChange={this.props.onWidthChange}
                     onWidthUpdate={this.props.onWidthUpdate}/>
                 <InputTools onTextNorm={this.props.onTextNorm}/>
-                <SaveTools />
+                <SaveTools onSave={this.props.onSave}/>
             </div>
         );
     }

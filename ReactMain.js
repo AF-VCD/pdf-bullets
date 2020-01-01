@@ -64,18 +64,60 @@ const tableSettings = {
     },
 };
 
+
+
+    let settings;
+    try{
+        if(localStorage.getItem('bullet-settings')){
+            settings = JSON.parse(localStorage.getItem("bullet-settings"));
+            clog('settings have been retrieved', checkSave)
+            clog(settings,checkSave)
+            
+        }
+    }catch(err){
+        if(err.name == 'SecurityError'){
+            console.log('Was not able to get localstorage bullets due to use of file interface and browser privacy settings');
+        }else{
+            throw err;
+        }
+    }
+
+
 class BulletApp extends React.Component {
     constructor(props){
         super(props);
-        this.state={
-            abbrDict: {},
-            abbrReplacer: (sentence)=>{return sentence;},
-            selection: "",
-            enableOptim: true,
-            text: this.props.initialText,
-            width: this.props.initialWidth,
+        if(this.props.savedSettings){
+            //enableOptim, text, and width should be in settings
+            clog('settings are being loaded into BulletApp', checkSave)
+            clog(this.props.savedSettings, checkSave)
+            const settings = this.props.savedSettings[0];
+            this.state={
+                enableOptim: settings.enableOptim,
+                text: settings.text,
+                width: settings.width,
+            };
+            this.initialAbbrData = settings.abbrData.map((row)=>{
+                return {
+                    enabled: row[0],
+                    abbr: row[1],
+                    value: row[2], 
+                };
+            });
+
+        }else{
+            this.state={
+                enableOptim: true,
+                text: this.props.initialText,
+                width: this.props.initialWidth,
+            }
+            this.initialAbbrData = this.props.initialAbbrData;
         }
-        this.bulletComparatorRef = React.createRef();
+        
+        this.state.abbrDict = {};
+        this.state.abbrReplacer = (sentence)=>{return sentence;};
+        this.state.selection = '';
+        this.abbrsViewerRef = React.createRef();
+
     }
     handleAbbrChange = (newAbbrDict)=>{
         this.setState({
@@ -151,6 +193,19 @@ class BulletApp extends React.Component {
             this.setState({width: newWidth})
         };
     } 
+    handleSave = () =>{
+        clog(this.abbrsViewerRef,checkSave);
+        clog(this.abbrsViewerRef.current.getData(),checkSave);
+        return {
+            width: this.state.width,
+            text: this.state.text,
+            abbrData: this.abbrsViewerRef.current.getData().filter((row)=>{
+                return row[0] != null
+            }),
+            enableOptim:this.state.enableOptim,
+            //do I need to add abbrReplacer?
+        }
+    }
     render(){
         return (
             <div>
@@ -161,14 +216,15 @@ class BulletApp extends React.Component {
                     onWidthUpdate={this.handleWidthUpdate}
                     onTextNorm={this.handleTextNorm}
                     onTextUpdate={this.handleTextUpdate}
+                    onSave={this.handleSave}
                     />
                 <SynonymViewer word={this.state.selection} abbrDict={this.state.abbrDict} abbrReplacer={this.state.abbrReplacer} />
                 <BulletComparator text={this.state.text} 
                     abbrReplacer={this.state.abbrReplacer} handleTextChange={this.handleTextChange}
                     width={this.state.width} onSelect={this.handleSelect} enableOptim={this.state.enableOptim} />
                 <AbbrsViewer settings={this.props.tableSettings} 
-                    initialData={this.props.initialData} 
-                    onAbbrChange={this.handleAbbrChange} />
+                    initialData={this.initialAbbrData} 
+                    onAbbrChange={this.handleAbbrChange} ref={this.abbrsViewerRef}/>
             </div>
         );
     }
@@ -183,6 +239,7 @@ var fontReady = new Promise(function(resolve,rej){
     resolve();
 });
 
+// /
 fontReady.then( ()=>{
-    ReactDOM.render( <BulletApp tableSettings={tableSettings} initialData={tableData} initialText={initialText} initialWidth={"202.321mm"}/>, document.getElementById('stuff'));
+    ReactDOM.render( <BulletApp savedSettings={settings} tableSettings={tableSettings} initialAbbrData={tableData} initialText={initialText} initialWidth={"202.321mm"}/>, document.getElementById('stuff'));
 });
