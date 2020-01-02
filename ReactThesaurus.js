@@ -41,12 +41,22 @@ class SynonymViewer extends React.PureComponent{
     render(){
         const replacedWord = this.props.abbrReplacer(this.props.word);
         const otherAbbrs = this.props.abbrDict[this.props.word];
-        return (
-            <div id='thesaurus' className="border">
-                <Synonym word={this.props.word} 
+        const header = <Synonym word={this.props.word} key={this.props.word}
                             abbr={replacedWord==this.props.word ? "" : replacedWord} 
                             otherAbbrs={otherAbbrs}/>
-                <SynonymList synonyms={this.state.synonyms} abbrDict={this.props.abbrDict} abbrReplacer={this.props.abbrReplacer}/>
+        const synonyms =  <SynonymList key={this.state.synonyms.join('')} synonyms={this.state.synonyms} abbrDict={this.props.abbrDict} abbrReplacer={this.props.abbrReplacer} />;
+        const explanation = <div key='init'>Auto-thesaurus box - highlight a word or phrase below to show synonyms in this box</div>;
+        let contents;
+        if(this.props.word == ''){
+            contents = explanation;
+        }else if(this.state.synonyms.length == 0){
+            contents = [header, <div key='none'>No results found</div>]
+        }else{
+            contents = [header, synonyms];
+        }
+        return (
+            <div id='thesaurus' className="border">
+                {contents}
             </div>
         )
     }

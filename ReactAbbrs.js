@@ -55,7 +55,7 @@ class AbbrTools extends React.PureComponent{
     render(){
 
         return (
-            <div>
+            <div className='toolbox'>
                 <input type="file" onChange={this.importAbbrs} ref={this.fileInputRef} style={{display:"none"}}></input>
                 <button onClick={this.inputClick}>Import Abbrs</button>
                 <button onClick={this.exportToXLS}>Export Abbrs</button>
@@ -132,6 +132,7 @@ class AbbrsViewer extends React.PureComponent {
         clog(this.state.tableData, checkAbbrs)
         return (
             <div>
+                <h2>Abbreviations List</h2>
                 <AbbrTools updater={this.reloadData} getter={this.getData}/>
                 <HotTable settings={this.props.settings}  data={this.state.tableData}
                 ref={this.tableRef} 

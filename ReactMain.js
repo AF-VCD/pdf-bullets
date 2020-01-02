@@ -158,12 +158,14 @@ class BulletApp extends React.Component {
         });
     }
     handleSelect = (newSel)=>{
-        clog('selection registered',false);
+        clog('selection registered',checkThesaurus);
         const maxWords = 8;
-        this.setState({
-            selection: Bullet.tokenize(newSel.trim()).slice(0,maxWords).join(' ')
-        });
-        
+        if(newSel.trim() != ''){
+            this.setState({
+                selection: Bullet.tokenize(newSel.trim()).slice(0,maxWords).join(' ')
+            });
+        }
+
     }
     handleTextChange = (e) => {
         this.setState({

@@ -118,7 +118,7 @@ class BulletEditor extends React.PureComponent{
     }
     render(){
         return (
-            <div className="bulletContainer border" >
+            <div className="border" >
                 <textarea 
                     ref={this.ref}
                     onChange={this.handleChange} 
@@ -165,7 +165,7 @@ class BulletOutputViewer extends React.PureComponent{
     }
     render(){
         return (
-            <div className="bulletContainer border" tabIndex="1" 
+            <div className="border" tabIndex="1" 
                 onKeyDown={this.selectOutput} 
                 onKeyUp={this.props.onHighlight} 
                 ref={this.outputRef}
@@ -493,12 +493,17 @@ class BulletComparator extends React.PureComponent {
         clog(this.props, checkOptims)
         return (
             <div>
+                <div className="bulletContainer">
+                <h2>Input Bullets Here:</h2>
                 <BulletEditor 
                     text={this.props.text} 
                     handleTextChange={this.props.handleTextChange} 
                     width={this.props.width}
                     onHighlight={this.handleSelect}
                     minHeight={100}/>
+                </div>
+                <div className="bulletContainer">
+                <h2>View Output Here:</h2>
                 <BulletOutputViewer bullets={this.props.text.split('\n')} 
                     abbrReplacer={this.props.abbrReplacer}
                     width={this.props.width} 
@@ -507,6 +512,7 @@ class BulletComparator extends React.PureComponent {
                     optimizer={this.optimizer}
                     onOptim={this.updateOptims}
                     onHighlight={this.handleSelect}/>
+                </div>
             </div>
         );
     }
