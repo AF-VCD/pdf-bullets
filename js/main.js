@@ -1,16 +1,30 @@
 
-const initialText = '- Saved Air Force moneys; Saved Air Force moneys; Saved Air Force moneys; Saved Air Force moneys; Saved Air Force moneys; Saved Air Force moneys;  \n\
-- Engineered 900 airplanes; Engineered 900 airplanes; Engineered 900 airplanes; Engineered 900 airplanes; Engineered 900 airplanes; Engineered 900 airplanes;equipment test';
+const initialText = '- This is a custom built bullet writing tool; abbreviations will be replaced according to table below--you will see output on the right\n\
+- This tool can optimize spacing; output will be red if the optimizer could not fix spacing with 2004 or 2009 Unicode spaces\n\
+- There is a thesaurus above; select a word in this or the output box to view synonyms--words in parentheses are abbreviations you have configured';
 
 const tableData = [{
     enabled: true,
-    abbr: 'eq',
-    value: 'equipment', 
+    abbr: 'abbrs',
+    value: 'abbreviations', 
     },{
     enabled: true,
-    abbr: 'tst',
-    value: 'test',
-    },];
+    abbr: 'tbl',
+    value: 'table',
+    },{
+    enabled: true,
+    abbr: 'optim',
+    value: 'optimize',
+    },{
+    enabled: true,
+    abbr: 'w/',
+    value: 'with ',
+    },{
+    enabled: true,
+    abbr: 'parens',
+    value: 'parentheses',
+    },
+];
 
 const tableSettings = {
     columns: [{
