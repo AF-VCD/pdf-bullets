@@ -91,3 +91,12 @@ h2{
 .toolbox button{
     margin:5px;
 }
+
+#footer{
+    text-align:center;
+    font-size:12px;
+    color:grey;
+}
+#footer div{
+    display:block
+}
