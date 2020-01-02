@@ -102,19 +102,24 @@ class BulletEditor extends React.PureComponent{
     }
     handleChange = (e) => {
         this.props.handleTextChange(e)
+        this.fixHeight();
     }
     handleInput = (e) => {
-        clog(this.ref,false)
+        clog(this.ref,checkEditor)
         this.fixHeight();
     }
     fixHeight = () => {
         this.ref.current.style.height = 'auto';
         this.ref.current.style.height = Math.max(this.ref.current.scrollHeight, this.props.minHeight) + 'px';
-        clog('input box height adjusted')
+        clog('input box height adjusted', checkEditor)
     }
     componentDidMount(){
         this.fixHeight();
-        clog('text editor mounted')
+        clog('text editor mounted', checkEditor)
+    }
+    componentDidUpdate(){
+        clog('text editor updated',checkEditor)
+        this.fixHeight();
     }
     render(){
         return (
@@ -175,8 +180,7 @@ class BulletOutputViewer extends React.PureComponent{
                     const optimRef = React.createRef();
                     return <OptimizedBullet text={line} 
                         width={this.props.width}
-                        key={i+Bullet.tokenize(line).join(" ")+this.props.enableOptim} 
-                        class='bullet optimized' 
+                        key={i+this.props.abbrReplacer(line)+this.props.enableOptim} 
                         optims={this.props.optims}
                         onOptim={this.props.onOptim}
                         optimizer={this.props.optimizer}
@@ -436,7 +440,7 @@ class OptimizedBullet extends React.PureComponent{
                 renderRef={this.renderRef}
                 width={this.props.width} 
                 onHighlight={this.props.onHighlight}
-                class='bullet optimized' 
+                class='bullets optimized' 
                 style={{
                     color: newColor,
                     display:'inline-block',

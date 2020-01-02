@@ -5,24 +5,24 @@ const initialText = '- This is a custom built bullet writing tool; abbreviations
 
 const tableData = [{
     enabled: true,
-    abbr: 'abbrs',
     value: 'abbreviations', 
+    abbr: 'abbrs',
     },{
     enabled: true,
-    abbr: 'tbl',
     value: 'table',
+    abbr: 'tbl',
     },{
     enabled: true,
-    abbr: 'optim',
     value: 'optimize',
+    abbr: 'optim',
     },{
     enabled: true,
-    abbr: 'w/',
     value: 'with ',
+    abbr: 'w/',
     },{
-    enabled: true,
-    abbr: 'parens',
+    enabled: true,    
     value: 'parentheses',
+    abbr: 'parens',
     },
 ];
 
@@ -104,27 +104,18 @@ class BulletApp extends React.Component {
             //enableOptim, text, and width should be in settings
             clog('settings are being loaded into BulletApp', checkSave)
             clog(this.props.savedSettings, checkSave)
-            const settings = this.props.savedSettings[0];
-            this.state={
-                enableOptim: settings.enableOptim,
-                text: settings.text,
-                width: settings.width,
-            };
-            this.initialAbbrData = settings.abbrData.map((row)=>{
-                return {
-                    enabled: row[0],
-                    abbr: row[1],
-                    value: row[2], 
-                };
-            });
+            
+            this.state = BulletApp.ParseSettings(this.props.savedSettings);
+            
+            
 
         }else{
             this.state={
                 enableOptim: true,
                 text: this.props.initialText,
                 width: this.props.initialWidth,
+                abbrData: this.props.abbrData,
             }
-            this.initialAbbrData = this.props.initialAbbrData;
         }
         
         this.state.abbrDict = {};
@@ -133,7 +124,58 @@ class BulletApp extends React.Component {
         this.abbrsViewerRef = React.createRef();
 
     }
-    handleAbbrChange = (newAbbrDict)=>{
+    static ParseSettings = (settingsAll) => {
+        const settings = settingsAll[0];
+        
+        const state={
+            enableOptim: settings.enableOptim,
+            text: settings.text,
+            width: settings.width,
+            abbrData: settings.abbrData.map((row)=>{
+                return {
+                    enabled: row[0],
+                    value: row[1], 
+                    abbr: row[2],
+                };
+            }),
+        };
+        return state;
+    }
+    handleJSONImport = (settings)=>{
+        clog("handleJSONImport: ", checkJSON) 
+        clog(settings, checkJSON)
+        this.setState({text:settings.text});
+        this.setState((state)=>{
+            state.enableOptim = settings.enableOptim;
+            state.width = settings.width;
+            state.abbrData= settings.abbrData;
+            return state;
+        },);
+        // some sort of race condition happens if I try to set text and other settings at the same time!
+
+    }
+    handleAbbrChange = (tableRef)=>{
+        if(tableRef.current == null ){return}
+        const abbrTable = tableRef.current.hotInstance;
+        const newAbbrDict = {};
+
+        for (var i = 0; i < abbrTable.countRows();i++){
+            let fullWord = String(abbrTable.getDataAtRowProp(i,'value')).replace(/\s/g,' ');
+            let abbr = abbrTable.getDataAtRowProp(i,'abbr');
+            //console.log('abbr: ' + abbr)
+            let enabled = abbrTable.getDataAtRowProp(i,'enabled')
+            newAbbrDict[fullWord] = newAbbrDict[fullWord] || [];
+            
+            if(enabled){
+                newAbbrDict[fullWord].enabled = newAbbrDict[fullWord].enabled || [];
+                newAbbrDict[fullWord].enabled.push(abbr)
+            }else{
+                newAbbrDict[fullWord].disabled = newAbbrDict[fullWord].disabled || [];
+                newAbbrDict[fullWord].disabled.push(abbr)
+            }
+
+        }
+
         this.setState({
             abbrDict: newAbbrDict,
             abbrReplacer: (sentence) => {
@@ -233,13 +275,14 @@ class BulletApp extends React.Component {
                     onTextNorm={this.handleTextNorm}
                     onTextUpdate={this.handleTextUpdate}
                     onSave={this.handleSave}
+                    onJSONImport={this.handleJSONImport}
                     />
                 <SynonymViewer word={this.state.selection} abbrDict={this.state.abbrDict} abbrReplacer={this.state.abbrReplacer} />
                 <BulletComparator text={this.state.text} 
                     abbrReplacer={this.state.abbrReplacer} handleTextChange={this.handleTextChange}
                     width={this.state.width} onSelect={this.handleSelect} enableOptim={this.state.enableOptim} />
                 <AbbrsViewer settings={this.props.tableSettings} 
-                    initialData={this.initialAbbrData} 
+                    abbrData={this.state.abbrData} 
                     onAbbrChange={this.handleAbbrChange} ref={this.abbrsViewerRef}/>
             </div>
         );
@@ -257,5 +300,5 @@ var fontReady = new Promise(function(resolve,rej){
 
 // /
 fontReady.then( ()=>{
-    ReactDOM.render( <BulletApp savedSettings={settings} tableSettings={tableSettings} initialAbbrData={tableData} initialText={initialText} initialWidth={"202.321mm"}/>, document.getElementById('stuff'));
+    ReactDOM.render( <BulletApp savedSettings={settings} tableSettings={tableSettings} abbrData={tableData} initialText={initialText} initialWidth={"202.321mm"}/>, document.getElementById('stuff'));
 });

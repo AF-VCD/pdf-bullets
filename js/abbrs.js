@@ -73,10 +73,7 @@ class AbbrsViewer extends React.PureComponent {
         super(props);
         this.tableRef = React.createRef();
         clog(this.props, checkAbbrs)
-        this.state = {
-            tableData: this.props.initialData,
-            abbrDict: {},
-        }
+
     }
     // var tableUpdater = function(){
     //     updateAbbrDict();
@@ -86,40 +83,19 @@ class AbbrsViewer extends React.PureComponent {
     // };
     
 
-    handleAbbrChange = ()=>{
-        //this.props.onAbbrChange(e);
-        clog(this.props,checkAbbrs)
-        clog(this.state,checkAbbrs)
-        clog(this.tableRef.current,checkAbbrs)
+    handleAbbrChange = (type) => {
+        clog(type, checkAbbrs)
+        return (e)=>{
+            //this.props.onAbbrChange(e);
+            clog(e, checkAbbrs)
+            clog(this.props,checkAbbrs)
+            clog(this.state,checkAbbrs)
+            clog(this.tableRef.current,checkAbbrs)
 
-        if(this.tableRef.current == null ){return}
-        const abbrTable = this.tableRef.current.hotInstance;
-        const newAbbrDict = {};
+            //clog(new RegExp("(\\b)("+Object.keys(this.state.abbrDict).join("|")+")(\\b|$|\\$)",'g'),checkAbbrs)
 
-        for (var i = 0; i < abbrTable.countRows();i++){
-            let fullWord = String(abbrTable.getDataAtRowProp(i,'value')).replace(/\s/g,' ');
-            let abbr = abbrTable.getDataAtRowProp(i,'abbr');
-            //console.log('abbr: ' + abbr)
-            let enabled = abbrTable.getDataAtRowProp(i,'enabled')
-            newAbbrDict[fullWord] = newAbbrDict[fullWord] || [];
-            
-            if(enabled){
-                newAbbrDict[fullWord].enabled = newAbbrDict[fullWord].enabled || [];
-                newAbbrDict[fullWord].enabled.push(abbr)
-            }else{
-                newAbbrDict[fullWord].disabled = newAbbrDict[fullWord].disabled || [];
-                newAbbrDict[fullWord].disabled.push(abbr)
-            }
-
+            this.props.onAbbrChange(this.tableRef);   
         }
-        this.setState((state)=>{
-            state.abbrDict = newAbbrDict;
-            return state;
-        })
-        //clog(new RegExp("(\\b)("+Object.keys(this.state.abbrDict).join("|")+")(\\b|$|\\$)",'g'),checkAbbrs)
-
-        this.props.onAbbrChange(this.state.abbrDict);
-        
     }
     reloadData = (rows)=>{
         this.tableRef.current.hotInstance.updateSettings({data:[]});
@@ -129,17 +105,17 @@ class AbbrsViewer extends React.PureComponent {
         return this.tableRef.current.hotInstance.getData();
     }
     render() {
-        clog(this.state.tableData, checkAbbrs)
+        clog(this.props.abbrData, checkAbbrs)
         return (
             <div>
                 <h2>Abbreviations List</h2>
                 <AbbrTools updater={this.reloadData} getter={this.getData}/>
-                <HotTable settings={this.props.settings}  data={this.state.tableData}
+                <HotTable settings={this.props.settings}  data={this.props.abbrData}
                 ref={this.tableRef} 
-                afterChange={this.handleAbbrChange}
-                afterPaste={this.handleAbbrChange}
-                afterRemoveRow={this.handleAbbrChange}
-                afterUpdateSettings={this.handleAbbrChange}/>
+                afterChange={this.handleAbbrChange('afterchange')}
+                afterPaste={this.handleAbbrChange('afterpaste')}
+                afterRemoveRow={this.handleAbbrChange('afterremoverow')}
+                afterUpdateSettings={this.handleAbbrChange('afterupdatesettings')}/>
             </div>
         );
     }

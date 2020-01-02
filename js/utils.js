@@ -101,3 +101,5 @@ const checkOptims = false;
 const checkAbbrs = false;
 const checkPDF = false;
 const checkSave = false;
+const checkEditor = false;
+const checkJSON = false;

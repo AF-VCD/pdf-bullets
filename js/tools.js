@@ -1,20 +1,34 @@
 //PDF import
-class PDFTools extends React.PureComponent{
+class ImportTools extends React.PureComponent{
     constructor(props){
         super(props);
         this.fileInputRef = React.createRef();
+        this.state={
+            type:'none'
+        }
     }
 
-    importPDF = (e) => {
+    importFile = (e) => {
         if(!this.fileInputRef.current.value){
             clog('no file picked');
             return;
         }else{
-            return Promise.resolve(this.fileInputRef.current.files[0]).then(this.getDataFromPDF);
+            let callback = (file)=>{clog(file)};
+            if(this.state.type == 'PDF'){
+                callback = this.getDataFromPDF;
+            }else if(this.state.type == 'JSON'){
+                callback = this.getDataFromJSON;
+            }
+            return Promise.resolve(this.fileInputRef.current.files[0]).then(callback);
         }
     }
-    inputClick = () => {
-        this.fileInputRef.current.click();;
+    inputClick = (importType) => {
+        return () => {
+            this.setState({
+                type: importType,
+            });
+            this.fileInputRef.current.click();
+        };
     }
     getDataFromPDF = (file) => {
         const tasks = getBulletsFromPdf(file);
@@ -39,11 +53,23 @@ class PDFTools extends React.PureComponent{
             widthUpdater(data.width)();          
         });
     }
+    getDataFromJSON = (file) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            clog(e.target.result, checkJSON)
+            
+            const data = JSON.parse(e.target.result);
+            
+            this.props.onJSONImport(BulletApp.ParseSettings(data));
+        };
+        reader.readAsText(file)
+    }
     render(){
         return( 
             <div className='toolbox'>
-                <input type="file" onChange={this.importPDF} style={{display:"none"}} ref={this.fileInputRef}></input>
-                <button onClick={this.inputClick}>Import from PDF</button>
+                <input type="file" onChange={this.importFile} style={{display:"none"}} ref={this.fileInputRef}></input>
+                <button onClick={this.inputClick('PDF')}>Import (PDF)</button>
+                <button onClick={this.inputClick('JSON')}>Import (JSON)</button>
             </div>
         );
     }
@@ -86,6 +112,7 @@ class InputTools extends React.PureComponent{
 class SaveTools extends React.PureComponent{
     constructor(props){
         super(props);
+        this.exportRef = React.createRef();
     }
     onSave = ()=>{
         const settings = this.props.onSave();
@@ -104,10 +131,26 @@ class SaveTools extends React.PureComponent{
             }
         }
     }
+    onExport = ()=>{
+        const settings = this.props.onSave();
+        //JSON stringifying an array for future growth
+        clog(settings, checkSave)
+        const storedData = JSON.stringify([settings]);
+        clog(storedData, checkSave)
+
+        const dataURI = 'data:application/JSON;charset=utf-8,'+ encodeURIComponent(storedData);
+        this.exportRef.current.href=dataURI;
+        this.exportRef.current.click();
+        clog(dataURI, checkSave)
+        console.log("exported settings/data to local storage with character length " + storedData.length);
+        
+    }
     render(){
         return (
             <div className='toolbox'>
-                <button onClick={this.onSave}>Save Text + Settings</button>
+                <button onClick={this.onSave}>Save</button>
+                <button onClick={this.onExport}>Save JSON</button>
+                <a style={{display:"none"}} download='settings.json' ref={this.exportRef}></a>
             </div>
         );
     }
@@ -119,13 +162,14 @@ class DocumentTools extends React.PureComponent{
     render(){
         return (
             <div>
-                <PDFTools onTextUpdate={this.props.onTextUpdate} onWidthUpdate={this.props.onWidthUpdate}/>
+                <SaveTools onSave={this.props.onSave}/>
+                <ImportTools onJSONImport={this.props.onJSONImport} onTextUpdate={this.props.onTextUpdate} onWidthUpdate={this.props.onWidthUpdate}/>
                 <OutputTools 
                     enableOptim={this.props.enableOptim} onOptimChange={this.props.onOptimChange} 
                     width={this.props.width} onWidthChange={this.props.onWidthChange}
                     onWidthUpdate={this.props.onWidthUpdate}/>
                 <InputTools onTextNorm={this.props.onTextNorm}/>
-                <SaveTools onSave={this.props.onSave}/>
+                
             </div>
         );
     }
