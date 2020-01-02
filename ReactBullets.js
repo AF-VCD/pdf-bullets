@@ -18,7 +18,7 @@ class Bullet extends React.PureComponent{
     }
     render(){
         return(
-            <div style={{width: this.props.width}} onMouseUp={this.props.onHighlight} >
+            <div style={{width: this.props.width, height:this.props.height}} onMouseUp={this.props.onHighlight} >
                 <span className={this.props.class} style={this.props.style} ref={this.props.renderRef} >
                     {this.props.text}
                 </span>
@@ -72,7 +72,8 @@ class Bullet extends React.PureComponent{
                 "sentence": this.props.text,
                 "status":false,
             },
-            "direction": false
+            "direction": false,
+            "height": trueHeight,
         }
 
         // you may be wondering, 'why do you have to check width and height? couldn't you 
@@ -104,8 +105,16 @@ class BulletEditor extends React.PureComponent{
     }
     handleInput = (e) => {
         clog(this.ref,false)
+        this.fixHeight();
+    }
+    fixHeight = () => {
         this.ref.current.style.height = 'auto';
         this.ref.current.style.height = Math.max(this.ref.current.scrollHeight, this.props.minHeight) + 'px';
+        clog('input box height adjusted')
+    }
+    componentDidMount(){
+        this.fixHeight();
+        clog('text editor mounted')
     }
     render(){
         return (
@@ -145,9 +154,22 @@ class BulletOutputViewer extends React.PureComponent{
             }
         }
     }
+    handleCopy = (e)=>{
+        
+        let text = Bullet.Untweak(window.getSelection().toString())
+        //console.log('Copy event: ' + text)
+        text = text.replace(/\n/g,'\r\n'); //need this for WINDOWS!
+        //console.log('Copy event: ' + text)
+        e.clipboardData.setData('text/plain',text);
+        e.preventDefault();
+    }
     render(){
         return (
-            <div className="bulletContainer border" tabIndex="1" onKeyDown={this.selectOutput} onKeyUp={this.props.onHighlight} ref={this.outputRef}>
+            <div className="bulletContainer border" tabIndex="1" 
+                onKeyDown={this.selectOutput} 
+                onKeyUp={this.props.onHighlight} 
+                ref={this.outputRef}
+                onCopy={this.handleCopy}>
                 {this.props.bullets.map(
                 (line,i)=>{
                     const optimRef = React.createRef();
@@ -160,8 +182,10 @@ class BulletOutputViewer extends React.PureComponent{
                         optimizer={this.props.optimizer}
                         enableOptim={this.props.enableOptim}
                         onHighlight={this.props.onHighlight}
+                        abbrReplacer = {this.props.abbrReplacer}
                         ref={optimRef} 
-                        optimRef={optimRef}/>
+                        optimRef={optimRef}
+                        />
                 })}
             </div>
         )
@@ -177,14 +201,15 @@ class OptimizedBullet extends React.PureComponent{
             loading: true,
             updating: null,
             status: BULLET.NOT_OPT,
+            height:'unset',
         }
         this.ref = this.props.optimRef;
         this.bulletRef=React.createRef();
         this.renderRef=React.createRef(); //this is a reference to the actual tag inside bullet in which the text is placed
         clog("constructed: " + this.state.text, false)
     }
-    optimExists = (sentence) => {
-        if(this.props.optims[sentence] && this.props.optims[sentence][this.props.width]){
+    optimExists = () => {
+        if(this.props.optims[this.state.text] && this.props.optims[this.state.text][this.props.width]){
             return true
         }else{
             return false
@@ -195,11 +220,11 @@ class OptimizedBullet extends React.PureComponent{
         if(!this.props.enableOptim){
             clog('no optimization done because it is disabled', checkOptims)
             this.setState({
-                text: this.props.text,
+                text: this.props.abbrReplacer(this.props.text),
                 status: BULLET.NOT_OPT,
                 loading:false
             })
-        }else if(this.optimExists(sentence)){
+        }else if(this.optimExists()){
             clog('optimization already exists for ' + sentence, checkOptims)
             clog(this.props.optims[sentence][this.props.width],checkOptims)
             this.setState({
@@ -247,7 +272,7 @@ class OptimizedBullet extends React.PureComponent{
     optimize = () => {
         const sentence = Bullet.clean(this.state.text);
         //clog(this.ref)
-        return this.optimizer(this.ref.current).then((optimization) => {
+        return this.optimizer().then((optimization) => {
             this.props.onOptim({
                 "sentence":sentence,
                 "width": this.props.width,
@@ -272,15 +297,21 @@ class OptimizedBullet extends React.PureComponent{
             
             const smallerSpace = "\u2009";
             const largerSpace = "\u2004";
-        
-            const origSentence = Bullet.clean(this.props.text);
+
+            const origSentence = 
+                Bullet.clean(
+                    this.props.abbrReplacer(this.props.text) 
+                )
+            
 
             //initialization of optimized words array
             let optWords = Bullet.tokenize(origSentence);
-            //initial instantiation of previousSentence
-            let prevSentence = origSentence;
+
 
             const initResults = bulletRef.evaluate();
+            this.setState({
+                text: origSentence
+            })
             
             //initial instantiation of previousResults
             let prevResults = initResults;
@@ -336,7 +367,6 @@ class OptimizedBullet extends React.PureComponent{
                         break;
                     }
                     prevResults = newResults;
-                    prevSentence = newSentence;
                 } 
             } 
 
@@ -347,7 +377,42 @@ class OptimizedBullet extends React.PureComponent{
         clog('component mounted for ' + this.state.text, checkOptims)
         clog(this.state, false)
         clog(this.ref, false)
-        this.update()
+        
+        
+        
+        let origHeight;
+        if(this.state.height == 'unset'){
+            if(true){ //TODO implement enable-disable aligned output prop
+
+                // on initial component creation, I want it to render once with original property text, so I can evaluate its original height.
+                origHeight = this.bulletRef.current.evaluate().height;
+                
+            }else{
+                origHeight = 'inherit';
+            }
+            
+            // After creation and checking height, I want to initiate the state text with its abbreviations replaced, unless the user disables space optimization.
+            this.setState({
+                text: this.props.abbrReplacer(this.props.text)
+            });
+            
+        }else{
+            origHeight = this.sate.height;
+        }
+        
+        //need to set height to inherit to make optimization work correctly.
+        this.setState({
+            height:'inherit',
+        })
+
+        this.update();
+        
+
+        clog('height: '+origHeight, checkOptims)
+        // need to set state after update/optimization, because the height of the bullet makes the optimization not work correctly.
+        this.setState({
+            height: origHeight? origHeight+'px':'inherit',
+        });
     }
     componentWillUnmount(){
         clog('component unmounted ', checkOptims)
@@ -366,7 +431,7 @@ class OptimizedBullet extends React.PureComponent{
         
 
         return (
-            <Bullet text={this.state.text} 
+            <Bullet text={Bullet.Tweak(this.state.text)} 
                 ref={this.bulletRef}
                 renderRef={this.renderRef}
                 width={this.props.width} 
@@ -376,7 +441,8 @@ class OptimizedBullet extends React.PureComponent{
                     color: newColor,
                     display:'inline-block',
                     wordBreak:'break-word',
-                }}/>
+                }}
+                height={this.state.height}/>
         )
     }
 
@@ -433,7 +499,8 @@ class BulletComparator extends React.PureComponent {
                     width={this.props.width}
                     onHighlight={this.handleSelect}
                     minHeight={100}/>
-                <BulletOutputViewer bullets={this.props.text.split('\n').map(this.props.abbrReplacer)} 
+                <BulletOutputViewer bullets={this.props.text.split('\n')} 
+                    abbrReplacer={this.props.abbrReplacer}
                     width={this.props.width} 
                     optims={this.state.optims} 
                     enableOptim={this.props.enableOptim} 

@@ -100,4 +100,4 @@ String.prototype.hashCode = function() {
 const checkOptims = false;
 const checkAbbrs = false;
 const checkPDF = false;
-const checkSave = true;
+const checkSave = false;

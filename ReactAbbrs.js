@@ -129,7 +129,7 @@ class AbbrsViewer extends React.PureComponent {
         return this.tableRef.current.hotInstance.getData();
     }
     render() {
-        clog(this.state.tableData)
+        clog(this.state.tableData, checkAbbrs)
         return (
             <div>
                 <AbbrTools updater={this.reloadData} getter={this.getData}/>
