@@ -75,13 +75,6 @@ class AbbrsViewer extends React.PureComponent {
         clog(this.props, checkAbbrs)
 
     }
-    // var tableUpdater = function(){
-    //     updateAbbrDict();
-    //     updateProcessedBullets();
-    //     getThesaurus();
-    //     //console.log('change occurred')
-    // };
-    
 
     handleAbbrChange = (type) => {
         clog(type, checkAbbrs)

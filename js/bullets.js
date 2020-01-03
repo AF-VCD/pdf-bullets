@@ -63,11 +63,11 @@ class Bullet extends React.PureComponent{
 
         const trueHeight = dispNode.getBoundingClientRect().height;
         //dispNode.style.wordBreak = 'inherit';
-        var overflow = (singleWidth - parentWidth);
+        const overflow = (singleWidth - parentWidth);
     
-        var madeNewLine = trueHeight > singleHeight;
+        const madeNewLine = trueHeight > singleHeight;
         
-        var results = {
+        let results = {
             "optimization": {
                 "sentence": this.props.text,
                 "status":false,

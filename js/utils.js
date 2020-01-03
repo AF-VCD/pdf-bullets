@@ -86,7 +86,7 @@ clog = (message, bool) => {
 }
 
 String.prototype.hashCode = function() {
-   var hash = 0, i, chr;
+   let hash = 0, i, chr;
    if (this.length === 0) return hash;
    for (i = 0; i < this.length; i++) {
      chr   = this.charCodeAt(i);

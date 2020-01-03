@@ -159,7 +159,7 @@ class BulletApp extends React.Component {
         const abbrTable = tableRef.current.hotInstance;
         const newAbbrDict = {};
 
-        for (var i = 0; i < abbrTable.countRows();i++){
+        for (let i = 0; i < abbrTable.countRows();i++){
             let fullWord = String(abbrTable.getDataAtRowProp(i,'value')).replace(/\s/g,' ');
             let abbr = abbrTable.getDataAtRowProp(i,'abbr');
             //console.log('abbr: ' + abbr)
@@ -289,7 +289,7 @@ class BulletApp extends React.Component {
     }
 }
 // implementing fontReady as a promise (instead of using document.fonts.ready) to make it Edge compatible
-var fontReady = new Promise(function(resolve,rej){
+const fontReady = new Promise(function(resolve,rej){
     WebFont.load({
         custom: {
             families: ['AdobeTimes']
