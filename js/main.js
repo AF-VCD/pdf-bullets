@@ -78,8 +78,6 @@ const tableSettings = {
     },
 };
 
-
-
     let settings;
     try{
         if(localStorage.getItem('bullet-settings')){
@@ -95,8 +93,6 @@ const tableSettings = {
             throw err;
         }
     }
-
-
 class BulletApp extends React.Component {
     constructor(props){
         super(props);
@@ -218,7 +214,7 @@ class BulletApp extends React.Component {
         const maxWords = 8;
         if(newSel.trim() != ''){
             this.setState({
-                selection: Bullet.tokenize(newSel.trim()).slice(0,maxWords).join(' ')
+                selection: Bullet.Tokenize(newSel.trim()).slice(0,maxWords).join(' ')
             });
         }
 

@@ -1,6 +1,4 @@
 
-
-
 // optimization status codes
 // status codes for optimization direction 
 // had to move this to a floating object because MS Edge doesn't support static variables
@@ -25,11 +23,11 @@ class Bullet extends React.PureComponent{
             </div>
         );
     }
-    static tokenize (sentence) {
+    static Tokenize (sentence) {
         return sentence.split(/[\s]+/);
     }
-    static clean(sentence){
-        return Bullet.tokenize(sentence).join(' ');
+    static Clean(sentence){
+        return Bullet.Tokenize(sentence).join(' ');
     }    // Tweak and Untweak are used to fix some miscellaneous PDF-vs-HTML formatting problems
     static Tweak(sentence){    
         // adds a 0-width space (\u200B) after forward slashes to cause them to wrap
@@ -274,7 +272,7 @@ class OptimizedBullet extends React.PureComponent{
         })
     }
     optimize = () => {
-        const sentence = Bullet.clean(this.state.text);
+        const sentence = Bullet.Clean(this.state.text);
         //clog(this.ref)
         return this.optimizer().then((optimization) => {
             this.props.onOptim({
@@ -303,14 +301,12 @@ class OptimizedBullet extends React.PureComponent{
             const largerSpace = "\u2004";
 
             const origSentence = 
-                Bullet.clean(
+                Bullet.Clean(
                     this.props.abbrReplacer(this.props.text) 
                 )
-            
 
             //initialization of optimized words array
-            let optWords = Bullet.tokenize(origSentence);
-
+            let optWords = Bullet.Tokenize(origSentence);
 
             const initResults = bulletRef.evaluate();
             this.setState({
@@ -323,10 +319,6 @@ class OptimizedBullet extends React.PureComponent{
             const newSpace = (initResults.direction == BULLET.ADD_SPACE)? largerSpace: smallerSpace;
             
             clog('Sentence: ' + origSentence, checkOptims)
-            //console.log(initResults)
-            //console.log('\tspan node height: ' + spanNode.offsetHeight)
-            //console.log('\tdesired height: ' + singleHeight)
-        
         
             function getRandomInt(seed,max){
                 return Math.floor( Math.abs((Math.floor(9*seed.hashCode()+5) % 100000) / 100000) * Math.floor(max));

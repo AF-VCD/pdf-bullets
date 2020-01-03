@@ -19,8 +19,6 @@ const Forms  = {
         },
     }
 };
-
-
 function getBulletsFromPdf(filedata){
 
     
