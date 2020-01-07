@@ -58,6 +58,10 @@
     </h1>
     
     <div id="stuff"></div>
+    <div id="legacy"></div>
+    <script type='text/javascript'>
+    document.getElementById('legacy').innerText = decodeURIComponent(localStorage.getItem("bullets")).trim();
+    </script>
     <div id="footer">
         <div>If you have feedback, submit 
             an <a href='https://github.com/EA-Pods-Team/pdf-bullets/issues'>issue</a> 
