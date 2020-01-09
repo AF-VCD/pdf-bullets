@@ -19,7 +19,10 @@ class ImportTools extends React.PureComponent{
             }else if(this.state.type == 'JSON'){
                 callback = this.getDataFromJSON;
             }
-            return Promise.resolve(this.fileInputRef.current.files[0]).then(callback);
+            //return Promise.resolve(this.fileInputRef.current.files[0]).then(callback).then(() => {
+            //    this.fileInputRef.current.value = ''});
+            callback(this.fileInputRef.current.files[0]);
+            this.fileInputRef.current.value = '';
         }
     }
     inputClick = (importType) => {
