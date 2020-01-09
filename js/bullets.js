@@ -167,6 +167,7 @@ class BulletOutputViewer extends React.PureComponent{
         e.preventDefault();
     }
     render(){
+        const keyDict = {};
         return (
             <div className="border" tabIndex="1" 
                 onKeyDown={this.selectOutput} 
@@ -176,9 +177,15 @@ class BulletOutputViewer extends React.PureComponent{
                 {this.props.bullets.map(
                 (line,i)=>{
                     const optimRef = React.createRef();
+                    const key = this.props.abbrReplacer(line) + this.props.width + this.props.enableOptim;
+                    if(key in keyDict){
+                        keyDict[key] += 1;
+                    }else{
+                        keyDict[key] = 1;
+                    }
                     return <OptimizedBullet text={line} 
                         width={this.props.width}
-                        key={i+this.props.abbrReplacer(line)+this.props.enableOptim} 
+                        key={key + keyDict[key]} 
                         optims={this.props.optims}
                         onOptim={this.props.onOptim}
                         optimizer={this.props.optimizer}
