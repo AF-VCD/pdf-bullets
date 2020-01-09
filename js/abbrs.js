@@ -25,7 +25,8 @@ class AbbrTools extends React.PureComponent{
             clog('no file picked');
             return;
         }else{
-            return Promise.resolve(this.fileInputRef.current.files[0]).then(this.getDataFromXLS);
+            this.getDataFromXLS(this.fileInputRef.current.files[0]);
+            this.fileInputRef.current.value = '';
         }
         
     }
