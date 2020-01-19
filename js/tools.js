@@ -4,7 +4,8 @@ class ImportTools extends React.PureComponent{
         super(props);
         this.fileInputRef = React.createRef();
         this.state={
-            type:'none'
+            type:'none',
+            hovering:false,
         }
     }
 
@@ -67,12 +68,35 @@ class ImportTools extends React.PureComponent{
         };
         reader.readAsText(file)
     }
+
+    hoverOut = () => {
+        this.setState({hovering: false});
+    }
+    toggleMenu = () => {
+        const current = this.state.hovering;
+        this.setState({hovering:!current});
+    }
     render(){
+        const menuState = this.state.hovering? "is-active": "";
         return( 
-            <div className='toolbox'>
+            <div className={"dropdown" + ' ' + menuState}>
                 <input type="file" onChange={this.importFile} style={{display:"none"}} ref={this.fileInputRef}></input>
-                <button onClick={this.inputClick('PDF')}>Import (PDF)</button>
-                <button onClick={this.inputClick('JSON')}>Import (JSON)</button>
+                <div className="dropdown-trigger">
+                    <div className="buttons has-addons">
+                        <button className="button" onClick={this.inputClick('PDF')}>Import</button>
+                        <button className="button" onClick={this.toggleMenu}  aria-haspopup="true" aria-controls="import-menu" >
+                            <span className="icon is-small">
+                                <i className="fas fa-angle-down" aria-hidden="true"></i>
+                            </span> 
+                        </button>
+                    </div>
+                </div>
+                <div className="dropdown-menu" id="import-menu" role="menu" onMouseLeave={this.hoverOut}>
+                    <div className="dropdown-content">
+                        <a className="dropdown-item" onClick={this.inputClick('PDF')}>PDF</a>
+                        <a className="dropdown-item" onClick={this.inputClick('JSON')}>JSON</a>
+                    </div>
+                </div>
             </div>
         );
     }
@@ -84,15 +108,25 @@ class OutputTools extends React.PureComponent{
     }
     render(){
         return( 
-            <div className='toolbox'>
-                <label htmlFor="widthInput">Enter form width or click preset: </label>
-                <input id="widthInput" type='number' min="100" max="500" step=".001" value={this.props.width.replace(/[a-zA-Z]/g,'')} onChange={this.props.onWidthChange}></input>
-                <button onClick={this.props.onWidthUpdate("202.321mm")}>AWD</button>
-                <button onClick={this.props.onWidthUpdate("202.321mm")}>EPR</button>
-                <button onClick={this.props.onWidthUpdate("201.041mm")}>OPR</button> 
-                <input type="checkbox" 
+            <div className="field is-grouped">
+                {/* if I want to group things together in a field, each subelement must have the control class name */}
+                <div className="control field has-addons">
+                    <div className="control">
+                        <input className="input" id="widthInput" type='number' min="100" max="500" step=".001" value={this.props.width.replace(/[a-zA-Z]/g,'')} onChange={this.props.onWidthChange}></input>
+                    </div>
+                    <div className="control buttons has-addons">
+                        <a className="button" onClick={this.props.onWidthUpdate("202.321mm")}>AWD</a>
+                        <a className="button" onClick={this.props.onWidthUpdate("202.321mm")}>EPR</a>
+                        <a className="button" onClick={this.props.onWidthUpdate("201.041mm")}>OPR</a> 
+                    </div>                    
+
+                </div>
+                
+                <a className="control button">Space Optim</a>
+                {/* <input type="checkbox" className='checkbox'
                     checked={this.props.enableOptim} 
-                    onChange={this.props.onOptimChange} id="enableOptim" /><label htmlFor='enableOptim'>space optimization</label>
+                    onChange={this.props.onOptimChange} id="enableOptim" /> */}
+                
             </div>
         );
     }
@@ -105,9 +139,7 @@ class InputTools extends React.PureComponent{
 
     render(){
         return (
-            <div className='toolbox'>
-                <button onClick={this.props.onTextNorm}>Renormalize Input Spacing</button>
-            </div>
+            <button className="button" onClick={this.props.onTextNorm}>Renormalize Input Spacing</button>
         );
     }
 }
@@ -116,6 +148,7 @@ class SaveTools extends React.PureComponent{
     constructor(props){
         super(props);
         this.exportRef = React.createRef();
+        this.state = {hovering:false};
     }
     onSave = ()=>{
         const settings = this.props.onSave();
@@ -148,11 +181,34 @@ class SaveTools extends React.PureComponent{
         console.log("exported settings/data to local storage with character length " + storedData.length);
         
     }
+    hoverOut = () => {
+        this.setState({hovering: false});
+    }
+    toggleMenu = () => {
+        const current = this.state.hovering;
+        this.setState({hovering:!current});
+    }
     render(){
+        const menuState = this.state.hovering? "is-active": "";
         return (
-            <div className='toolbox'>
-                <button onClick={this.onSave}>Save</button>
-                <button onClick={this.onExport}>Save JSON</button>
+            <div className={'dropdown' + ' ' + menuState}>
+                <div className="dropdown-trigger">
+                    <div className="buttons has-addons">
+                        <button className="button" onClick={this.onSave}>Save </button>
+                        <button className="button" aria-haspopup="true" aria-controls="save-menu" >
+                            <span className="icon is-small" onClick={this.toggleMenu} >
+                                <i className="fas fa-angle-down" aria-hidden="true"></i>
+                            </span> 
+                        </button>
+                    </div> 
+                </div>
+                <div className="dropdown-menu" id="save-menu" role="menu" onMouseLeave={this.hoverOut}>
+                    <div className="dropdown-content">
+                        <a className="dropdown-item" onClick={this.onSave}>Cookie</a>
+                        <a className="dropdown-item" onClick={this.onExport}>JSON</a>
+                    </div>
+                </div>
+                
                 <a style={{display:"none"}} download='settings.json' ref={this.exportRef}></a>
             </div>
         );
@@ -164,16 +220,26 @@ class DocumentTools extends React.PureComponent{
     }
     render(){
         return (
-            <div>
-                <SaveTools onSave={this.props.onSave}/>
-                <ImportTools onJSONImport={this.props.onJSONImport} onTextUpdate={this.props.onTextUpdate} onWidthUpdate={this.props.onWidthUpdate}/>
-                <OutputTools 
-                    enableOptim={this.props.enableOptim} onOptimChange={this.props.onOptimChange} 
-                    width={this.props.width} onWidthChange={this.props.onWidthChange}
-                    onWidthUpdate={this.props.onWidthUpdate}/>
-                <InputTools onTextNorm={this.props.onTextNorm}/>
-                
-            </div>
+            <nav className="navbar" role="navigation" aria-label="main navigation">
+                <div className="navbar-start">
+                    <div className="navbar-item">
+                        <SaveTools onSave={this.props.onSave}/>
+                    </div>
+                    <div className="navbar-item">
+                        <ImportTools onJSONImport={this.props.onJSONImport} onTextUpdate={this.props.onTextUpdate} onWidthUpdate={this.props.onWidthUpdate}/>
+                    </div>
+                    <div className="navbar-item">
+                        <OutputTools 
+                            enableOptim={this.props.enableOptim} onOptimChange={this.props.onOptimChange} 
+                            width={this.props.width} onWidthChange={this.props.onWidthChange}
+                            onWidthUpdate={this.props.onWidthUpdate}/>
+                    </div>
+                    <div className="navbar-item">
+                        <InputTools onTextNorm={this.props.onTextNorm}/>
+                    </div>
+                 
+                </div>
+            </nav>
         );
     }
 }
