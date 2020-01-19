@@ -129,11 +129,12 @@ class BulletEditor extends React.PureComponent{
                     onInput={this.handleInput}
                     style={{
                         width: this.props.width,
+                        maxHeight: "unset",
                     }}
                     onMouseUp={this.props.onHighlight}
                     onKeyUp={this.props.onHighlight}
                     
-                    className="bullets"></textarea>
+                    className="bullets textarea is-paddingless is-marginless"></textarea>
             </div>
         )
     }
@@ -495,8 +496,8 @@ class BulletComparator extends React.PureComponent {
         clog(this.state, checkOptims)
         clog(this.props, checkOptims)
         return (
-            <div>
-                <div className="bulletContainer">
+            <div className="columns">
+                <div className="column">
                 <h2>Input Bullets Here:</h2>
                 <BulletEditor 
                     text={this.props.text} 
@@ -505,7 +506,7 @@ class BulletComparator extends React.PureComponent {
                     onHighlight={this.handleSelect}
                     minHeight={100}/>
                 </div>
-                <div className="bulletContainer">
+                <div className="column">
                 <h2>View Output Here:</h2>
                 <BulletOutputViewer bullets={this.props.text.split('\n')} 
                     abbrReplacer={this.props.abbrReplacer}
