@@ -46,7 +46,7 @@ class Bullet extends React.PureComponent{
     evaluate = () => {
         const dispNode = this.props.renderRef.current;
 
-        dispNode.style.whiteSpace = "nowrap";
+        dispNode.style.whiteSpace = "pre";
         const parentWidth = dispNode.parentNode.getBoundingClientRect().width;
         const singleWidth = dispNode.getBoundingClientRect().width;
         
@@ -56,7 +56,7 @@ class Bullet extends React.PureComponent{
 
         // This makes the node go back to normal wrapping, and we can run getBoundingClientRect() 
         //  again to see the height again
-        dispNode.style.whiteSpace = "inherit";
+        dispNode.style.whiteSpace = "pre-line";
         dispNode.style.wordBreak = "break-word";
 
         const trueHeight = dispNode.getBoundingClientRect().height;
@@ -496,9 +496,9 @@ class BulletComparator extends React.PureComponent {
         clog(this.state, checkOptims)
         clog(this.props, checkOptims)
         return (
-            <div className="columns">
+            <div className="columns is-multiline">
                 <div className="column">
-                <h2>Input Bullets Here:</h2>
+                <h2 className='subtitle'>Input Bullets Here:</h2>
                 <BulletEditor 
                     text={this.props.text} 
                     handleTextChange={this.props.handleTextChange} 
@@ -507,7 +507,7 @@ class BulletComparator extends React.PureComponent {
                     minHeight={100}/>
                 </div>
                 <div className="column">
-                <h2>View Output Here:</h2>
+                <h2 className='subtitle'>View Output Here:</h2>
                 <BulletOutputViewer bullets={this.props.text.split('\n')} 
                     abbrReplacer={this.props.abbrReplacer}
                     width={this.props.width} 
