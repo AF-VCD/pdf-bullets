@@ -85,7 +85,7 @@ class ImportTools extends React.PureComponent{
                     <div className="buttons has-addons">
                         <button className="button" onClick={this.inputClick('PDF')}>Import</button>
                         <button className="button" onClick={this.toggleMenu}  aria-haspopup="true" aria-controls="import-menu" >
-                            <span className="icon is-small">
+                            <span className="icon">
                                 <i className="fas fa-angle-down" aria-hidden="true"></i>
                             </span> 
                         </button>
@@ -203,7 +203,7 @@ class SaveTools extends React.PureComponent{
                     <div className="buttons has-addons">
                         <button className="button" onClick={this.onSave}>Save </button>
                         <button className="button" aria-haspopup="true" aria-controls="save-menu" >
-                            <span className="icon is-small" onClick={this.toggleMenu} >
+                            <span className="icon" onClick={this.toggleMenu} >
                                 <i className="fas fa-angle-down" aria-hidden="true"></i>
                             </span> 
                         </button>
@@ -233,6 +233,17 @@ class Logo extends React.PureComponent{
             );
     }
 }
+class ThesaurusTools extends React.PureComponent{
+    render(){
+        return(
+            <a className="button" onClick={this.props.onHide} aria-haspopup="true" aria-controls="thesaurus-menu" >
+                <span>Thesaurus</span><span className="icon"  >
+                    <i className="fas fa-angle-down" aria-hidden="true"></i>
+                </span> 
+            </a>
+        );
+    }
+}
 class DocumentTools extends React.PureComponent{
     constructor(props){
         super(props);
@@ -256,7 +267,9 @@ class DocumentTools extends React.PureComponent{
                     <div className="navbar-item">
                         <InputTools onTextNorm={this.props.onTextNorm}/>
                     </div>
-                 
+                    <div className="navbar-item">
+                        <ThesaurusTools onHide={this.props.onThesaurusHide}/>
+                    </div>
                 </div>
             </nav>
         );

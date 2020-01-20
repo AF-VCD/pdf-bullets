@@ -39,10 +39,7 @@ class SynonymViewer extends React.PureComponent{
             this.getSynonyms(this.props.word);
         }
     }
-    toggleHidden = () => {
-        const hiddenState = this.state.hidden;
-        this.setState({hidden: !hiddenState});
-    }
+
     render(){
         const replacedWord = this.props.abbrReplacer(this.props.word);
         const otherAbbrs = this.props.abbrDict[this.props.word];
@@ -63,18 +60,18 @@ class SynonymViewer extends React.PureComponent{
         
         return (
             <div className="card">
-                <header className="card-header has-background-light	is-shadowless" onClick={this.toggleHidden}>
+                <header className="card-header has-background-light	is-shadowless">
                     <a className="card-header-title" >
                         <span style={{marginRight:'5px'}}>Thesaurus{this.props.word==''?'':":"}</span>
                         {header} 
                     </a>
-                    <a className="card-header-icon" >
-                        <span className="icon">
+                    <a className="card-header-icon" onClick={this.props.onHide}>
+                        <span className="delete">
                             <i className="fas fa-angle-down" aria-hidden="true"></i>
                         </span>
                     </a>
                 </header>
-                <div className={"card-content" + ' ' + (this.state.hidden? "is-hidden":'')} style={{height:"250px", overflow:"auto"}} >
+                <div className="card-content" style={{height:"250px", overflow:"auto"}} >
                     
                     {mainBody}                   
                     

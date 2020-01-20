@@ -119,6 +119,7 @@ class BulletApp extends React.Component {
         this.state.selection = '';
         this.state.currentTab = 0;
         this.abbrsViewerRef = React.createRef();
+        this.state.showThesaurus = false;
 
     }
     static ParseSettings = (settingsAll) => {
@@ -266,6 +267,10 @@ class BulletApp extends React.Component {
             this.setState({currentTab: newTab})
         };
     }
+    handleThesaurusHide = () => {
+        const oldState = this.state.showThesaurus;
+        this.setState({showThesaurus: !oldState});
+    }
     render(){
         const tabs = ['Bullets', 'Abbreviations'];
         return (
@@ -282,11 +287,13 @@ class BulletApp extends React.Component {
                             onTextUpdate={this.handleTextUpdate}
                             onSave={this.handleSave}
                             onJSONImport={this.handleJSONImport}
+                            onThesaurusHide={this.handleThesaurusHide}
                             />
                     </div>
                 
-                    <div className='column is-full'>
-                        <SynonymViewer word={this.state.selection} abbrDict={this.state.abbrDict} abbrReplacer={this.state.abbrReplacer} />
+                    <div className={'column is-full' + ' ' + (this.state.showThesaurus? "":"is-hidden")}>
+                        <SynonymViewer word={this.state.selection} abbrDict={this.state.abbrDict} abbrReplacer={this.state.abbrReplacer} 
+                            onHide={this.handleThesaurusHide}/>
                     </div>
                     <div className="column is-full">
                         <div className="tabs">
