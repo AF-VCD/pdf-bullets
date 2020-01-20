@@ -102,7 +102,6 @@ class AbbrsViewer extends React.PureComponent {
         clog(this.props.abbrData, checkAbbrs)
         return (
             <div>
-                <h2>Abbreviations List</h2>
                 <AbbrTools updater={this.reloadData} getter={this.getData}/>
                 <HotTable settings={this.props.settings}  data={this.props.abbrData}
                 ref={this.tableRef} 

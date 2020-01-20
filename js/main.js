@@ -117,6 +117,7 @@ class BulletApp extends React.Component {
         this.state.abbrDict = {};
         this.state.abbrReplacer = (sentence)=>{return sentence;};
         this.state.selection = '';
+        this.state.currentTab = 0;
         this.abbrsViewerRef = React.createRef();
 
     }
@@ -202,9 +203,9 @@ class BulletApp extends React.Component {
             }
         })
     }
-    handleOptimChange = (e) =>{
-        this.setState({
-            enableOptim: e.target.checked
+    handleOptimChange = () =>{
+        this.setState((state)=>{
+            return {enableOptim: !state.enableOptim};
         },()=>{
             clog("optimization toggle: "+ this.state.enableOptim, checkOptims)
         });
@@ -260,26 +261,60 @@ class BulletApp extends React.Component {
             //do I need to add abbrReplacer?
         }
     }
+    handleTabChange = (newTab)=>{
+        return ()=>{
+            this.setState({currentTab: newTab})
+        };
+    }
     render(){
+        const tabs = ['Bullets', 'Abbreviations'];
         return (
-            <div>
-                <DocumentTools 
-                    enableOptim={this.state.enableOptim}
-                    onOptimChange={this.handleOptimChange} 
-                    width={this.state.width} onWidthChange={this.handleWidthChange} 
-                    onWidthUpdate={this.handleWidthUpdate}
-                    onTextNorm={this.handleTextNorm}
-                    onTextUpdate={this.handleTextUpdate}
-                    onSave={this.handleSave}
-                    onJSONImport={this.handleJSONImport}
-                    />
-                <SynonymViewer word={this.state.selection} abbrDict={this.state.abbrDict} abbrReplacer={this.state.abbrReplacer} />
-                <BulletComparator text={this.state.text} 
-                    abbrReplacer={this.state.abbrReplacer} handleTextChange={this.handleTextChange}
-                    width={this.state.width} onSelect={this.handleSelect} enableOptim={this.state.enableOptim} />
-                <AbbrsViewer settings={this.props.tableSettings} 
-                    abbrData={this.state.abbrData} 
-                    onAbbrChange={this.handleAbbrChange} ref={this.abbrsViewerRef}/>
+            <div className="container is-fluid">
+                <div className='columns is-multiline'>
+                    <div className='column is-full'>
+                        <Logo />
+                        <DocumentTools 
+                            enableOptim={this.state.enableOptim}
+                            onOptimChange={this.handleOptimChange} 
+                            width={this.state.width} onWidthChange={this.handleWidthChange} 
+                            onWidthUpdate={this.handleWidthUpdate}
+                            onTextNorm={this.handleTextNorm}
+                            onTextUpdate={this.handleTextUpdate}
+                            onSave={this.handleSave}
+                            onJSONImport={this.handleJSONImport}
+                            />
+                    </div>
+                
+                    <div className='column is-full'>
+                        <SynonymViewer word={this.state.selection} abbrDict={this.state.abbrDict} abbrReplacer={this.state.abbrReplacer} />
+                    </div>
+                    <div className="column is-full">
+                        <div className="tabs">
+                            <ul>
+                                {tabs.map((tab,i)=>{
+                                    return (
+                                        <li key={i} className={this.state.currentTab == i?"is-active":''} ><a onClick={this.handleTabChange(i)}>{tab}</a></li>
+                                    )}
+                                )}
+                            </ul>
+                        </div>
+                    </div>
+                    <div className={'column is-full' + ' ' + (this.state.currentTab != 0?'is-hidden':'')}>
+                        <BulletComparator text={this.state.text} 
+                            abbrReplacer={this.state.abbrReplacer} handleTextChange={this.handleTextChange}
+                            width={this.state.enableOptim? (parseFloat(this.state.width.replace(/[a-zA-Z]/g,''))-0.00)+'mm':this.state.width} 
+                            onSelect={this.handleSelect} enableOptim={this.state.enableOptim} />
+                    </div>
+                    <div className={'column is-full' + ' ' + (this.state.currentTab != 1?'is-invisible':'')}>
+                        <AbbrsViewer settings={this.props.tableSettings} 
+                        abbrData={this.state.abbrData} 
+                        onAbbrChange={this.handleAbbrChange} ref={this.abbrsViewerRef}/>
+                    </div>
+                </div>    
+                
+                
+                    
+                
             </div>
         );
     }

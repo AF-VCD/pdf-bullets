@@ -105,28 +105,35 @@ class ImportTools extends React.PureComponent{
 class OutputTools extends React.PureComponent{
     constructor(props){
         super(props);
+        this.state = {
+
+        }
     }
     render(){
+        const widthAWD = '202.321mm';
+        const widthEPR = '202.321mm';
+        const widthOPR = '201.041mm';
         return( 
             <div className="field is-grouped">
                 {/* if I want to group things together in a field, each subelement must have the control class name */}
                 <div className="control field has-addons">
-                    <div className="control">
+                    <div className="control has-icons-right">
                         <input className="input" id="widthInput" type='number' min="100" max="500" step=".001" value={this.props.width.replace(/[a-zA-Z]/g,'')} onChange={this.props.onWidthChange}></input>
+                        <span className='icon is-right'>mm</span>
                     </div>
                     <div className="control buttons has-addons">
-                        <a className="button" onClick={this.props.onWidthUpdate("202.321mm")}>AWD</a>
-                        <a className="button" onClick={this.props.onWidthUpdate("202.321mm")}>EPR</a>
-                        <a className="button" onClick={this.props.onWidthUpdate("201.041mm")}>OPR</a> 
+                        <a className={"button is-primary" + ' ' + (this.props.width==widthAWD?'':'is-outlined')}
+                            onClick={this.props.onWidthUpdate(widthAWD)}>AWD</a>
+                        <a className={"button is-success" + ' ' + (this.props.width==widthEPR?'':'is-outlined')}
+                            onClick={this.props.onWidthUpdate(widthEPR)}>EPR</a>
+                        <a className={"button is-link" + ' ' + (this.props.width==widthOPR?'':'is-outlined')}
+                            onClick={this.props.onWidthUpdate(widthOPR)}>OPR</a> 
                     </div>                    
 
                 </div>
                 
-                <a className="control button">Space Optim</a>
-                {/* <input type="checkbox" className='checkbox'
-                    checked={this.props.enableOptim} 
-                    onChange={this.props.onOptimChange} id="enableOptim" /> */}
-                
+                <a className={"control button is-dark" + (this.props.enableOptim?'':"is-outlined")}
+                    onClick={this.props.onOptimChange} id="enableOptim">Auto-Space</a>        
             </div>
         );
     }
@@ -212,6 +219,18 @@ class SaveTools extends React.PureComponent{
                 <a style={{display:"none"}} download='settings.json' ref={this.exportRef}></a>
             </div>
         );
+    }
+}
+class Logo extends React.PureComponent{
+    render() {
+        return (
+            <h1 className='title'><span className="logo">AF </span>
+                <span className="logo">Bull</span>et 
+                <span className="logo"> Sh</span>aping &amp; 
+                <span className="logo"> i</span>teration 
+                <span className="logo"> t</span>ool
+            </h1>
+            );
     }
 }
 class DocumentTools extends React.PureComponent{
