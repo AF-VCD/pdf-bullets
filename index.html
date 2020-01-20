@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.8.0/css/bulma.min.css">
+    <script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>PDF Bullets with React</title>
     <script src="./lib/webfont.js"></script>
@@ -50,27 +52,22 @@
     <link rel='stylesheet' href='./index.css' type='text/css'>
 </head>
 <body>
-    <h1><span class="logo">AF</span>
-        <span class="logo">Bull</span>et 
-        <span class="logo">Sh</span>aping &amp; 
-        <span class="logo">i</span>teration 
-        <span class="logo">t</span>ool
-    </h1>
     
-    <div id="stuff">Loading...</div>
-    <div id="legacy"></div>
-    <!--
-    <script type='text/javascript'>
-    document.getElementById('legacy').innerText = decodeURIComponent(localStorage.getItem("bullets")).trim();
-    </script>
-    -->
-    <div id="footer">
-        <div>If you have feedback, submit 
-            an <a href='https://github.com/EA-Pods-Team/pdf-bullets/issues'>issue</a> 
-            or a <a href="https://github.com/EA-Pods-Team/pdf-bullets/pulls">pull request</a>
+        <div class="section" id="stuff" >Loading...</div>
+        <!--
+        <div id="legacy"></div>
+        <script type='text/javascript'>
+        document.getElementById('legacy').innerText = decodeURIComponent(localStorage.getItem("bullets")).trim();
+        </script>
+        -->
+        <div class="container" id="footer">
+            <div>If you have feedback, submit 
+                an <a href='https://github.com/EA-Pods-Team/pdf-bullets/issues'>issue</a> 
+                or a <a href="https://github.com/EA-Pods-Team/pdf-bullets/pulls">pull request</a>
+            </div>
+            <div>This site utilizes PDF.JS (pdf import), HandsOnTable (spreadsheet), the DataMuse API (thesaurus), and Bulma (CSS).</div>
+            <div>Maintained by Christopher Kodama </div>
         </div>
-        <div>This site utilizes PDF.JS (pdf import), HandsOnTable (spreadsheet), and the DataMuse API (thesaurus).</div>
-        <div>Maintained by Christopher Kodama </div>
-    </div>
+
 </body>
 </html>

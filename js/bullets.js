@@ -46,7 +46,7 @@ class Bullet extends React.PureComponent{
     evaluate = () => {
         const dispNode = this.props.renderRef.current;
 
-        dispNode.style.whiteSpace = "nowrap";
+        dispNode.style.whiteSpace = "pre";
         const parentWidth = dispNode.parentNode.getBoundingClientRect().width;
         const singleWidth = dispNode.getBoundingClientRect().width;
         
@@ -56,7 +56,7 @@ class Bullet extends React.PureComponent{
 
         // This makes the node go back to normal wrapping, and we can run getBoundingClientRect() 
         //  again to see the height again
-        dispNode.style.whiteSpace = "inherit";
+        dispNode.style.whiteSpace = "pre-line";
         dispNode.style.wordBreak = "break-word";
 
         const trueHeight = dispNode.getBoundingClientRect().height;
@@ -129,11 +129,12 @@ class BulletEditor extends React.PureComponent{
                     onInput={this.handleInput}
                     style={{
                         width: this.props.width,
+                        maxHeight: "unset",
                     }}
                     onMouseUp={this.props.onHighlight}
                     onKeyUp={this.props.onHighlight}
                     
-                    className="bullets"></textarea>
+                    className="bullets textarea is-paddingless is-marginless"></textarea>
             </div>
         )
     }
@@ -304,7 +305,7 @@ class OptimizedBullet extends React.PureComponent{
             //clog(this.evaluate(bullet))
             const bulletRef = this.bulletRef.current;
             
-            const smallerSpace = "\u2009";
+            const smallerSpace = "\u2006";
             const largerSpace = "\u2004";
 
             const origSentence = 
@@ -495,9 +496,9 @@ class BulletComparator extends React.PureComponent {
         clog(this.state, checkOptims)
         clog(this.props, checkOptims)
         return (
-            <div>
-                <div className="bulletContainer">
-                <h2>Input Bullets Here:</h2>
+            <div className="columns is-multiline">
+                <div className="column is-narrow">
+                <h2 className='subtitle'>Input Bullets Here:</h2>
                 <BulletEditor 
                     text={this.props.text} 
                     handleTextChange={this.props.handleTextChange} 
@@ -505,8 +506,8 @@ class BulletComparator extends React.PureComponent {
                     onHighlight={this.handleSelect}
                     minHeight={100}/>
                 </div>
-                <div className="bulletContainer">
-                <h2>View Output Here:</h2>
+                <div className="column is-narrow">
+                <h2 className='subtitle'>View Output Here:</h2>
                 <BulletOutputViewer bullets={this.props.text.split('\n')} 
                     abbrReplacer={this.props.abbrReplacer}
                     width={this.props.width} 
