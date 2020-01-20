@@ -304,7 +304,7 @@ class OptimizedBullet extends React.PureComponent{
             //clog(this.evaluate(bullet))
             const bulletRef = this.bulletRef.current;
             
-            const smallerSpace = "\u2009";
+            const smallerSpace = "\u2006";
             const largerSpace = "\u2004";
 
             const origSentence = 
