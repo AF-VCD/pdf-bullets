@@ -497,7 +497,7 @@ class BulletComparator extends React.PureComponent {
         clog(this.props, checkOptims)
         return (
             <div className="columns is-multiline">
-                <div className="column">
+                <div className="column is-narrow">
                 <h2 className='subtitle'>Input Bullets Here:</h2>
                 <BulletEditor 
                     text={this.props.text} 
@@ -506,7 +506,7 @@ class BulletComparator extends React.PureComponent {
                     onHighlight={this.handleSelect}
                     minHeight={100}/>
                 </div>
-                <div className="column">
+                <div className="column is-narrow">
                 <h2 className='subtitle'>View Output Here:</h2>
                 <BulletOutputViewer bullets={this.props.text.split('\n')} 
                     abbrReplacer={this.props.abbrReplacer}
