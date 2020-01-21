@@ -103,3 +103,4 @@ const checkPDF = false;
 const checkSave = false;
 const checkEditor = false;
 const checkJSON = false;
+const checkThesaurus = false;

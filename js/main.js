@@ -115,6 +115,7 @@ class BulletApp extends React.Component {
         }
         
         this.state.abbrDict = {};
+        this.state.textSelRange = {start: 0, end:0}
         this.state.abbrReplacer = (sentence)=>{return sentence;};
         this.state.selection = '';
         this.state.currentTab = 0;
@@ -220,9 +221,10 @@ class BulletApp extends React.Component {
         });
     }
     handleSelect = (newSel)=>{
-        if(checkThesaurus) console.log('selection registered');
+        
         const maxWords = 8;
         if(newSel.trim() != ''){
+            if(checkThesaurus) console.log('selection registered');
             this.setState({
                 selection: Bullet.Tokenize(newSel.trim()).slice(0,maxWords).join(' ')
             });
@@ -279,6 +281,25 @@ class BulletApp extends React.Component {
         const oldState = this.state.showThesaurus;
         this.setState({showThesaurus: !oldState});
     }
+    handleSelReplace = (start,end, word) => {
+        const oldText = this.state.text;
+        const beforeText = oldText.substring(0,start);
+        const replacedText = oldText.substring(start,end);
+        const match = replacedText.match(/^(\s*).*?(\s*)$/);
+        const beforeSpaces = match[1];
+        const afterSpaces = match[2];
+        let newWord
+        if(replacedText.match(/^\s*[A-Z]/)){
+            newWord = word.split(/\s/).map((subword)=>{return subword[0].toUpperCase() + subword.slice(1)}).join(' ')
+        }else{ newWord = word }
+        
+        const afterText = oldText.substring(end);
+        this.setState({
+            text: beforeText+beforeSpaces+newWord+afterSpaces+afterText,
+            textSelRange:  {start: (beforeText+beforeSpaces).length, end: (beforeText+beforeSpaces+newWord).length}
+        })
+        
+    }
     render(){
         const tabs = ['Bullets', 'Abbreviations'];
         return (
@@ -300,7 +321,7 @@ class BulletApp extends React.Component {
                     </div>
                 
                     <div className={'column is-full' + ' ' + (this.state.showThesaurus? "":"is-hidden")}>
-                        <SynonymViewer word={this.state.selection} abbrDict={this.state.abbrDict} abbrReplacer={this.state.abbrReplacer} 
+                        <SynonymViewer word={this.state.selection} onSelReplace={this.handleSelReplace} abbrDict={this.state.abbrDict} abbrReplacer={this.state.abbrReplacer} 
                             onHide={this.handleThesaurusHide}/>
                     </div>
                     <div className="column is-full">
@@ -316,7 +337,7 @@ class BulletApp extends React.Component {
                     </div>
                     {this.state.currentTab==0? (
                     <div className='column is-full'>
-                        <BulletComparator text={this.state.text} 
+                        <BulletComparator text={this.state.text} textSelRange={this.state.textSelRange}
                             abbrReplacer={this.state.abbrReplacer} handleTextChange={this.handleTextChange}
                             width={this.state.enableOptim? (parseFloat(this.state.width.replace(/[a-zA-Z]/g,''))-0.00)+'mm':this.state.width} 
                             onSelect={this.handleSelect} enableOptim={this.state.enableOptim} />
