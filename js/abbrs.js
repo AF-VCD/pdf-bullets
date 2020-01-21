@@ -73,20 +73,20 @@ class AbbrsViewer extends React.PureComponent {
     constructor(props) {
         super(props);
         this.tableRef = React.createRef();
-        clog(this.props, checkAbbrs)
+        if(checkAbbrs) console.log(this.props)
 
     }
 
     handleAbbrChange = (type) => {
-        clog(type, checkAbbrs)
+        if( checkAbbrs) console.log(type)
         return (e)=>{
             //this.props.onAbbrChange(e);
-            clog(e, checkAbbrs)
-            clog(this.props,checkAbbrs)
-            clog(this.state,checkAbbrs)
-            clog(this.tableRef.current,checkAbbrs)
+            if( checkAbbrs) console.log(e)
+            if(checkAbbrs) console.log(this.props)
+            if(checkAbbrs) console.log(this.state)
+            if(checkAbbrs) console.log(this.tableRef.current)
 
-            //clog(new RegExp("(\\b)("+Object.keys(this.state.abbrDict).join("|")+")(\\b|$|\\$)",'g'),checkAbbrs)
+            //if(checkAbbrs) console.log(new RegExp("(\\b)("+Object.keys(this.state.abbrDict).join("|")+")(\\b|$|\\$)",'g'))
 
             this.props.onAbbrChange(this.tableRef);   
         }
@@ -99,7 +99,7 @@ class AbbrsViewer extends React.PureComponent {
         return this.tableRef.current.hotInstance.getData();
     }
     render() {
-        clog(this.props.abbrData, checkAbbrs)
+        if( checkAbbrs) console.log(this.props.abbrData)
         return (
             <div>
                 <AbbrTools updater={this.reloadData} getter={this.getData}/>

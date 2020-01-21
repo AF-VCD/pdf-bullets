@@ -82,8 +82,8 @@ const tableSettings = {
     try{
         if(localStorage.getItem('bullet-settings')){
             settings = JSON.parse(localStorage.getItem("bullet-settings"));
-            clog('settings have been retrieved', checkSave)
-            clog(settings,checkSave)
+            if( checkSave) console.log('settings have been retrieved')
+            if(checkSave) console.log(settings)
             
         }
     }catch(err){
@@ -98,8 +98,8 @@ class BulletApp extends React.Component {
         super(props);
         if(this.props.savedSettings){
             //enableOptim, text, and width should be in settings
-            clog('settings are being loaded into BulletApp', checkSave)
-            clog(this.props.savedSettings, checkSave)
+            if( checkSave) console.log('settings are being loaded into BulletApp')
+            if( checkSave) console.log(this.props.savedSettings)
             
             this.state = BulletApp.ParseSettings(this.props.savedSettings);
             
@@ -140,8 +140,8 @@ class BulletApp extends React.Component {
         return state;
     }
     handleJSONImport = (settings)=>{
-        clog("handleJSONImport: ", checkJSON) 
-        clog(settings, checkJSON)
+        if( checkJSON) console.log("handleJSONImport: ") 
+        if( checkJSON) console.log(settings)
         this.setState({text:settings.text});
         this.setState((state)=>{
             state.enableOptim = settings.enableOptim;
@@ -156,7 +156,7 @@ class BulletApp extends React.Component {
         if(tableRef.current == null ){return}
         const abbrTable = tableRef.current.hotInstance;
         const newAbbrDict = {};
-
+        
         for (let i = 0; i < abbrTable.countRows();i++){
             let fullWord = String(abbrTable.getDataAtRowProp(i,'value')).replace(/\s/g,' ');
             let abbr = abbrTable.getDataAtRowProp(i,'abbr');
@@ -187,7 +187,7 @@ class BulletApp extends React.Component {
                         }
                     }
                 )
-                clog(finalAbbrDict, false)
+                
                 const regExp = new RegExp("(\\b)("+Object.keys(finalAbbrDict).join("|")+")(\\b|$|\\$)",'g');
                 const newSentence = sentence.replace(regExp, 
                     (match,p1,p2,p3) => {
@@ -199,20 +199,28 @@ class BulletApp extends React.Component {
                         return p1 + abbr +  p3;
                     }
                 );
-                //console.log('sentence in replaceAbbrs replaced: "' + newSentence + '"')
+                if( checkAbbrs) {
+                    console.log('abbrReplacer original: "' + sentence + '"')
+                    console.log('abbrReplacer replaced: "' + newSentence + '"')
+                }
                 return newSentence;
             }
         })
+        if(checkAbbrs) {
+            console.log('handling abbr change in main.js');
+            console.log(this.state.abbrReplacer + '')
+        }
+
     }
     handleOptimChange = () =>{
         this.setState((state)=>{
             return {enableOptim: !state.enableOptim};
         },()=>{
-            clog("optimization toggle: "+ this.state.enableOptim, checkOptims)
+            if( checkOptims) console.log("optimization toggle: "+ this.state.enableOptim)
         });
     }
     handleSelect = (newSel)=>{
-        clog('selection registered',checkThesaurus);
+        if(checkThesaurus) console.log('selection registered');
         const maxWords = 8;
         if(newSel.trim() != ''){
             this.setState({
@@ -250,8 +258,8 @@ class BulletApp extends React.Component {
         };
     } 
     handleSave = () =>{
-        clog(this.abbrsViewerRef,checkSave);
-        clog(this.abbrsViewerRef.current.getData(),checkSave);
+        if(checkSave) console.log(this.abbrsViewerRef);
+        if(checkSave) console.log(this.abbrsViewerRef.current.getData());
         return {
             width: this.state.width,
             text: this.state.text,
@@ -306,12 +314,13 @@ class BulletApp extends React.Component {
                             </ul>
                         </div>
                     </div>
-                    <div className={'column is-full' + ' ' + (this.state.currentTab != 0?'is-hidden':'')}>
+                    {this.state.currentTab==0? (
+                    <div className='column is-full'>
                         <BulletComparator text={this.state.text} 
                             abbrReplacer={this.state.abbrReplacer} handleTextChange={this.handleTextChange}
                             width={this.state.enableOptim? (parseFloat(this.state.width.replace(/[a-zA-Z]/g,''))-0.00)+'mm':this.state.width} 
                             onSelect={this.handleSelect} enableOptim={this.state.enableOptim} />
-                    </div>
+                    </div> ) : '' }
                     <div className={'column is-full' + ' ' + (this.state.currentTab != 1?'is-invisible':'')}>
                         <AbbrsViewer settings={this.props.tableSettings} 
                         abbrData={this.state.abbrData} 
