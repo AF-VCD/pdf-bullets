@@ -1,7 +1,7 @@
 
-const initialText = '- This is a custom built bullet writing tool; abbreviations will be replaced according to table below--you will see output on the right\n\
-- This tool can optimize spacing; output will be red if the optimizer could not fix spacing with 2004 or 2009 Unicode spaces\n\
-- There is a thesaurus above; select a word in this or the output box to view synonyms--words in parentheses are abbreviations you have configured';
+const initialText = '- This is a custom built bullet writing tool; abbreviations will be replaced according to table in the abbreviations tab--you will see output on the right\n\
+- This tool can optimize spacing; output will be red if the optimizer could not fix spacing with 2004 or 2006 Unicode spaces\n\
+- Click the thesaurus button to show one; select a word in this or the output box to view synonyms--words in parentheses are abbreviations that are configured';
 
 const tableData = [{
     enabled: true,
