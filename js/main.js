@@ -288,11 +288,15 @@ class BulletApp extends React.Component {
         const match = replacedText.match(/^(\s*).*?(\s*)$/);
         const beforeSpaces = match[1];
         const afterSpaces = match[2];
-        console.log(match)
+        let newWord
+        if(replacedText.match(/^\s*[A-Z]/)){
+            newWord = word.split(/\s/).map((subword)=>{return subword[0].toUpperCase() + subword.slice(1)}).join(' ')
+        }else{ newWord = word }
+        
         const afterText = oldText.substring(end);
         this.setState({
-            text: beforeText+beforeSpaces+word+afterSpaces+afterText,
-            textSelRange:  {start: (beforeText+beforeSpaces).length, end: (beforeText+beforeSpaces+word).length}
+            text: beforeText+beforeSpaces+newWord+afterSpaces+afterText,
+            textSelRange:  {start: (beforeText+beforeSpaces).length, end: (beforeText+beforeSpaces+newWord).length}
         })
         
     }
