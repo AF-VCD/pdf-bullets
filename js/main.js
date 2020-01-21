@@ -294,9 +294,11 @@ class BulletApp extends React.Component {
         }else{ newWord = word }
         
         const afterText = oldText.substring(end);
+        console.log(beforeText+beforeSpaces, beforeText+beforeSpaces+newWord)
+        console.log((beforeText+beforeSpaces).length, (beforeText+beforeSpaces+newWord).length)
         this.setState({
             text: beforeText+beforeSpaces+newWord+afterSpaces+afterText,
-            textSelRange:  {start: (beforeText+beforeSpaces).length, end: (beforeText+beforeSpaces+newWord).length}
+            textSelRange:  {trigger: Math.random(), start: (beforeText+beforeSpaces).length, end: (beforeText+beforeSpaces+newWord).length}
         })
         
     }
