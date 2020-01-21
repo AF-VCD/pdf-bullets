@@ -116,9 +116,16 @@ class BulletEditor extends React.PureComponent{
         this.fixHeight();
         if( checkEditor) console.log('text editor mounted')
     }
-    componentDidUpdate(){
+    componentDidUpdate(prevProps){
         if(checkEditor) console.log('text editor updated')
+        
         this.fixHeight();
+        if(this.props.textSelRange.start != prevProps.textSelRange.start || this.props.textSelRange.end != prevProps.textSelRange.end){
+            if(checkThesaurus || checkEditor) console.log('new selection range: ', this.props.textSelRange)
+            this.ref.current.setSelectionRange(this.props.textSelRange.start, this.props.textSelRange.end)
+        }
+        
+
     }
     render(){
         return (
@@ -558,6 +565,7 @@ class BulletComparator extends React.PureComponent {
                 <div className="column is-narrow">
                 <h2 className='subtitle'>Input Bullets Here:</h2>
                 <BulletEditor 
+                    textSelRange={this.props.textSelRange}
                     text={this.props.text} 
                     handleTextChange={this.props.handleTextChange} 
                     width={this.props.width}
