@@ -108,6 +108,7 @@ class BulletEditor extends React.PureComponent{
         this.fixHeight();
     }
     fixHeight = () => {
+
         this.ref.current.style.height = 'auto';
         this.ref.current.style.height = Math.max(this.ref.current.scrollHeight, this.props.minHeight) + 'px';
         if( checkEditor) console.log('input box height adjusted')
@@ -120,9 +121,17 @@ class BulletEditor extends React.PureComponent{
         if(checkEditor) console.log('text editor updated')
         
         this.fixHeight();
-        if(this.props.textSelRange.start != prevProps.textSelRange.start || this.props.textSelRange.end != prevProps.textSelRange.end){
+        if(this.props.textSelRange.trigger != prevProps.textSelRange.trigger){
             if(checkThesaurus || checkEditor) console.log('new selection range: ', this.props.textSelRange)
-            this.ref.current.setSelectionRange(this.props.textSelRange.start, this.props.textSelRange.end)
+            let start, end;
+            if(this.props.textSelRange.start < this.props.textSelRange.end){
+                start = this.props.textSelRange.start;
+                end = this.props.textSelRange.end;
+            }else{
+                start = this.props.textSelRange.end;
+                end = this.props.textSelRange.start;
+            }
+            this.ref.current.setSelectionRange(start, end)
         }
         
 
