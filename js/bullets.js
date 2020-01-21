@@ -199,7 +199,6 @@ class BulletOutputViewer extends React.PureComponent{
                     return <HeightAdjustedBullet text={this.state.abbrBullets[i] || ''} 
                         rawText={line}
                         width={this.props.width}
-                        height='40px'
                         key={key + keyDict[key]} 
                         optims={this.props.optims}
                         onOptim={this.props.onOptim}
@@ -237,8 +236,23 @@ class HeightAdjustedBullet extends React.PureComponent{
    
         }
     }
-    componentDidUpdate(){
-        if(checkOptims) console.log('height adjustment updated')
+    componentDidUpdate(prevProps, prevState){
+        if(checkOptims) console.log('height adjustment updated',prevProps, this.props, prevState,this.state)
+        if(prevProps.rawText != this.props.rawText){
+            this.setState({
+                checkingHeight: true,
+            })
+        }else{
+            if(this.state.checkingHeight){
+                if(checkOptims) console.log('new calculated height: ', this.bulletRef.current.evaluate())
+                const newHeight = this.bulletRef.current.evaluate().height;
+                const newHeightSetting = newHeight==0? 'inherit':newHeight+'px';
+                this.setState({
+                    checkingHeight: false,
+                    height: newHeightSetting,
+                })
+            }
+        }
     }
     render(){
             let bullet;
