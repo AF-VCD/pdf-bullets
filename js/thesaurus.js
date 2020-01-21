@@ -8,12 +8,12 @@ class SynonymViewer extends React.PureComponent{
         }
     }
     getSynonyms = (phrase)=>{
-        clog('finding synonyms for '+ phrase, checkThesaurus);
+        if( checkThesaurus) console.log('finding synonyms for '+ phrase);
         const xhttp = new XMLHttpRequest();
         xhttp.onreadystatechange =  () => {
             if(xhttp.readyState == 4 && xhttp.status == 200){
                 const dat = JSON.parse(xhttp.responseText);
-                clog(dat,checkThesaurus);
+                if(checkThesaurus) console.log(dat);
                 if(dat.length != 0){
                     this.setState({
                         synonyms: dat.map((item)=>{return item.word}),
@@ -30,12 +30,12 @@ class SynonymViewer extends React.PureComponent{
         xhttp.send();
     }
     componentDidMount(){
-        clog('componentDidMount getting synonyms for ' + this.props.word, checkThesaurus)
+        if( checkThesaurus) console.log('componentDidMount getting synonyms for ' + this.props.word)
         this.getSynonyms(this.props.word);
     }
     componentDidUpdate(prevProps){
         if(prevProps.word != this.props.word){
-            clog("componentDidUpdate getting synonyms for " + this.props.word, checkThesaurus)
+            if( checkThesaurus) console.log("componentDidUpdate getting synonyms for " + this.props.word)
             this.getSynonyms(this.props.word);
         }
     }
@@ -91,7 +91,7 @@ class SynonymList extends React.PureComponent{
         super(props);
     }
     render(){
-        clog(this.props, checkThesaurus)
+        if( checkThesaurus) console.log(this.props)
         const words = 75;
         const cols = 10;
         const filler = (new Array(cols - words%cols)).join('.').split('.');
