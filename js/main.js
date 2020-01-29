@@ -93,6 +93,7 @@ const tableSettings = {
             throw err;
         }
     }
+
 class BulletApp extends React.Component {
     constructor(props){
         super(props);
@@ -116,7 +117,6 @@ class BulletApp extends React.Component {
         
         this.state.abbrDict = {};
         this.state.textSelRange = {start: 0, end:0}
-        this.state.abbrReplacer = (sentence)=>{return sentence;};
         this.state.selection = '';
         this.state.currentTab = 0;
         this.abbrsViewerRef = React.createRef();
@@ -172,46 +172,67 @@ class BulletApp extends React.Component {
                 newAbbrDict[fullWord].disabled = newAbbrDict[fullWord].disabled || [];
                 newAbbrDict[fullWord].disabled.push(abbr)
             }
-
         }
-
         this.setState({
             abbrDict: newAbbrDict,
-            abbrReplacer: (sentence) => {
-                const finalAbbrDict = {};
-                Object.keys(newAbbrDict).map(
-                    (word)=>{
-                        const abbrs = newAbbrDict[word]; //an array
-                        //if there is at least one enabled abbreviation, take the lowest most element of it.
-                        if(abbrs.enabled) {
-                            finalAbbrDict[word] = abbrs.enabled[abbrs.enabled.length-1]
-                        }
-                    }
-                )
-                
-                const regExp = new RegExp("(\\b)("+Object.keys(finalAbbrDict).join("|")+")(\\b|$|\\$)",'g');
-                const newSentence = sentence.replace(regExp, 
-                    (match,p1,p2,p3) => {
-                        //p2 = p2.replace(/ /g,'\\s')
-                        let abbr = finalAbbrDict[p2];
-                        if(!abbr){
-                            abbr = '';
-                        }
-                        return p1 + abbr +  p3;
-                    }
-                );
-                if( checkAbbrs) {
-                    console.log('abbrReplacer original: "' + sentence + '"')
-                    console.log('abbrReplacer replaced: "' + newSentence + '"')
-                }
-                return newSentence;
-            }
         })
         if(checkAbbrs) {
             console.log('handling abbr change in main.js');
             console.log(this.state.abbrReplacer + '')
         }
 
+    }
+    createAbbrDict = (abbrData)=>{
+
+        const abbrDict = {};
+        abbrData.map((row)=>{
+            let fullWord = String(row.value).replace(/\s/g,' ');
+            let abbr = row.abbr;
+            let enabled = row.enabled;
+            abbrDict[fullWord] = abbrDict[fullWord] || []; //initializes to empty array if necessary
+
+            if(enabled){
+                abbrDict[fullWord].enabled = abbrDict[fullWord].enabled || [];
+                abbrDict[fullWord].enabled.push(abbr)
+            }else{
+                abbrDict[fullWord].disabled = abbrDict[fullWord].disabled || [];
+                abbrDict[fullWord].disabled.push(abbr)
+            }
+        })
+
+        return abbrDict;
+
+    }
+    createAbbrReplacer = (abbrDict) => {
+        return (sentence) => {
+            const finalAbbrDict = {};
+            Object.keys(abbrDict).map(
+                (word)=>{
+                    const abbrs = abbrDict[word]; //an array
+                    //if there is at least one enabled abbreviation, take the lowest most element of it.
+                    if(abbrs.enabled) {
+                        finalAbbrDict[word] = abbrs.enabled[abbrs.enabled.length-1]
+                    }
+                }
+            )
+            let modifiers = 'g'
+            const regExp = new RegExp("(\\b)("+Object.keys(finalAbbrDict).join("|")+")(\\b|$|\\$)", modifiers);
+            const newSentence = sentence.replace(regExp, 
+                (match,p1,p2,p3) => {
+                    //p2 = p2.replace(/ /g,'\\s')
+                    let abbr = finalAbbrDict[p2];
+                    if(!abbr){
+                        abbr = '';
+                    }
+                    return p1 + abbr +  p3;
+                }
+            );
+            if( checkAbbrs) {
+                console.log('abbrReplacer original: "' + sentence + '"')
+                console.log('abbrReplacer replaced: "' + newSentence + '"')
+            }
+            return newSentence;
+        }
     }
     handleOptimChange = () =>{
         this.setState((state)=>{
@@ -302,8 +323,15 @@ class BulletApp extends React.Component {
         })
         
     }
+    handleCaseChange = () => {
+        this.setState((state)=>{
+            state.enableCase = !state.enableCase;
+            return state;
+        })
+    }
     render(){
         const tabs = ['Bullets', 'Abbreviations'];
+        const abbrReplacer = this.createAbbrReplacer(this.state.abbrDict);
         return (
             <div className="container is-fluid">
                 <div className='columns is-multiline'>
@@ -323,7 +351,7 @@ class BulletApp extends React.Component {
                     </div>
                 
                     <div className={'column is-full' + ' ' + (this.state.showThesaurus? "":"is-hidden")}>
-                        <SynonymViewer word={this.state.selection} onSelReplace={this.handleSelReplace} abbrDict={this.state.abbrDict} abbrReplacer={this.state.abbrReplacer} 
+                        <SynonymViewer word={this.state.selection} onSelReplace={this.handleSelReplace} abbrDict={this.state.abbrDict} abbrReplacer={abbrReplacer} 
                             onHide={this.handleThesaurusHide}/>
                     </div>
                     <div className="column is-full">
@@ -340,20 +368,16 @@ class BulletApp extends React.Component {
                     {this.state.currentTab==0? (
                     <div className='column is-full'>
                         <BulletComparator text={this.state.text} textSelRange={this.state.textSelRange}
-                            abbrReplacer={this.state.abbrReplacer} handleTextChange={this.handleTextChange}
+                            abbrReplacer={abbrReplacer} handleTextChange={this.handleTextChange}
                             width={this.state.enableOptim? (parseFloat(this.state.width.replace(/[a-zA-Z]/g,''))-0.00)+'mm':this.state.width} 
                             onSelect={this.handleSelect} enableOptim={this.state.enableOptim} />
                     </div> ) : '' }
                     <div className={'column is-full' + ' ' + (this.state.currentTab != 1?'is-invisible':'')}>
                         <AbbrsViewer settings={this.props.tableSettings} 
                         abbrData={this.state.abbrData} 
-                        onAbbrChange={this.handleAbbrChange} ref={this.abbrsViewerRef}/>
+                        onAbbrChange={this.handleAbbrChange} ref={this.abbrsViewerRef} />
                     </div>
                 </div>    
-                
-                
-                    
-                
             </div>
         );
     }
