@@ -10,11 +10,11 @@ const Forms  = {
             'likelyWidth':'202.321mm'
         },
         'AF910': {
-            'fields': ['KeyDuties','IIIComments','IVComments','VComments'],
+            'fields': ['KeyDuties','IIIComments','IVComments','VComments', 'VIIIComments', 'IXComments'],
             'likelyWidth':'202.321mm'
         },
         'AF911': {
-            'fields': ['KeyDuties','IIIComments','IVComments'],
+            'fields': ['KeyDuties','IIIComments','IVComments', 'VIIComments', 'VIIIComments', 'IXComments'],
             'likelyWidth':'202.321mm'
         },
     }
