@@ -25,7 +25,7 @@ Note: When importing rules from a .xlsx file, the columns are:
 2. Word (long form)
 3. Abbreviation
 
-VERY IMPORTANT: Sort the Excel sheet in DESCENDING ORDER.  Due to the greedy nature of the replacement, the reverse sorted order is required to ensure proper compression of abbreviations.  
+*VERY IMPORTANT*: Sort the Excel sheet in DESCENDING ORDER.  Due to the greedy nature of the replacement, the reverse sorted order is required to ensure proper compression of abbreviations.  
 
 Example of the bug above: acronyms in sorted order:  
 United States Air Force: USAF  
