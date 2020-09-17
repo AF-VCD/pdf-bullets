@@ -224,6 +224,9 @@ class BulletApp extends React.Component {
                     if(!abbr){
                         abbr = '';
                     }
+                    if(!p3){
+                        p3 = '';
+                    }                 
                     return p1 + abbr +  p3;
                 }
             );
