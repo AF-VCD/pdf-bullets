@@ -25,7 +25,7 @@ class AbbrTools extends React.PureComponent{
             xhttp.onload = ()=>{
                 res(xhttp.response);
             }
-            xhttp.open('GET','/abbrs.xlsx',true);
+            xhttp.open('GET','../static/abbrs.xlsx',true);
             xhttp.send();
         }).then(this.getDataFromXLS);        
     }
