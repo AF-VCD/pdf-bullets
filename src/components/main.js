@@ -4,26 +4,14 @@ import {Logo,DocumentTools}  from "./tools.js"
 import AbbrsViewer from "./abbrs.js"
 import SynonymViewer from "./thesaurus.js"
  // booleans for debugging
- const checkOptims = false;
- const checkAbbrs = false;
- const checkPDF = false;
- const checkSave = false;
- const checkEditor = false;
- const checkJSON = false;
- const checkThesaurus = false;
+
 
 class BulletApp extends React.Component {
     constructor(props){
         super(props);
         if(this.props.savedSettings){
             //enableOptim, text, and width should be in settings
-            if( checkSave) console.log('settings are being loaded into BulletApp')
-            if( checkSave) console.log(this.props.savedSettings)
-            
             this.state = BulletApp.ParseSettings(this.props.savedSettings);
-            
-            
-
         }else{
             this.state={
                 enableOptim: true,
@@ -59,8 +47,7 @@ class BulletApp extends React.Component {
         return state;
     }
     handleJSONImport = (settings)=>{
-        if( checkJSON) console.log("handleJSONImport: ") 
-        if( checkJSON) console.log(settings)
+
         this.setState({text:settings.text});
         this.setState((state)=>{
             state.enableOptim = settings.enableOptim;
@@ -100,11 +87,8 @@ class BulletApp extends React.Component {
         this.setState({
             abbrDict: newAbbrDict,
         })
-        if(checkAbbrs) {
-            console.log('handling abbr change in main.js');
-            console.log(this.state.abbrReplacer + '')
-        }
 
+        
     }
     createAbbrDict = (abbrData)=>{
 
@@ -151,25 +135,21 @@ class BulletApp extends React.Component {
                     return p1 + abbr +  p3;
                 }
             );
-            if( checkAbbrs) {
-                console.log('abbrReplacer original: "' + sentence + '"')
-                console.log('abbrReplacer replaced: "' + newSentence + '"')
-            }
+
+            
             return newSentence;
         }
     }
     handleOptimChange = () =>{
         this.setState((state)=>{
             return {enableOptim: !state.enableOptim};
-        },()=>{
-            if( checkOptims) console.log("optimization toggle: "+ this.state.enableOptim)
         });
     }
     handleSelect = (newSel)=>{
         
         const maxWords = 8;
         if(newSel.trim() !== ''){
-            if(checkThesaurus) console.log('selection registered');
+            
             this.setState({
                 selection: Bullet.Tokenize(newSel.trim()).slice(0,maxWords).join(' ')
             });
@@ -205,8 +185,7 @@ class BulletApp extends React.Component {
         };
     } 
     handleSave = () =>{
-        if(checkSave) console.log(this.abbrsViewerRef);
-        if(checkSave) console.log(this.abbrsViewerRef.current.getData());
+
         return {
             width: this.state.width,
             text: this.state.text,

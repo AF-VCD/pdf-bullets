@@ -4,13 +4,9 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import  {faAngleDown} from "@fortawesome/free-solid-svg-icons"
 
 const pdfjs = require('@ckhordiasma/pdfjs-dist');
+const pdfjsWorker = require('@ckhordiasma/pdfjs-dist/build/pdf.worker.entry');
+pdfjs.GlobalWorkerOptions.workerSrc = pdfjsWorker;
 
-
-
-
-const checkPDF = false;
-const checkJSON = false;
-const checkSave = false;
 //PDF import
 class ImportTools extends React.PureComponent{
     constructor(props){
@@ -60,20 +56,17 @@ class ImportTools extends React.PureComponent{
             // This is needed to convert the bullets HTML into normal text. It gets rid of things like &amp;
            const bullets = 
                 new DOMParser().parseFromString(bulletsHTML,'text/html').documentElement.textContent;
-            if(checkPDF) console.log(bullets) 
             textUpdater(bullets)();
         });
 
         tasks.getPageInfo.then(function(data){
             const newWidth = data.width;
-            if(checkPDF) console.log(newWidth);
             widthUpdater(data.width)();          
         });
     }
     getDataFromJSON = (file) => {
         const reader = new FileReader();
         reader.onload = (e) => {
-            if( checkJSON) console.log(e.target.result)
             
             const data = JSON.parse(e.target.result);
             
@@ -174,9 +167,7 @@ class SaveTools extends React.PureComponent{
     onSave = ()=>{
         const settings = this.props.onSave();
         //JSON stringifying an array for future growth
-        if( checkSave) console.log(settings)
         const storedData = JSON.stringify([settings]);
-        if( checkSave) console.log(storedData)
         try{
             localStorage.setItem('bullet-settings',storedData);
             console.log("saved settings/data to local storage with character length " + storedData.length);
@@ -191,14 +182,10 @@ class SaveTools extends React.PureComponent{
     onExport = ()=>{
         const settings = this.props.onSave();
         //JSON stringifying an array for future growth
-        if( checkSave) console.log(settings)
         const storedData = JSON.stringify([settings]);
-        if( checkSave) console.log(storedData)
-
         const dataURI = 'data:application/JSON;charset=utf-8,'+ encodeURIComponent(storedData);
         this.exportRef.current.href=dataURI;
         this.exportRef.current.click();
-        if( checkSave) console.log(dataURI)
         console.log("exported settings/data to local storage with character length " + storedData.length);
         
     }

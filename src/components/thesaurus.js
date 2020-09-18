@@ -2,7 +2,7 @@ import React from "react"
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import  {faPlus} from "@fortawesome/free-solid-svg-icons"
 
-const checkThesaurus = false;
+
 
 class SynonymViewer extends React.PureComponent{
     constructor(props){
@@ -13,12 +13,11 @@ class SynonymViewer extends React.PureComponent{
         }
     }
     getSynonyms = (phrase)=>{
-        if( checkThesaurus) console.log('finding synonyms for '+ phrase);
         const xhttp = new XMLHttpRequest();
         xhttp.onreadystatechange =  () => {
             if(xhttp.readyState === 4 && xhttp.status === 200){
                 const dat = JSON.parse(xhttp.responseText);
-                if(checkThesaurus) console.log(dat);
+               
                 if(dat.length !== 0){
                     this.setState({
                         synonyms: dat.map((item)=>{return item.word}),
@@ -35,12 +34,10 @@ class SynonymViewer extends React.PureComponent{
         xhttp.send();
     }
     componentDidMount(){
-        if( checkThesaurus) console.log('componentDidMount getting synonyms for ' + this.props.word)
         this.getSynonyms(this.props.word);
     }
     componentDidUpdate(prevProps){
         if(prevProps.word !== this.props.word){
-            if( checkThesaurus) console.log("componentDidUpdate getting synonyms for " + this.props.word)
             this.getSynonyms(this.props.word);
         }
     }
@@ -97,10 +94,8 @@ class SynonymList extends React.PureComponent{
     handleCardClick = (word) => {
         return (e) => {
             e.preventDefault();
-            if(checkThesaurus) console.log('word clicked: ' + word)
             if(document.activeElement === window.getSelection().anchorNode.firstChild){
                 const ta = document.activeElement;
-                if(checkThesaurus)  console.log(ta.selectionStart, ta.selectionEnd)
                 this.props.onSelReplace(ta.selectionStart, ta.selectionEnd, word);
                 
                 
@@ -108,7 +103,6 @@ class SynonymList extends React.PureComponent{
         }
     }
     render(){
-        if( checkThesaurus) console.log(this.props)
         const words = 75;
         const cols = 10;
         const filler = (new Array(cols - words%cols)).join('.').split('.');

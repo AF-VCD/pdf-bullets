@@ -12,7 +12,6 @@ import XLSX from "xlsx"
 
 import { HotTable } from '@handsontable/react';
 
-const checkAbbrs = false;
 
 class AbbrTools extends React.PureComponent{
     constructor(props){
@@ -84,20 +83,13 @@ class AbbrsViewer extends React.PureComponent {
     constructor(props) {
         super(props);
         this.tableRef = React.createRef();
-        if(checkAbbrs) console.log(this.props)
+        
 
     }
 
     handleAbbrChange = (type) => {
-        if( checkAbbrs) console.log(type);
+        
         return (e)=>{
-            //this.props.onAbbrChange(e);
-            if( checkAbbrs) console.log(e);
-            if(checkAbbrs) console.log(this.props);
-            if(checkAbbrs) console.log(this.state);
-            if(checkAbbrs) console.log(this.tableRef.current);
-
-            //if(checkAbbrs) console.log(new RegExp("(\\b)("+Object.keys(this.state.abbrDict).join("|")+")(\\b|$|\\$)",'g'))
 
             this.props.onAbbrChange(this.tableRef);   
         }
@@ -112,7 +104,7 @@ class AbbrsViewer extends React.PureComponent {
         return this.tableRef.current.hotInstance.getData();
     }
     render() {
-        if( checkAbbrs) console.log(this.props.abbrData)
+        
         return (
             <div>
                 <AbbrTools updater={this.reloadData} getter={this.getData}/>
