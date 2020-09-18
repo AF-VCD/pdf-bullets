@@ -5,7 +5,7 @@
 
 import React from "react"
 import XLSX from "xlsx"
- 
+import SampleAbbrFile from '../static/abbrs.xlsx'
 
 
 
@@ -25,7 +25,7 @@ class AbbrTools extends React.PureComponent{
             xhttp.onload = ()=>{
                 res(xhttp.response);
             }
-            xhttp.open('GET','../static/abbrs.xlsx',true);
+            xhttp.open('GET',SampleAbbrFile,true);
             xhttp.send();
         }).then(this.getDataFromXLS);        
     }
