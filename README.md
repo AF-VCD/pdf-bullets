@@ -1,68 +1,38 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# pdf-bullets
+pdf analysis of air force forms
 
-## Available Scripts
+One of the most pointless and time-consuming things that Air Force officer and enlisted personnel do every year is bullet-writing. 
 
-In the project directory, you can run:
+Air Force personnel typically are required to write bullets for performance reports and award packages. 
 
-### `yarn start`
+AF bullets follow a few formatting rules:
 
-Runs the app in the development mode.<br />
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+- Each bullet must be exactly one line, with the width of the line depending on the form (performance report, award package, etc).
+- Acronyms and abbreviations are organization/commander-specific. Organizations are highly inconsistent with their abbreviation/acronym policies.
 
-The page will reload if you make edits.<br />
-You will also see any lint errors in the console.
+Those formatting rules lead to the following
 
-### `yarn test`
+- Information compression is prioritized over legibility
+- Time is wasted on acronym/abbreviation revision
+- Bullet "appearance" becomes highly valued; some examples of arbitrary bullet appearance rules:
+  - any sort of repetition = bad
+  - bullets near flush with page boundaries = good
 
-Launches the test runner in the interactive watch mode.<br />
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+The purpose of this repository is to develop a set of tools to automate the pointless aspects of bullet-writing so that an officer/enlisted member can focus more on writing actual content rather than worry about irrelevant formatting.
 
-### `yarn build`
+Note: When importing rules from a .xlsx file, the columns are:
+1. Enabled (TRUE|FALSE)
+2. Word (long form)
+3. Abbreviation
 
-Builds the app for production to the `build` folder.<br />
-It correctly bundles React in production mode and optimizes the build for the best performance.
+*VERY IMPORTANT*: Sort the Excel sheet in DESCENDING ORDER.  Due to the greedy nature of the replacement, the reverse sorted order is required to ensure proper compression of abbreviations.  
 
-The build is minified and the filenames include the hashes.<br />
-Your app is ready to be deployed!
+Example of the bug above: acronyms in sorted order:  
+United States Air Force: USAF  
+United States Air Force Academy: USAFA  
+Will cause "United States Air Force Academy" to be abbreviated as "USAF Academy"  
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `yarn eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/code-splitting
-
-### Analyzing the Bundle Size
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size
-
-### Making a Progressive Web App
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app
-
-### Advanced Configuration
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/advanced-configuration
-
-### Deployment
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/deployment
-
-### `yarn build` fails to minify
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
+Reversing the order:   
+United States Air Force Academy: USAFA  
+United States Air Force: USAF  
+Corrects this issue.  
