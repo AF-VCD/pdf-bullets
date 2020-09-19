@@ -287,20 +287,3 @@ class BulletApp extends React.Component {
 }
 
 export default BulletApp;
-
-/*
-// implementing fontReady as a promise (instead of using document.fonts.ready) to make it Edge compatible
-const fontReady = new Promise(function(resolve,rej){
-    WebFont.load({
-        custom: {
-            families: ['AdobeTimes']
-        }
-    });
-    resolve();
-});
-
-/*
-fontReady.then( ()=>{
-    ReactDOM.render( , document.getElementById('stuff'));
-});
-*/

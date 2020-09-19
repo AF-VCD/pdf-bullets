@@ -7,6 +7,7 @@ import "./styles/index.scss"
 import 'handsontable/dist/handsontable.full.css'
 
 import * as serviceWorker from './serviceWorker';
+import WebFont from 'webfontloader';
 
 const initialText = '- This is a custom built bullet writing tool; abbreviations will be replaced according to table in the abbreviations tab--you will see output on the right\n\
 - This tool can optimize spacing; output will be red if the optimizer could not fix spacing with 2004 or 2006 Unicode spaces\n\
@@ -114,8 +115,17 @@ try {
   }
 }
 
+
+
+WebFont.load({
+    custom: {
+        families: ['AdobeTimes']
+    }
+});
+
+
 ReactDOM.render(
-  <>
+  <React.StrictMode>
     <div className="section" id="stuff" >
       <BulletApp savedSettings={settings} tableSettings={tableSettings} abbrData={tableData} initialText={initialText} initialWidth={"202.321mm"} />
     </div>
@@ -127,20 +137,10 @@ ReactDOM.render(
       <div>This site utilizes PDF.JS (pdf import), HandsOnTable (spreadsheet), the DataMuse API (thesaurus), and Bulma (CSS).</div>
       <div>Maintained by Christopher Kodama </div>
     </div>
-  </>
+  </React.StrictMode>
 , document.getElementById('root'));
 
-/*
 
-ReactDOM.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
-  document.getElementById('root')
-);
-
-
-*/
 
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.

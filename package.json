@@ -18,6 +18,7 @@
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-scripts": "3.4.3",
+    "webfontloader": "^1.6.28",
     "xlsx": "^0.16.7"
   },
   "devDependencies": {
@@ -29,7 +30,7 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "deploy": "gh-pages -d build",
-    "predeploy":"CI=false npm run build"
+    "predeploy": "CI=false npm run build"
   },
   "eslintConfig": {
     "extends": "react-app"
