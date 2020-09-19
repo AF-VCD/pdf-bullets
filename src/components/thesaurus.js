@@ -132,32 +132,7 @@ class SynonymList extends React.PureComponent{
                 </div>
             </div>
         )
-        /*
-        return (
-                <div>
-                    {this.props.synonyms.concat(filler).chunk(cols).map((words,i)=>{          
-                        return (
-                            <div className="columns is-multiline" key={i}>
-                                {words.map((word,j)=>{
-                                    const replacedWord = this.props.abbrReplacer(word);
-                                    const otherAbbrs = this.props.abbrDict[word];
-                                    return (
-                                        <div className='card column is-narrow' key={j}>
-                                            <div className='card-content is-paddingless	'>
-                                                <Synonym word={word} 
-                                                abbr={replacedWord===word ? "" : replacedWord} 
-                                                otherAbbrs={otherAbbrs}/>
-                                            </div>
-                                        </div>
-                                        
-                                    )}
-                                )}
-                            </div> 
-                        )}
-                    )}
-                </div>
-        );
-        */
+
     }
 }
 class Synonym extends React.PureComponent{
