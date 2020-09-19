@@ -71,9 +71,9 @@ class AbbrTools extends React.PureComponent{
                 <button className="button" onClick={this.inputClick}>Import Abbrs</button>
                 <button className="button" onClick={this.exportToXLS}>Export Abbrs</button>
                 <button className="button" onClick={() => { 
-                    //if(console.log("Are you sure you want to remove all existing acronyms and replace with a common list?")){
+                    if(window.confirm("Are you sure you want to remove all existing acronyms and replace with a common list?")){
                         this.importSampleAbbrs();
-                    //}
+                    }
                 }}>Load Common Abbrs</button>
             </div>
         );
