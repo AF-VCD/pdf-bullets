@@ -316,7 +316,6 @@ class OptimizedBullet extends React.PureComponent{
         }
 
         this.bulletRef=React.createRef();
-        if( false) console.log("constructed: " + this.state.text)
     }
     optimExists = () => {
         if(this.props.optims[this.state.text] && this.props.optims[this.state.text][this.props.width]){
@@ -357,25 +356,13 @@ class OptimizedBullet extends React.PureComponent{
         }
         this.setState({
             updating: setTimeout(()=>{
-                this.optimize();
-                this.setState({
-                    updating:null,
-                    loading:false,
-                });
-            }, delay),
-        })
-    }
-    bufferedUpdate = (delay) => { 
-        if(this.state.updating){
-            clearTimeout(this.state.updating)
-        }
-        this.setState({
-            updating: setTimeout(()=>{
-                this.update();
-                this.setState({
-                    updating:null,
-                    loading:false,
-                });
+                this.optimize().then(() => {
+                    this.setState({
+                        updating:null,
+                        loading:false,
+                    });
+                })
+                
             }, delay),
         })
     }
@@ -483,16 +470,13 @@ class OptimizedBullet extends React.PureComponent{
     componentDidUpdate(prevProps){
 
     }
-    componentDidMount(){
-        
-        
+    componentDidMount(){  
         this.update();
         this.setState({height: this.props.height})
 
     }
     
     componentWillUnmount(){
-        
         clearTimeout(this.state.updating)
     }
 
