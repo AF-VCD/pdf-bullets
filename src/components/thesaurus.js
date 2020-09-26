@@ -1,3 +1,9 @@
+import React from "react"
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import  {faPlus} from "@fortawesome/free-solid-svg-icons"
+
+
+
 class SynonymViewer extends React.PureComponent{
     constructor(props){
         super(props)
@@ -7,13 +13,12 @@ class SynonymViewer extends React.PureComponent{
         }
     }
     getSynonyms = (phrase)=>{
-        if( checkThesaurus) console.log('finding synonyms for '+ phrase);
         const xhttp = new XMLHttpRequest();
         xhttp.onreadystatechange =  () => {
-            if(xhttp.readyState == 4 && xhttp.status == 200){
+            if(xhttp.readyState === 4 && xhttp.status === 200){
                 const dat = JSON.parse(xhttp.responseText);
-                if(checkThesaurus) console.log(dat);
-                if(dat.length != 0){
+               
+                if(dat.length !== 0){
                     this.setState({
                         synonyms: dat.map((item)=>{return item.word}),
                     });
@@ -29,12 +34,10 @@ class SynonymViewer extends React.PureComponent{
         xhttp.send();
     }
     componentDidMount(){
-        if( checkThesaurus) console.log('componentDidMount getting synonyms for ' + this.props.word)
         this.getSynonyms(this.props.word);
     }
     componentDidUpdate(prevProps){
-        if(prevProps.word != this.props.word){
-            if( checkThesaurus) console.log("componentDidUpdate getting synonyms for " + this.props.word)
+        if(prevProps.word !== this.props.word){
             this.getSynonyms(this.props.word);
         }
     }
@@ -43,15 +46,15 @@ class SynonymViewer extends React.PureComponent{
         const replacedWord = this.props.abbrReplacer(this.props.word);
         const otherAbbrs = this.props.abbrDict[this.props.word];
         const header = <Synonym word={this.props.word} key={this.props.word}
-                            abbr={replacedWord==this.props.word ? "" : replacedWord} 
+                            abbr={replacedWord===this.props.word ? "" : replacedWord} 
                             otherAbbrs={otherAbbrs}/>
         const synonyms =  <SynonymList onSelReplace={this.props.onSelReplace} key={this.state.synonyms.join('')} synonyms={this.state.synonyms} abbrDict={this.props.abbrDict} abbrReplacer={this.props.abbrReplacer} />;
         const explanation = <a className="panel-block" key='init'>Auto-thesaurus box - highlight a word or phrase below to show synonyms in this box</a>;
         const noResults = <a className="panel-block"  key='none'>no results found</a>;
         let mainBody;
-        if(this.props.word == ''){
+        if(this.props.word === ''){
             mainBody = explanation;
-        }else if(this.state.synonyms.length == 0){
+        }else if(this.state.synonyms.length === 0){
             mainBody = noResults;
         }else{
             mainBody = synonyms;
@@ -61,12 +64,11 @@ class SynonymViewer extends React.PureComponent{
             <div className="card">
                 <header className="card-header has-background-light	is-shadowless">
                     <a className="card-header-title" >
-                        <span style={{marginRight:'5px'}}>Thesaurus{this.props.word==''?'':":"}</span>
+                        <span style={{marginRight:'5px'}}>Thesaurus{this.props.word===''?'':":"}</span>
                         {header} 
                     </a>
                     <a className="card-header-icon" onClick={this.props.onHide}>
-                        <span className="delete">
-                            <i className="fas fa-angle-down" aria-hidden="true"></i>
+                        <span className="delete"> 
                         </span>
                     </a>
                 </header>
@@ -92,10 +94,8 @@ class SynonymList extends React.PureComponent{
     handleCardClick = (word) => {
         return (e) => {
             e.preventDefault();
-            if(checkThesaurus) console.log('word clicked: ' + word)
-            if(document.activeElement == window.getSelection().anchorNode.firstChild){
+            if(document.activeElement === window.getSelection().anchorNode.firstChild){
                 const ta = document.activeElement;
-                if(checkThesaurus)  console.log(ta.selectionStart, ta.selectionEnd)
                 this.props.onSelReplace(ta.selectionStart, ta.selectionEnd, word);
                 
                 
@@ -103,7 +103,6 @@ class SynonymList extends React.PureComponent{
         }
     }
     render(){
-        if( checkThesaurus) console.log(this.props)
         const words = 75;
         const cols = 10;
         const filler = (new Array(cols - words%cols)).join('.').split('.');
@@ -117,11 +116,12 @@ class SynonymList extends React.PureComponent{
                         <div className='card column is-narrow ' key={i}>
                             <div className='card-content is-paddingless' >
                                 <Synonym word={word} 
-                                abbr={replacedWord==word ? "" : replacedWord} 
+                                abbr={replacedWord===word ? "" : replacedWord} 
                                 otherAbbrs={otherAbbrs}/>
                                 
                                 <a className="icon is-small" onMouseDown={this.handleCardClick(word)}>
-                                    <i className="fas fa-plus fa-xs" style={{color: "#51cf66"}} aria-hidden="true"></i>
+                                    
+                                    <FontAwesomeIcon  icon={faPlus} size="xs" color="#51cf66"/> 
                                 </a>
                                
 
@@ -132,32 +132,7 @@ class SynonymList extends React.PureComponent{
                 </div>
             </div>
         )
-        /*
-        return (
-                <div>
-                    {this.props.synonyms.concat(filler).chunk(cols).map((words,i)=>{          
-                        return (
-                            <div className="columns is-multiline" key={i}>
-                                {words.map((word,j)=>{
-                                    const replacedWord = this.props.abbrReplacer(word);
-                                    const otherAbbrs = this.props.abbrDict[word];
-                                    return (
-                                        <div className='card column is-narrow' key={j}>
-                                            <div className='card-content is-paddingless	'>
-                                                <Synonym word={word} 
-                                                abbr={replacedWord==word ? "" : replacedWord} 
-                                                otherAbbrs={otherAbbrs}/>
-                                            </div>
-                                        </div>
-                                        
-                                    )}
-                                )}
-                            </div> 
-                        )}
-                    )}
-                </div>
-        );
-        */
+
     }
 }
 class Synonym extends React.PureComponent{
@@ -176,7 +151,7 @@ class Synonym extends React.PureComponent{
         if(this.props.otherAbbrs){
             if(this.props.otherAbbrs.enabled){
                 let enabledAbbrs = this.props.otherAbbrs.enabled.filter((abbr)=>{
-                    return abbr!=this.props.abbr;
+                    return abbr!==this.props.abbr;
                 });
                 if(enabledAbbrs.length>0){
                     enabledAbbrDisp = <span style={{fontStyle:"italic"}}>
@@ -204,3 +179,4 @@ class Synonym extends React.PureComponent{
         )
     }
 }
+export default SynonymViewer;

@@ -1,7 +1,15 @@
+
+@charset "utf-8";
+
 @font-face {
     font-family: "AdobeTimes";
-    src: url("./TimesNewRomanPSMT.ttf");
+    src: url("../static/TimesNewRomanPSMT.ttf");
 }
+
+
+// If need, change your variables before importing Bulma
+// $title-color: #ff0000;
+@import "~bulma/bulma.sass";
 
 textarea.bullets{
 
@@ -23,7 +31,7 @@ textarea.bullets{
 }
 .bullets{
     font-family: "AdobeTimes";
-    /* font-family: 'Times New Roman'; */
+    //font-family: 'Times New Roman'; 
     font-size: 12pt;
     white-space:pre-wrap;
     display:inline;

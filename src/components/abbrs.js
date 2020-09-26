@@ -3,6 +3,16 @@
 //import { HotTable } from '@handsontable/react';
 //import Handsontable from 'handsontable';
 
+import React from "react"
+import XLSX from "xlsx"
+import SampleAbbrFile from '../static/abbrs.xlsx'
+
+
+
+
+import { HotTable } from '@handsontable/react';
+
+
 class AbbrTools extends React.PureComponent{
     constructor(props){
         super(props);
@@ -15,14 +25,14 @@ class AbbrTools extends React.PureComponent{
             xhttp.onload = ()=>{
                 res(xhttp.response);
             }
-            xhttp.open('GET','./abbrs.xlsx',true);
+            xhttp.open('GET',SampleAbbrFile,true);
             xhttp.send();
         }).then(this.getDataFromXLS);        
     }
     importAbbrs = (e) => {
         
         if(!this.fileInputRef.current.value){
-            clog('no file picked');
+            console.log('no file picked');
             return;
         }else{
             this.getDataFromXLS(this.fileInputRef.current.files[0]);
@@ -60,8 +70,8 @@ class AbbrTools extends React.PureComponent{
                 <input type="file" onChange={this.importAbbrs} ref={this.fileInputRef} style={{display:"none"}}></input>
                 <button className="button" onClick={this.inputClick}>Import Abbrs</button>
                 <button className="button" onClick={this.exportToXLS}>Export Abbrs</button>
-                <button className="button" onClick={() => {
-                    if(confirm("Are you sure you want to remove all existing acronyms and replace with a common list?")){
+                <button className="button" onClick={() => { 
+                    if(window.confirm("Are you sure you want to remove all existing acronyms and replace with a common list?")){
                         this.importSampleAbbrs();
                     }
                 }}>Load Common Abbrs</button>
@@ -73,33 +83,28 @@ class AbbrsViewer extends React.PureComponent {
     constructor(props) {
         super(props);
         this.tableRef = React.createRef();
-        if(checkAbbrs) console.log(this.props)
+        
 
     }
 
     handleAbbrChange = (type) => {
-        if( checkAbbrs) console.log(type)
+        
         return (e)=>{
-            //this.props.onAbbrChange(e);
-            if( checkAbbrs) console.log(e)
-            if(checkAbbrs) console.log(this.props)
-            if(checkAbbrs) console.log(this.state)
-            if(checkAbbrs) console.log(this.tableRef.current)
-
-            //if(checkAbbrs) console.log(new RegExp("(\\b)("+Object.keys(this.state.abbrDict).join("|")+")(\\b|$|\\$)",'g'))
 
             this.props.onAbbrChange(this.tableRef);   
         }
     }
     reloadData = (rows)=>{
-        this.tableRef.current.hotInstance.updateSettings({data:[]});
+        //this.tableRef.current.hotInstance.updateSettings({data:[]});
+        this.tableRef.current.hotInstance.alter("remove_row",0, this.tableRef.current.hotInstance.countRows())
         this.tableRef.current.hotInstance.loadData(rows);
+
     }
     getData = ()=>{
         return this.tableRef.current.hotInstance.getData();
     }
     render() {
-        if( checkAbbrs) console.log(this.props.abbrData)
+        
         return (
             <div>
                 <AbbrTools updater={this.reloadData} getter={this.getData}/>
@@ -114,3 +119,4 @@ class AbbrsViewer extends React.PureComponent {
     }
 }
 
+export default AbbrsViewer;

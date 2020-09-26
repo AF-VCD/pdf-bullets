@@ -1,111 +1,17 @@
+import React from "react"
+import {Bullet, BulletComparator} from "./bullets.js"
+import {Logo,DocumentTools}  from "./tools.js"
+import AbbrsViewer from "./abbrs.js"
+import SynonymViewer from "./thesaurus.js"
+ // booleans for debugging
 
-const initialText = '- This is a custom built bullet writing tool; abbreviations will be replaced according to table in the abbreviations tab--you will see output on the right\n\
-- This tool can optimize spacing; output will be red if the optimizer could not fix spacing with 2004 or 2006 Unicode spaces\n\
-- Click the thesaurus button to show one; select a word in this or the output box to view synonyms--words in parentheses are abbreviations that are configured';
-
-const tableData = [{
-    enabled: true,
-    value: 'abbreviations', 
-    abbr: 'abbrs',
-    },{
-    enabled: true,
-    value: 'table',
-    abbr: 'tbl',
-    },{
-    enabled: true,
-    value: 'optimize',
-    abbr: 'optim',
-    },{
-    enabled: true,
-    value: 'with ',
-    abbr: 'w/',
-    },{
-    enabled: true,    
-    value: 'parentheses',
-    abbr: 'parens',
-    },
-];
-
-const tableSettings = {
-    columns: [{
-        data: 'enabled',
-        type: 'checkbox',
-        disableVisualSelection: true,
-        width:20
-        },{
-        data: 'value',
-        type: 'text'
-        },{
-        data: 'abbr',
-        type: 'text'
-        },
-    ],
-    stretchH: 'all',
-    width: 500,
-    autoWrapRow: true,
-    height: 500,
-    maxRows: Infinity,
-    manualRowResize: true,
-    manualColumnResize: true,
-    rowHeaders: true,
-    colHeaders: [
-        'Enabled',
-        'Word',
-        'Abbreviation',
-    ],
-    trimWhitespace: false,
-    enterBeginsEditing:false,
-    manualRowMove: true,
-    manualColumnMove: true,
-    columnSorting: {
-        indicator: true
-    },
-    autoColumnSize: false,
-    minRows: 15,
-    contextMenu: true,
-    licenseKey: 'non-commercial-and-evaluation',
-    search: {
-        queryMethod: function(queryStr,value){
-            return queryStr.toString() === value.toString();
-        },
-        callback: function(instance, row, col, value, result){
-            const DEFAULT_CALLBACK = function(instance, row, col, data, testResult) {
-                instance.getCellMeta(row, col).isSearchResult = testResult;
-            };
-
-            DEFAULT_CALLBACK.apply(this, arguments);
-        },
-    },
-};
-
-    let settings;
-    try{
-        if(localStorage.getItem('bullet-settings')){
-            settings = JSON.parse(localStorage.getItem("bullet-settings"));
-            if( checkSave) console.log('settings have been retrieved')
-            if(checkSave) console.log(settings)
-            
-        }
-    }catch(err){
-        if(err.name == 'SecurityError'){
-            console.log('Was not able to get localstorage bullets due to use of file interface and browser privacy settings');
-        }else{
-            throw err;
-        }
-    }
 
 class BulletApp extends React.Component {
     constructor(props){
         super(props);
         if(this.props.savedSettings){
             //enableOptim, text, and width should be in settings
-            if( checkSave) console.log('settings are being loaded into BulletApp')
-            if( checkSave) console.log(this.props.savedSettings)
-            
             this.state = BulletApp.ParseSettings(this.props.savedSettings);
-            
-            
-
         }else{
             this.state={
                 enableOptim: true,
@@ -141,8 +47,7 @@ class BulletApp extends React.Component {
         return state;
     }
     handleJSONImport = (settings)=>{
-        if( checkJSON) console.log("handleJSONImport: ") 
-        if( checkJSON) console.log(settings)
+
         this.setState({text:settings.text});
         this.setState((state)=>{
             state.enableOptim = settings.enableOptim;
@@ -154,7 +59,13 @@ class BulletApp extends React.Component {
 
     }
     handleAbbrChange = (tableRef)=>{
-        if(tableRef.current == null ){return}
+
+        //this handles the very first abbreviation replacement when the page is first opened. not prettu but it works.
+        if(tableRef.current == null ){this.setState({
+            abbrDict: this.createAbbrDict(this.state.abbrData),
+        })
+        return;
+        }
         const abbrTable = tableRef.current.hotInstance;
         const newAbbrDict = {};
         
@@ -176,11 +87,8 @@ class BulletApp extends React.Component {
         this.setState({
             abbrDict: newAbbrDict,
         })
-        if(checkAbbrs) {
-            console.log('handling abbr change in main.js');
-            console.log(this.state.abbrReplacer + '')
-        }
 
+        
     }
     createAbbrDict = (abbrData)=>{
 
@@ -224,31 +132,24 @@ class BulletApp extends React.Component {
                     if(!abbr){
                         abbr = '';
                     }
-                    if(!p3){
-                        p3 = '';
-                    }                 
                     return p1 + abbr +  p3;
                 }
             );
-            if( checkAbbrs) {
-                console.log('abbrReplacer original: "' + sentence + '"')
-                console.log('abbrReplacer replaced: "' + newSentence + '"')
-            }
+
+            
             return newSentence;
         }
     }
     handleOptimChange = () =>{
         this.setState((state)=>{
             return {enableOptim: !state.enableOptim};
-        },()=>{
-            if( checkOptims) console.log("optimization toggle: "+ this.state.enableOptim)
         });
     }
     handleSelect = (newSel)=>{
         
         const maxWords = 8;
-        if(newSel.trim() != ''){
-            if(checkThesaurus) console.log('selection registered');
+        if(newSel.trim() !== ''){
+            
             this.setState({
                 selection: Bullet.Tokenize(newSel.trim()).slice(0,maxWords).join(' ')
             });
@@ -284,13 +185,12 @@ class BulletApp extends React.Component {
         };
     } 
     handleSave = () =>{
-        if(checkSave) console.log(this.abbrsViewerRef);
-        if(checkSave) console.log(this.abbrsViewerRef.current.getData());
+
         return {
             width: this.state.width,
             text: this.state.text,
             abbrData: this.abbrsViewerRef.current.getData().filter((row)=>{
-                return row[0] != null
+                return row[0] !== null
             }),
             enableOptim:this.state.enableOptim,
             //do I need to add abbrReplacer?
@@ -362,20 +262,20 @@ class BulletApp extends React.Component {
                             <ul>
                                 {tabs.map((tab,i)=>{
                                     return (
-                                        <li key={i} className={this.state.currentTab == i?"is-active":''} ><a onClick={this.handleTabChange(i)}>{tab}</a></li>
+                                        <li key={i} className={this.state.currentTab === i?"is-active":''} ><a onClick={this.handleTabChange(i)}>{tab}</a></li>
                                     )}
                                 )}
                             </ul>
                         </div>
                     </div>
-                    {this.state.currentTab==0? (
+                    {this.state.currentTab===0? (
                     <div className='column is-full'>
                         <BulletComparator text={this.state.text} textSelRange={this.state.textSelRange}
                             abbrReplacer={abbrReplacer} handleTextChange={this.handleTextChange}
                             width={this.state.enableOptim? (parseFloat(this.state.width.replace(/[a-zA-Z]/g,''))-0.00)+'mm':this.state.width} 
                             onSelect={this.handleSelect} enableOptim={this.state.enableOptim} />
                     </div> ) : '' }
-                    <div className={'column is-full' + ' ' + (this.state.currentTab != 1?'is-invisible':'')}>
+                    <div className={'column is-full' + ' ' + (this.state.currentTab !== 1?'is-invisible':'')}>
                         <AbbrsViewer settings={this.props.tableSettings} 
                         abbrData={this.state.abbrData} 
                         onAbbrChange={this.handleAbbrChange} ref={this.abbrsViewerRef} />
@@ -385,17 +285,5 @@ class BulletApp extends React.Component {
         );
     }
 }
-// implementing fontReady as a promise (instead of using document.fonts.ready) to make it Edge compatible
-const fontReady = new Promise(function(resolve,rej){
-    WebFont.load({
-        custom: {
-            families: ['AdobeTimes']
-        }
-    });
-    resolve();
-});
 
-// /
-fontReady.then( ()=>{
-    ReactDOM.render( <BulletApp savedSettings={settings} tableSettings={tableSettings} abbrData={tableData} initialText={initialText} initialWidth={"202.321mm"}/>, document.getElementById('stuff'));
-});
+export default BulletApp;

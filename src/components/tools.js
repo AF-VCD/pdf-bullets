@@ -1,3 +1,12 @@
+import React from "react"
+import BulletApp from "./main.js"
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import  {faAngleDown} from "@fortawesome/free-solid-svg-icons"
+
+const pdfjs = require('@ckhordiasma/pdfjs-dist');
+const pdfjsWorker = require('@ckhordiasma/pdfjs-dist/build/pdf.worker.entry');
+pdfjs.GlobalWorkerOptions.workerSrc = pdfjsWorker;
+
 //PDF import
 class ImportTools extends React.PureComponent{
     constructor(props){
@@ -11,13 +20,13 @@ class ImportTools extends React.PureComponent{
 
     importFile = (e) => {
         if(!this.fileInputRef.current.value){
-            clog('no file picked');
+            console.log('no file picked');
             return;
         }else{
-            let callback = (file)=>{clog(file)};
-            if(this.state.type == 'PDF'){
+            let callback = (file)=>{console.log(file)};
+            if(this.state.type === 'PDF'){
                 callback = this.getDataFromPDF;
-            }else if(this.state.type == 'JSON'){
+            }else if(this.state.type === 'JSON'){
                 callback = this.getDataFromJSON;
             }
             //return Promise.resolve(this.fileInputRef.current.files[0]).then(callback).then(() => {
@@ -47,20 +56,17 @@ class ImportTools extends React.PureComponent{
             // This is needed to convert the bullets HTML into normal text. It gets rid of things like &amp;
            const bullets = 
                 new DOMParser().parseFromString(bulletsHTML,'text/html').documentElement.textContent;
-            if(checkPDF) console.log(bullets) 
             textUpdater(bullets)();
         });
 
         tasks.getPageInfo.then(function(data){
             const newWidth = data.width;
-            if(checkPDF) console.log(newWidth);
             widthUpdater(data.width)();          
         });
     }
     getDataFromJSON = (file) => {
         const reader = new FileReader();
         reader.onload = (e) => {
-            if( checkJSON) console.log(e.target.result)
             
             const data = JSON.parse(e.target.result);
             
@@ -86,7 +92,8 @@ class ImportTools extends React.PureComponent{
                         <button className="button" onClick={this.inputClick('PDF')}>Import</button>
                         <button className="button" onClick={this.toggleMenu}  aria-haspopup="true" aria-controls="import-menu" >
                             <span className="icon">
-                                <i className="fas fa-angle-down" aria-hidden="true"></i>
+                                 
+                                 <FontAwesomeIcon  icon={faAngleDown}/> 
                             </span> 
                         </button>
                     </div>
@@ -122,11 +129,11 @@ class OutputTools extends React.PureComponent{
                         <span className='icon is-right'>mm</span>
                     </div>
                     <div className="control buttons has-addons">
-                        <a className={"button is-primary" + ' ' + (this.props.width==widthAWD?'':'is-outlined')}
+                        <a className={"button is-primary" + ' ' + (this.props.width===widthAWD?'':'is-outlined')}
                             onClick={this.props.onWidthUpdate(widthAWD)}>AWD</a>
-                        <a className={"button is-success" + ' ' + (this.props.width==widthEPR?'':'is-outlined')}
+                        <a className={"button is-success" + ' ' + (this.props.width===widthEPR?'':'is-outlined')}
                             onClick={this.props.onWidthUpdate(widthEPR)}>EPR</a>
-                        <a className={"button is-link" + ' ' + (this.props.width==widthOPR?'':'is-outlined')}
+                        <a className={"button is-link" + ' ' + (this.props.width===widthOPR?'':'is-outlined')}
                             onClick={this.props.onWidthUpdate(widthOPR)}>OPR</a> 
                     </div>                    
 
@@ -160,14 +167,12 @@ class SaveTools extends React.PureComponent{
     onSave = ()=>{
         const settings = this.props.onSave();
         //JSON stringifying an array for future growth
-        if( checkSave) console.log(settings)
         const storedData = JSON.stringify([settings]);
-        if( checkSave) console.log(storedData)
         try{
             localStorage.setItem('bullet-settings',storedData);
             console.log("saved settings/data to local storage with character length " + storedData.length);
         }catch(err){
-            if(err.name == 'SecurityError'){
+            if(err.name === 'SecurityError'){
                 alert("Sorry, saving to cookies does not work using the file:// interface and/or your browser's privacy settings")
             }else{
                 throw err;
@@ -177,14 +182,10 @@ class SaveTools extends React.PureComponent{
     onExport = ()=>{
         const settings = this.props.onSave();
         //JSON stringifying an array for future growth
-        if( checkSave) console.log(settings)
         const storedData = JSON.stringify([settings]);
-        if( checkSave) console.log(storedData)
-
         const dataURI = 'data:application/JSON;charset=utf-8,'+ encodeURIComponent(storedData);
         this.exportRef.current.href=dataURI;
         this.exportRef.current.click();
-        if( checkSave) console.log(dataURI)
         console.log("exported settings/data to local storage with character length " + storedData.length);
         
     }
@@ -204,7 +205,7 @@ class SaveTools extends React.PureComponent{
                         <button className="button" onClick={this.onSave}>Save </button>
                         <button className="button" aria-haspopup="true" aria-controls="save-menu" >
                             <span className="icon" onClick={this.toggleMenu} >
-                                <i className="fas fa-angle-down" aria-hidden="true"></i>
+                                <FontAwesomeIcon  icon={faAngleDown}/> 
                             </span> 
                         </button>
                     </div> 
@@ -238,7 +239,7 @@ class ThesaurusTools extends React.PureComponent{
         return(
             <a className="button" onClick={this.props.onHide} aria-haspopup="true" aria-controls="thesaurus-menu" >
                 <span>Thesaurus</span><span className="icon"  >
-                    <i className="fas fa-angle-down" aria-hidden="true"></i>
+                    <FontAwesomeIcon  icon={faAngleDown}/> 
                 </span> 
             </a>
         );
@@ -275,3 +276,114 @@ class DocumentTools extends React.PureComponent{
         );
     }
 }
+
+// could not do a static class property because of MS edge
+const Forms  = { 
+    all : {
+           'AF707': {
+               'fields': ['S2DutyTitleDesc','S4Assessment','S5Assessment','S6Assessment'],
+               'likelyWidth':'201.041mm'
+           },
+           'AF1206': {
+               'fields': ['specificAccomplishments','p2SpecificAccomplishments'],
+               'likelyWidth':'202.321mm'
+           },
+           'AF910': {
+               'fields': ['KeyDuties','IIIComments','IVComments','VComments', 'VIIIComments', 'IXComments'],
+               'likelyWidth':'202.321mm'
+           },
+           'AF911': {
+               'fields': ['KeyDuties','IIIComments','IVComments', 'VIIComments', 'VIIIComments', 'IXComments'],
+               'likelyWidth':'202.321mm'
+           },
+       }
+   };
+   function getBulletsFromPdf(filedata){
+   
+       
+       const pdfSetup = filedata.arrayBuffer().then(function(buffer){
+           const uint8Array = new Uint8Array(buffer);
+
+           return pdfjs.getDocument({data:uint8Array}).promise;
+           
+       });
+   
+       const getXFA = pdfSetup.then(function(pdf){
+            return pdf.getXFA();
+       });
+   
+       const getFormName = pdfSetup.then(function(pdf){
+            return pdf.getMetadata().then(function (result){
+                const prefix = result.info.Custom["Short Title - Prefix"];
+                const num = result.info.Custom["Short Title - Number"];
+                return prefix + '' + num;
+            })
+       });
+       const getAllData = Promise.all([getFormName, getXFA]);
+       const pullBullets = getAllData.then(function(results){
+           
+           const formName = results[0];
+           const xfaDict = results[1];
+           
+           let datasetXML = xfaDict['datasets'];
+           datasetXML = datasetXML.replace(/&#xD;/g,'\n');
+           
+           const parser = new DOMParser();
+           const xmlDoc = parser.parseFromString(datasetXML, "text/xml");
+           
+           let bulletText = '';
+           for (let tagName of Forms.all[formName]['fields']){
+               const bulletTag = xmlDoc.querySelector(tagName);
+               bulletText += bulletTag.innerHTML + '\n';
+           }
+           return bulletText;
+       });
+   
+       const getPageInfo = getAllData.then(function(results){
+           
+            const formName = results[0];
+            const xfaDict = results[1];
+   
+           const templateXML = xfaDict['template'];
+           const parser = new DOMParser();
+           const xmlDoc = parser.parseFromString(templateXML, "text/xml");
+           
+           let fonts = [];
+           let fontSizes = []
+           let widths = [];
+           let i = 0;
+           for (let tagName of Forms.all[formName]['fields']){
+               const bulletTag  = xmlDoc.querySelector("field[name='" + tagName + "'");
+               fonts[i] = bulletTag.querySelector('font').getAttribute('typeface');
+               fontSizes[i] = bulletTag.querySelector('font').getAttribute('size');
+               widths[i] = bulletTag.getAttribute('w');
+               i += 1;
+           }
+           for (let font of fonts){
+               if(font !== fonts[0]){
+                   console.log('warning: not all grabbed sections have the same font type');
+                   break;
+               }
+           }
+           for (let fontSize of fontSizes){
+               if(fontSize !== fontSizes[0]){
+                   console.log('warning: not all grabbed sections have the same font size');
+                   break;
+               }
+           }
+           for (let width of widths){
+               if(width !== widths[0]){
+                   console.log('warning: not all grabbed sections have the same width');
+                   break;
+               }
+           }
+           
+           return {'font': fonts[0], 'fontSize':fontSizes[0], 'width':widths[0]}
+           
+           //accomplishmentsTag = templateXML.match(/name="specificAccomplishments"(.*?)<\/field/);
+           //console.log(accomplishmentsTag)
+       });
+       return {'pullBullets': pullBullets, 'getPageInfo':getPageInfo};
+   }
+
+export {Logo,DocumentTools};

@@ -1,3 +1,5 @@
+import React from "react"
+
 
 // optimization status codes
 // status codes for optimization direction 
@@ -104,25 +106,25 @@ class BulletEditor extends React.PureComponent{
         this.fixHeight();
     }
     handleInput = (e) => {
-        if(checkEditor) console.log(this.ref)
+        
         this.fixHeight();
     }
     fixHeight = () => {
 
         this.ref.current.style.height = 'auto';
         this.ref.current.style.height = Math.max(this.ref.current.scrollHeight, this.props.minHeight) + 'px';
-        if( checkEditor) console.log('input box height adjusted')
+        
     }
     componentDidMount(){
         this.fixHeight();
-        if( checkEditor) console.log('text editor mounted')
+        
     }
     componentDidUpdate(prevProps){
-        if(checkEditor) console.log('text editor updated')
+        
         
         this.fixHeight();
-        if(this.props.textSelRange.trigger != prevProps.textSelRange.trigger){
-            if(checkThesaurus || checkEditor) console.log('new selection range: ', this.props.textSelRange)
+        if(this.props.textSelRange.trigger !== prevProps.textSelRange.trigger){
+            
             let start, end;
             if(this.props.textSelRange.start < this.props.textSelRange.end){
                 start = this.props.textSelRange.start;
@@ -167,17 +169,17 @@ class BulletOutputViewer extends React.PureComponent{
     }
     componentDidUpdate(prevProps,prevState){
         const newAbbrBullets = this.props.bullets.map(this.props.abbrReplacer);
-        if(prevProps.bullets.map(prevProps.abbrReplacer).join('') != newAbbrBullets.join('')){
+        if(prevProps.bullets.map(prevProps.abbrReplacer).join('') !== newAbbrBullets.join('')){
             this.setState({
                 abbrBullets: newAbbrBullets,
             });
         }
     }
     selectOutput = (e)=>{
-        if(e.ctrlKey && e.keyCode == 65){
+        if(e.ctrlKey && e.keyCode === 65){
             e.preventDefault();
-            //clog('control-a')
-            //clog(this.outputRef.current)
+            //console.log('control-a')
+            //console.log(this.outputRef.current)
             if (window.getSelection) { 
                 const range = document.createRange();
                 range.selectNode(this.outputRef.current);
@@ -206,7 +208,7 @@ class BulletOutputViewer extends React.PureComponent{
                 {this.props.bullets.map(
                 (line,i)=>{
                     const key = this.state.abbrBullets[i] + this.props.width + this.props.enableOptim;
-                    if(checkAbbrs) console.log("key for optim bullet", key, this.props)
+                    
                     if(key in keyDict){
                         keyDict[key] += 1;
                     }else{
@@ -239,12 +241,11 @@ class HeightAdjustedBullet extends React.PureComponent{
         }
     }
     componentDidMount(){
-        if(checkOptims) console.log('height adjustment is mounting')
+        
         if(this.state.checkingHeight){
-            if(checkOptims) console.log('height adjustment after mount: ', this.bulletRef.current)
-            if(checkOptims) console.log('height adjustment evaluated height: ', this.bulletRef.current.evaluate())
+            
             const newHeight = this.bulletRef.current.evaluate().height;
-            const newHeightSetting = newHeight==0? 'inherit':newHeight+'px';
+            const newHeightSetting = newHeight===0? 'inherit':newHeight+'px';
             this.setState({
                 height:newHeightSetting,
                 checkingHeight: false,
@@ -253,16 +254,16 @@ class HeightAdjustedBullet extends React.PureComponent{
         }
     }
     componentDidUpdate(prevProps, prevState){
-        if(checkOptims) console.log('height adjustment updated',prevProps, this.props, prevState,this.state)
-        if(prevProps.rawText != this.props.rawText){
+        
+        if(prevProps.rawText !== this.props.rawText){
             this.setState({
                 checkingHeight: true,
             })
         }else{
             if(this.state.checkingHeight){
-                if(checkOptims) console.log('new calculated height: ', this.bulletRef.current.evaluate())
+                
                 const newHeight = this.bulletRef.current.evaluate().height;
-                const newHeightSetting = newHeight==0? 'inherit':newHeight+'px';
+                const newHeightSetting = newHeight===0? 'inherit':newHeight+'px';
                 this.setState({
                     checkingHeight: false,
                     height: newHeightSetting,
@@ -315,7 +316,6 @@ class OptimizedBullet extends React.PureComponent{
         }
 
         this.bulletRef=React.createRef();
-        if( false) console.log("constructed: " + this.state.text)
     }
     optimExists = () => {
         if(this.props.optims[this.state.text] && this.props.optims[this.state.text][this.props.width]){
@@ -327,15 +327,14 @@ class OptimizedBullet extends React.PureComponent{
     update = () => {
         const sentence = this.state.text;
         if(!this.props.enableOptim){
-            if( checkOptims) console.log('no optimization done because it is disabled')
+            
             this.setState({
                 text: this.props.text,
                 status: BULLET.NOT_OPT,
                 loading:false
             })
         }else if(this.optimExists()){
-            if( checkOptims) console.log('optimization already exists for ' + sentence)
-            if(checkOptims) console.log(this.props.optims[sentence][this.props.width])
+            
             this.setState({
                 text: this.props.optims[sentence][this.props.width].result,
                 status: this.props.optims[sentence][this.props.width].status,
@@ -346,7 +345,7 @@ class OptimizedBullet extends React.PureComponent{
             this.setState({
                 loading:true
             })
-            if( checkOptims) console.log('Optimization loading for ' + sentence)
+
             this.bufferedOptimize(500);
         }
     }
@@ -357,25 +356,13 @@ class OptimizedBullet extends React.PureComponent{
         }
         this.setState({
             updating: setTimeout(()=>{
-                this.optimize();
-                this.setState({
-                    updating:null,
-                    loading:false,
-                });
-            }, delay),
-        })
-    }
-    bufferedUpdate = (delay) => { 
-        if(this.state.updating){
-            clearTimeout(this.state.updating)
-        }
-        this.setState({
-            updating: setTimeout(()=>{
-                this.update();
-                this.setState({
-                    updating:null,
-                    loading:false,
-                });
+                this.optimize().then(() => {
+                    this.setState({
+                        updating:null,
+                        loading:false,
+                    });
+                })
+                
             }, delay),
         })
     }
@@ -397,15 +384,15 @@ class OptimizedBullet extends React.PureComponent{
                 status: optimization.status,
                 loading:false,
             })
-        }).then(()=>{if(checkOptims) console.log("optimization finished")})
+        });
         
     }
     optimizer = () =>{
         return new Promise((res)=>{
-            //clog(ref)
-            //clog(this.evaluate(bullet))
+            //console.log(ref)
+            //console.log(this.evaluate(bullet))
             const bulletRef = this.bulletRef.current;
-            if(bulletRef == null) return;
+            if(bulletRef === null) return;
             const smallerSpace = "\u2006";
             const largerSpace = "\u2004";
 
@@ -427,9 +414,9 @@ class OptimizedBullet extends React.PureComponent{
             //initial instantiation of previousResults
             let prevResults = initResults;
             let finalResults = initResults;
-            const newSpace = (initResults.direction == BULLET.ADD_SPACE)? largerSpace: smallerSpace;
+            const newSpace = (initResults.direction === BULLET.ADD_SPACE)? largerSpace: smallerSpace;
             
-            if( checkOptims) console.log('Sentence: ' + origSentence, initResults)
+            
         
             function getRandomInt(seed,max){
                 return Math.floor( Math.abs((Math.floor(9*seed.hashCode()+5) % 100000) / 100000) * Math.floor(max));
@@ -441,7 +428,7 @@ class OptimizedBullet extends React.PureComponent{
                 finalResults.optimization.status = BULLET.OPTIMIZED;
             } else{
 
-                while(finalResults.optimization.status != BULLET.OPTIMIZED){
+                while(finalResults.optimization.status !== BULLET.OPTIMIZED){
                     //don't select the first space after the dash- that would be noticeable and look wierd.
                     // also don't select the last word, don't want to add a space after that.
                     let iReplace = getRandomInt(optWords.join(''), optWords.length -1 -1) + 1;
@@ -460,11 +447,11 @@ class OptimizedBullet extends React.PureComponent{
                     // check to see how sentence fits
                     let newResults = bulletRef.evaluate();
                     //console.log(newResults)
-                    if(initResults.direction == BULLET.ADD_SPACE && newResults.direction == BULLET.REM_SPACE){            
+                    if(initResults.direction === BULLET.ADD_SPACE && newResults.direction === BULLET.REM_SPACE){            
                         //console.log("Note: Can't add more spaces without overflow, reverting to previous" );
                         finalResults.optimization = prevResults.optimization;
                         break;
-                    } else if(initResults.direction == BULLET.REM_SPACE && newResults.direction == BULLET.ADD_SPACE){
+                    } else if(initResults.direction === BULLET.REM_SPACE && newResults.direction === BULLET.ADD_SPACE){
                         //console.log("Removed enough spaces. Terminating." );
                         finalResults.optimization = newResults.optimization;
                         break;
@@ -481,31 +468,25 @@ class OptimizedBullet extends React.PureComponent{
         })
     };
     componentDidUpdate(prevProps){
-        if(checkOptims) {
-            console.log('component updated. previous: ' + prevProps.text)
-            console.log('to ' + this.props.text)
-        }
+
     }
-    componentDidMount(){
-        if( checkOptims) console.log('component mounted for ' + this.state.text)
-        if( false) console.log(this.state)
+    componentDidMount(){  
         this.update();
         this.setState({height: this.props.height})
 
     }
     
     componentWillUnmount(){
-        if( checkOptims) console.log('component unmounted ')
         clearTimeout(this.state.updating)
     }
 
     render(){
-        if( checkOptims) console.log('component rendering: ', escape(this.state.text))
+
         let newColor = "inherit";
    
         if(this.state.loading){
             newColor = "gray"
-        }else if(this.state.status == BULLET.FAILED_OPT){
+        }else if(this.state.status === BULLET.FAILED_OPT){
             newColor = "red"
         }
         
@@ -556,7 +537,7 @@ class BulletComparator extends React.PureComponent {
     handleSelect = (e) =>{
         if( false) console.log('selection registered in reactBullets')
         const selection = window.getSelection().toString();
-        if(selection != ""){
+        if(selection !== ""){
             this.props.onSelect(selection);
         }else if(e.target.selectionStart){
             //this hack is for microsoft edge, which sucks at window.getSelection()
@@ -566,9 +547,7 @@ class BulletComparator extends React.PureComponent {
         }
     }
     render() {
-        if( checkOptims) console.log('rendering bullet comparator')
-        if( checkOptims) console.log(this.state)
-        if( checkOptims) console.log(this.props)
+
         return (
             <div className="columns is-multiline">
                 <div className="column is-narrow">
@@ -597,3 +576,4 @@ class BulletComparator extends React.PureComponent {
     }
 }
 
+export {Bullet, BulletComparator};
