@@ -399,21 +399,24 @@ const fontReady = new Promise(function(resolve,rej){
 fontReady.then( ()=>{
     ReactDOM.render( <BulletApp savedSettings={settings} tableSettings={tableSettings} abbrData={tableData} initialText={initialText} initialWidth={"202.321mm"}/>, document.getElementById('stuff'));
 });
-
-// code for incrementing visitor count    
-xh = new XMLHttpRequest();
-xh.onreadystatechange = () => {  
-  if(xh.readyState === XMLHttpRequest.DONE) {
-    var status = xh.status;
-    if (status === 0 || (status >= 200 && status < 400)) {
-      // The request has been completed successfully
-      const count = JSON.parse(xh.response).Count;
-      console.log("The bullets site(s) have been visited " + count + " times.");
-    } else {
-      console.log("Visitor count increment task failed successfully");
+incrementVisitors();
+    
+function incrementVisitors() {
+  // code for incrementing visitor count    
+  const xh = new XMLHttpRequest();
+  xh.onreadystatechange = () => {  
+    if(xh.readyState === XMLHttpRequest.DONE) {
+      var status = xh.status;
+      if (status === 0 || (status >= 200 && status < 400)) {
+        // The request has been completed successfully
+        const count = JSON.parse(xh.response).Count;
+        console.log("The bullets site(s) have been visited " + count + " times.");
+      } else {
+        console.log("Visitor count increment task failed successfully");
+      }
     }
   }
+  xh.open("POST", "https://g5z50elklh.execute-api.us-east-2.amazonaws.com/default/LogVisitors",true); 
+  xh.send();
 }
-xh.open("POST", "https://g5z50elklh.execute-api.us-east-2.amazonaws.com/default/LogVisitors",true); 
-xh.send();
     
