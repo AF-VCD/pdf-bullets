@@ -1,0 +1,8 @@
+{
+  "short_name": "AF Bullet Tool",
+  "name": "Air Force Bullet Shaping and Iteration Tool",
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#000000",
+  "background_color": "#ffffff"
+}
