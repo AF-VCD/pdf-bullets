@@ -113,18 +113,34 @@ class BulletApp extends React.Component {
     }
     createAbbrReplacer = (abbrDict) => {
         return (sentence) => {
+
             const finalAbbrDict = {};
             Object.keys(abbrDict).map(
                 (word)=>{
                     const abbrs = abbrDict[word]; //an array
                     //if there is at least one enabled abbreviation, take the lowest most element of it.
                     if(abbrs.enabled) {
-                        finalAbbrDict[word] = abbrs.enabled[abbrs.enabled.length-1]
+                        finalAbbrDict[word] = abbrs.enabled[abbrs.enabled.length-1];
                     }
                 }
             )
-            let modifiers = 'g'
-            const regExp = new RegExp("(\\b)("+Object.keys(finalAbbrDict).join("|")+")(\\b|$|\\$)", modifiers);
+
+            // courtesy of https://stackoverflow.com/questions/3446170/escape-string-for-use-in-javascript-regex 
+            function escapeRegExp(string) {
+                return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
+            }
+
+            let modifiers = 'g';
+            const allApprovedAbbrs = Object.keys(finalAbbrDict).map(escapeRegExp).join('|');
+
+            // some info on the boundary parts of the regex:
+            // (^|\\W) 
+            //     ^ - ensures words at the beginning of line are considered for abbreviation
+            //     \\W - expects abbr to be preceded by a non-word, i.e. a space, semicolon, dash, etc.
+            // (\\W|$)
+            //     \\W - see above
+            //     $ - ensures words at end of line are considered for abbreviation
+            const regExp = new RegExp("(^|\\W)("+ allApprovedAbbrs +")(\\W|$)", modifiers);
             const newSentence = sentence.replace(regExp, 
                 (match,p1,p2,p3) => {
                     //p2 = p2.replace(/ /g,'\\s')
