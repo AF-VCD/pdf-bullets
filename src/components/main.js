@@ -134,13 +134,15 @@ class BulletApp extends React.Component {
             const allApprovedAbbrs = Object.keys(finalAbbrDict).map(escapeRegExp).join('|');
 
             // some info on the boundary parts of the regex:
-            // (^|\\W) 
+            // (^|\\W|\\b) 
             //     ^ - ensures words at the beginning of line are considered for abbreviation
             //     \\W - expects abbr to be preceded by a non-word, i.e. a space, semicolon, dash, etc.
-            // (\\W|$)
-            //     \\W - see above
+            //     \\b - also check for word boundaries, this is necessary for edge cases like 'f/ ' and 'w/ '.
+            //            Otherwise things like 'with chicken' and 'for $2M' won't resolve to 'w/chicken' and 'f/$2M'.
+            // (\\W|\\b|$)
+            //     \\W, \\b - see above
             //     $ - ensures words at end of line are considered for abbreviation
-            const regExp = new RegExp("(^|\\W)("+ allApprovedAbbrs +")(\\W|$)", modifiers);
+            const regExp = new RegExp("(^|\\W|\\b)("+ allApprovedAbbrs +")(\\W|\\b|$)", modifiers);
             const newSentence = sentence.replace(regExp, 
                 (match,p1,p2,p3) => {
                     //p2 = p2.replace(/ /g,'\\s')
