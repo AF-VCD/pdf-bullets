@@ -3,6 +3,15 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import  {faPlus} from "@fortawesome/free-solid-svg-icons"
 
 
+const handleCardClick = (word, This) => {
+    return (e) => {
+        e.preventDefault();
+        if(document.activeElement === window.getSelection().anchorNode.firstChild){
+            const ta = document.activeElement;
+            This.props.onSelReplace(ta.selectionStart, ta.selectionEnd, word);
+        }
+    }
+}
 
 class SynonymViewer extends React.PureComponent{
     constructor(props){
@@ -63,10 +72,13 @@ class SynonymViewer extends React.PureComponent{
         return (
             <div className="card">
                 <header className="card-header has-background-light	is-shadowless">
-                    <a className="card-header-title" >
+                    <div className="card-header-title" >
                         <span style={{marginRight:'5px'}}>Thesaurus{this.props.word===''?'':":"}</span>
-                        {header} 
-                    </a>
+                        {header}
+                        <a className="icon is-small" onMouseDown={handleCardClick(this.props.word, this)}>
+                            <FontAwesomeIcon  icon={faPlus} size="xs" color="#51cf66"/>
+                        </a>
+                    </div>
                     <a className="card-header-icon" onClick={this.props.onHide}>
                         <span className="delete"> 
                         </span>
@@ -91,17 +103,6 @@ class SynonymList extends React.PureComponent{
     constructor(props){
         super(props);
     }
-    handleCardClick = (word) => {
-        return (e) => {
-            e.preventDefault();
-            if(document.activeElement === window.getSelection().anchorNode.firstChild){
-                const ta = document.activeElement;
-                this.props.onSelReplace(ta.selectionStart, ta.selectionEnd, word);
-                
-                
-            }
-        }
-    }
     render(){
         const words = 75;
         const cols = 10;
@@ -118,13 +119,9 @@ class SynonymList extends React.PureComponent{
                                 <Synonym word={word} 
                                 abbr={replacedWord===word ? "" : replacedWord} 
                                 otherAbbrs={otherAbbrs}/>
-                                
-                                <a className="icon is-small" onMouseDown={this.handleCardClick(word)}>
-                                    
+                                <a className="icon is-small" onMouseDown={handleCardClick(word, this)}>
                                     <FontAwesomeIcon  icon={faPlus} size="xs" color="#51cf66"/> 
                                 </a>
-                               
-
                             </div>
                         </div>
                     )}
