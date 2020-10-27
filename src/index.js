@@ -154,12 +154,15 @@ function incrementVisitors() {
   xh.onreadystatechange = () => {  
     if(xh.readyState === XMLHttpRequest.DONE) {
       var status = xh.status;
-      if (status === 0 || (status >= 200 && status < 400)) {
-        // The request has been completed successfully
-        const count = JSON.parse(xh.response).Count;
-        console.log("The bullets site(s) have been visited " + count + " times.");
+
+      // Not sure what status codes are acceptable.. using MDN successful responses and redirects range as a guide
+      if ((status >= 200 && status < 400)) {
+          // The request has been completed successfully
+          const count = JSON.parse(xh.response).Count;
+          console.log("The bullets site(s) have been visited " + count + " times.");
+
       } else {
-        console.log("Visitor count increment task failed successfully");
+        console.log("Visitor count increment: task failed successfully");
       }
     }
   }
