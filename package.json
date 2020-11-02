@@ -9,19 +9,24 @@
     "@fortawesome/react-fontawesome": "^0.1.11",
     "@handsontable/react": "^4.0.0",
     "@testing-library/jest-dom": "^4.2.4",
-    "@testing-library/react": "^9.3.2",
     "@testing-library/user-event": "^7.1.2",
     "bulma": "^0.9.0",
+    "draft-js": "^0.11.7",
     "gh-pages": "^3.1.0",
     "handsontable": "^8.0.0",
     "node-sass": "^4.14.1",
     "react": "^16.13.1",
+    "react-contenteditable": "^3.3.5",
     "react-dom": "^16.13.1",
     "react-scripts": "3.4.3",
+    "sanitize-html": "^2.1.1",
     "webfontloader": "^1.6.28",
     "xlsx": "^0.16.7"
   },
   "devDependencies": {
+    "@testing-library/react": "^9.5.0",
+    "cypress": "^5.5.0",
+    "cypress-react-unit-test": "^4.16.9",
     "gh-pages": "^3.1.0"
   },
   "scripts": {
@@ -30,7 +35,8 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "deploy": "gh-pages -d build",
-    "predeploy": "CI=false npm run build"
+    "predeploy": "CI=false npm run build",
+    "cypress": "cypress open"
   },
   "eslintConfig": {
     "extends": "react-app"

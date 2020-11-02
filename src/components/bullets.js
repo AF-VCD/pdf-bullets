@@ -1,5 +1,143 @@
 import React from "react"
+import ContentEditable from 'react-contenteditable'
+import sanitizeHtml from "sanitize-html"
+import {Editor, EditorState, RichUtils} from "draft-js"
+const DPI = 96;
+const MM_PER_IN = 25.4;
+const DPMM = DPI / MM_PER_IN;
 
+const testText = 'iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii'
+
+function Skeleton(){
+    const editText = React.useRef('<div>'+testText+'</div>');
+    const [text, setText] = React.useState(testText);
+
+    const inputSanitizeConf = {
+        //allowedTags: ["b", "i", "u","div","br"],
+        //allowedAttributes: { },
+    };
+
+    const outputSanitizeConf = {
+        allowedTags: ['div'],
+        allowedAttributes: {},
+    };
+    
+
+
+
+    const handleChange = (event)=>{
+        editText.current = (event.target.value);
+        
+        const divsOnly = sanitizeHtml(editText.current, outputSanitizeConf);
+        const textOnly = divsOnly.replace(/<div>/g,'').replace(/<\/div>/g,'\n');
+        console.log(textOnly);
+        setText(textOnly);
+    }
+    const handleBlur = ()=>{
+        console.log(editText.current);
+        //setText(editText.current);
+    }
+
+
+    return (<>
+        <ContentEditable html={editText.current} onChange={handleChange} onBlur={handleBlur} style={{whiteSpace:'pre-wrap'}}/>
+        {text.split('\n').map((row)=>{
+            return <Bullet text={row} width={202.321*DPMM}/>
+        })}
+        </>);
+}
+//
+
+
+function Bullet(props){
+    const canvasRef = React.useRef(null);
+    const [results, setResults] = React.useState('');
+    React.useEffect(() => {
+        const canvas = canvasRef.current;
+        const context = canvas.getContext('2d');
+
+        //now we can draw in 2d here.
+        context.font = '12pt AdobeTimes';
+        //context.fillText(props.text, 50,50);
+        setResults(evaluator(props.text, context, props.width))
+    }, [props.text]);
+    // [] indicates that this happens once after the component mounts.
+    // [props.text] indicates that this happens every time the text changes.
+    
+    // the style properties help lock the canvas in the same spot and make it essentially invisible.
+    const canvas = <canvas 
+        ref={canvasRef} 
+        style={{
+            visibility:"hidden", 
+            position:"absolute",
+            top:"0px",
+            left: "0px"   
+        }}/>;
+
+    //whitespace: pre-wrap is essential as it allows javascript string line breaks to appear properly.
+    return (
+        <>
+        {canvas}
+        <div style={{whiteSpace:'pre-wrap'}}>
+        {results}
+        </div>
+        </>
+    );
+    //return canvas;
+}
+
+// all widths in this function are in pixels
+function evaluator(text, context, width){
+    
+    const getWidth = (txt)=> (context.measureText(txt)).width;
+    const fullWidth = getWidth(text);
+    if(fullWidth < width){
+        return text;
+    }else{
+        // Regex- split after one of the following: \s ? / | - % ! 
+        // but ONLY if immediately followed by: [a-zA-z] [0-9] + \
+        const textSplit = text.split(/(?<=[ \?\/\|\-\%\!])(?=[a-zA-Z0-9\+\\])/) ;
+        
+        if(textSplit.length > 1){
+            let answerIdx = 0;
+            for(let i = 1; i <= textSplit.length; i++){
+                const evalText = textSplit.slice(0,i).join('').trimEnd();
+                const evalWidth = getWidth(evalText);
+                if(evalWidth > width){
+                    answerIdx = i - 1;
+                    break;
+                }
+            }
+            
+            return textSplit.slice(0,answerIdx).join('') + '\n' + evaluator(textSplit.slice(answerIdx,textSplit.length).join(''), context, width)
+        }else{
+            const avgCharWidth = fullWidth/(text.length);
+            const guessIndex = parseInt(width / avgCharWidth);
+            const firstGuessWidth = getWidth(text.substring(0,guessIndex)) 
+            let answerIdx = guessIndex;
+            if(firstGuessWidth > width){
+                for(let i=guessIndex-1; i>0; i--){
+                    const nextGuessWidth = getWidth(text.substring(0,i));
+                    if(nextGuessWidth < width){
+                        answerIdx = i;
+                        break;
+                    }
+                }
+            }else if(firstGuessWidth < width){
+                for(let i=guessIndex; i <= text.length; i++){
+                    
+                    const nextGuessWidth = getWidth(text.substring(0,i));
+                    if(nextGuessWidth > width){
+                        answerIdx = i - 1;
+                        break;
+                    }
+                }
+            }
+            
+            return text.substring(0,answerIdx) + '\n' + evaluator(text.substring(answerIdx,text.length), context, width)
+        }
+    }
+}
 
 // optimization status codes
 // status codes for optimization direction 
@@ -12,7 +150,7 @@ const BULLET = {
     REM_SPACE: -1,
     MAX_UNDERFLOW: -4
 }
-class Bullet extends React.PureComponent{
+class BulletOld extends React.PureComponent{
     constructor(props){
         super(props);
         this.renderRef = React.createRef();
@@ -576,4 +714,4 @@ class BulletComparator extends React.PureComponent {
     }
 }
 
-export {Bullet, BulletComparator};
+export {Bullet, BulletComparator, evaluator, Skeleton};
