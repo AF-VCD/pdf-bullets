@@ -1,6 +1,4 @@
 import React from "react"
-import ContentEditable from 'react-contenteditable'
-import sanitizeHtml from "sanitize-html"
 import {Editor, EditorState, RichUtils} from "draft-js"
 const DPI = 96;
 const MM_PER_IN = 25.4;
@@ -9,8 +7,11 @@ const DPMM = DPI / MM_PER_IN;
 const testText = 'iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii'
 
 function Skeleton(){
-    const editText = React.useRef('<div>'+testText+'</div>');
+    
     const [text, setText] = React.useState(testText);
+    const [editorState, setEditorState] = React.useState(()=>
+        EditorState.createEmpty(),
+    );
 
     const inputSanitizeConf = {
         //allowedTags: ["b", "i", "u","div","br"],
@@ -23,24 +24,22 @@ function Skeleton(){
     };
     
 
-
-
-    const handleChange = (event)=>{
-        editText.current = (event.target.value);
-        
-        const divsOnly = sanitizeHtml(editText.current, outputSanitizeConf);
-        const textOnly = divsOnly.replace(/<div>/g,'').replace(/<\/div>/g,'\n');
-        console.log(textOnly);
-        setText(textOnly);
-    }
-    const handleBlur = ()=>{
-        console.log(editText.current);
-        //setText(editText.current);
+    const handleKeyCommand = (command, editorState) => {
+        const newState = RichUtils.handleKeyCommand(editorState, command);
+        if(newState){
+            setEditorState(newState);
+            return 'handled';
+        }
+        return 'not-handled';
     }
 
+    const onChange = (editorState)=>{
+        setEditorState(editorState);
+        setText(editorState.getCurrentContent().getPlainText('\n'));
+    }
 
     return (<>
-        <ContentEditable html={editText.current} onChange={handleChange} onBlur={handleBlur} style={{whiteSpace:'pre-wrap'}}/>
+        <Editor editorState={editorState} onChange={onChange} handleKeyCommand={handleKeyCommand}/>
         {text.split('\n').map((row)=>{
             return <Bullet text={row} width={202.321*DPMM}/>
         })}
