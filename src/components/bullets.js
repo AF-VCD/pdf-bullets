@@ -1,28 +1,78 @@
 import React from "react"
-import {Editor, EditorState, RichUtils} from "draft-js"
+import {Editor, EditorState, RichUtils, CompositeDecorator, Modifier, SelectionState} from "draft-js"
+import "draft-js/dist/Draft.css";
 const DPI = 96;
 const MM_PER_IN = 25.4;
 const DPMM = DPI / MM_PER_IN;
 
 const testText = 'iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii'
 
+//make sure regexes defined here are global, or else findWithRegex() will break
+const abbr_regex = /evaluated/g;
+const abbrs = {
+    'evaluated': 'eval\'d'
+};
+function findWithRegex(regex, contentBlock, callback){
+    const text = contentBlock.getText();
+    let matchArr, start;
+
+    // wow, the draftjs tweet example has some fancy syntax here. basically 
+    //  assignment of matchArr happens inside the conditional check and it's available in the loop as well
+    while((matchArr = regex.exec(text)) !== null){
+        start = matchArr.index;
+        // can see here that callback is called on the start and end indices of the text in the content block.. I think
+        
+        callback(start, start+matchArr[0].length);
+    }
+}
+
+function findAbbrEntities(contentBlock, callback, contentState) {
+    
+    contentBlock.findEntityRanges(
+      (character) => {
+        const entityKey = character.getEntity();
+        
+        return (
+          entityKey !== null &&
+          contentState.getEntity(entityKey).getType() === 'ABBR'
+        );
+      },
+      callback
+    );
+  }
+
+
+const Abbr = (props)=>{
+    const {abbr} = props.contentState.getEntity(props.entityKey).getData();
+    
+    return (
+        <span >
+            <span style={{color:'red'}} >{abbr}</span>
+            <span data-offset-key={props.offsetKey}  style={{display:'none'}} >
+            
+                {props.children}
+            </span>
+        </span>
+    )
+}
+
+var draftjscontent;
+
 function Skeleton(){
     
     const [text, setText] = React.useState(testText);
+
+    const compositeDecorator = new CompositeDecorator([
+        {
+            strategy: findAbbrEntities,
+            component: Abbr,
+        }
+    ])
+
+
     const [editorState, setEditorState] = React.useState(()=>
-        EditorState.createEmpty(),
+        EditorState.createEmpty(compositeDecorator),
     );
-
-    const inputSanitizeConf = {
-        //allowedTags: ["b", "i", "u","div","br"],
-        //allowedAttributes: { },
-    };
-
-    const outputSanitizeConf = {
-        allowedTags: ['div'],
-        allowedAttributes: {},
-    };
-    
 
     const handleKeyCommand = (command, editorState) => {
         const newState = RichUtils.handleKeyCommand(editorState, command);
@@ -35,8 +85,51 @@ function Skeleton(){
 
     const onChange = (editorState)=>{
         setEditorState(editorState);
-        setText(editorState.getCurrentContent().getPlainText('\n'));
+        const content = editorState.getCurrentContent();
+        const blockMap = content.getBlockMap();
+        // ordered map has a key and a block associasted with it
+        /*
+        for(let [key,block] of blockMap){
+            console.log(block.getText());
+        }
+        */
+        
+        
+        
+        for(let [key,block] of blockMap){
+            const createNewEntity= (start,end)=>{
+                const selState = SelectionState.createEmpty(key);
+                const updatedSelection = selState.merge({
+                    anchorKey : key,
+                    anchorOffset: start,
+                    focusKey: key,
+                    focusOffset: end
+                });
+                const contentWithEntity = content.createEntity('ABBR','IMMUTABLE',{abbr: 'eval\'d'});
+                const entityKey = contentWithEntity.getLastCreatedEntityKey();
+                const contentStateWithAbbr = Modifier.applyEntity(
+                    contentWithEntity,
+                    updatedSelection,
+                    entityKey
+                );
+                const newEditorState = EditorState.set(editorState,{currentContent:contentStateWithAbbr});
+                setEditorState(newEditorState);
+                
+            }
+            findWithRegex(abbr_regex,block,createNewEntity)
+        }
+        /*
+        const contentStateWithAbbr = Modifier.applyEntity(
+            contentWithEntity,
+            SelectionState.createEmpty('asdf'),
+            entityKey
+        )
+        setEditorState(editorState, {currentContent: contentStateWithAbbr});
+            
+            */
+        setText(content.getPlainText('\n'));
     }
+
 
     return (<>
         <Editor editorState={editorState} onChange={onChange} handleKeyCommand={handleKeyCommand}/>
