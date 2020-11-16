@@ -1,5 +1,5 @@
 import React from "react"
-import {Bullet, BulletComparator} from "./bullets.js"
+import {BULLET, BulletComparator} from "./bullets.js"
 import {Logo,DocumentTools}  from "./tools.js"
 import AbbrsViewer from "./abbrs.js"
 import SynonymViewer from "./thesaurus.js"
@@ -169,7 +169,7 @@ class BulletApp extends React.Component {
         if(newSel.trim() !== ''){
             
             this.setState({
-                selection: Bullet.Tokenize(newSel.trim()).slice(0,maxWords).join(' ')
+                selection: BULLET.Tokenize(newSel.trim()).slice(0,maxWords).join(' ')
             });
         }
 

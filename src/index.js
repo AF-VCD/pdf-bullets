@@ -2,7 +2,8 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 
-import {Bullet, BulletComparator, Skeleton} from "./components/bullets.js"
+//import {Bullet, BulletComparator, Skeleton} from "./components/bullets.js"
+import BulletApp from "./components/main.js"
 
 import "./styles/index.scss"
 import 'handsontable/dist/handsontable.full.css'
@@ -130,7 +131,7 @@ WebFont.load({
 ReactDOM.render(
   <React.StrictMode>
     <div className="section" id="stuff" >
-      <Skeleton />
+      <BulletApp savedSettings={settings} tableSettings={tableSettings} abbrData={tableData} initialText={initialText} initialWidth={"202.321mm"} />
     </div>
     <div className="container" id="footer">
       <div>If you have feedback, submit
