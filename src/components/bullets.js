@@ -1,77 +1,33 @@
 import React from "react"
-import {Editor, EditorState, RichUtils, CompositeDecorator, Modifier, SelectionState} from "draft-js"
+import {Editor, EditorState, RichUtils, ContentState, ContentBlock} from "draft-js"
 import "draft-js/dist/Draft.css";
 const DPI = 96;
 const MM_PER_IN = 25.4;
 const DPMM = DPI / MM_PER_IN;
 
-const testText = 'iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii'
-
-//make sure regexes defined here are global, or else findWithRegex() will break
-const abbr_regex = /evaluated/g;
-const abbrs = {
-    'evaluated': 'eval\'d'
-};
-function findWithRegex(regex, contentBlock, callback){
-    const text = contentBlock.getText();
-    let matchArr, start;
-
-    // wow, the draftjs tweet example has some fancy syntax here. basically 
-    //  assignment of matchArr happens inside the conditional check and it's available in the loop as well
-    while((matchArr = regex.exec(text)) !== null){
-        start = matchArr.index;
-        // can see here that callback is called on the start and end indices of the text in the content block.. I think
-        
-        callback(start, start+matchArr[0].length);
-    }
+let testText;
+testText = 'iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii';
+testText = '- This is a test of the emergency notification system; I repeat-- this is a test. test. test. test. test. test. test. test. test. test. ';
+// optimization status codes
+// status codes for optimization direction 
+// had to move this to a floating object because MS Edge doesn't support static variables
+const BULLET = {
+    OPTIMIZED: 0,
+    FAILED_OPT: 1,
+    NOT_OPT: -1,
+    ADD_SPACE: 1,
+    REM_SPACE: -1,
+    MAX_UNDERFLOW: -4,
+    Tokenize: (sentence) => {
+        return sentence.split(/[\s]+/);
+    },
 }
-
-function findAbbrEntities(contentBlock, callback, contentState) {
-    
-    contentBlock.findEntityRanges(
-      (character) => {
-        const entityKey = character.getEntity();
-        
-        return (
-          entityKey !== null &&
-          contentState.getEntity(entityKey).getType() === 'ABBR'
-        );
-      },
-      callback
-    );
-  }
-
-
-const Abbr = (props)=>{
-    const {abbr} = props.contentState.getEntity(props.entityKey).getData();
-    
-    return (
-        <span >
-            <span style={{color:'red'}} >{abbr}</span>
-            <span data-offset-key={props.offsetKey}  style={{display:'none'}} >
-            
-                {props.children}
-            </span>
-        </span>
-    )
-}
-
-var draftjscontent;
 
 function Skeleton(){
     
-    const [text, setText] = React.useState(testText);
-
-    const compositeDecorator = new CompositeDecorator([
-        {
-            strategy: findAbbrEntities,
-            component: Abbr,
+    const [editorState, setEditorState] = React.useState(()=>{
+            return EditorState.createWithContent(ContentState.createFromText(testText))
         }
-    ])
-
-
-    const [editorState, setEditorState] = React.useState(()=>
-        EditorState.createEmpty(compositeDecorator),
     );
 
     const handleKeyCommand = (command, editorState) => {
@@ -86,109 +42,207 @@ function Skeleton(){
     const onChange = (editorState)=>{
         setEditorState(editorState);
         const content = editorState.getCurrentContent();
-        const blockMap = content.getBlockMap();
         // ordered map has a key and a block associasted with it
+        //const blockMap = content.getBlockMap();
         /*
         for(let [key,block] of blockMap){
             console.log(block.getText());
         }
         */
-        
-        
-        
-        for(let [key,block] of blockMap){
-            const createNewEntity= (start,end)=>{
-                const selState = SelectionState.createEmpty(key);
-                const updatedSelection = selState.merge({
-                    anchorKey : key,
-                    anchorOffset: start,
-                    focusKey: key,
-                    focusOffset: end
-                });
-                const contentWithEntity = content.createEntity('ABBR','IMMUTABLE',{abbr: 'eval\'d'});
-                const entityKey = contentWithEntity.getLastCreatedEntityKey();
-                const contentStateWithAbbr = Modifier.applyEntity(
-                    contentWithEntity,
-                    updatedSelection,
-                    entityKey
-                );
-                const newEditorState = EditorState.set(editorState,{currentContent:contentStateWithAbbr});
-                setEditorState(newEditorState);
-                
-            }
-            findWithRegex(abbr_regex,block,createNewEntity)
-        }
-        /*
-        const contentStateWithAbbr = Modifier.applyEntity(
-            contentWithEntity,
-            SelectionState.createEmpty('asdf'),
-            entityKey
-        )
-        setEditorState(editorState, {currentContent: contentStateWithAbbr});
-            
-            */
-        setText(content.getPlainText('\n'));
+
     }
 
 
-    return (<>
-        <Editor editorState={editorState} onChange={onChange} handleKeyCommand={handleKeyCommand}/>
-        {text.split('\n').map((row)=>{
-            return <Bullet text={row} width={202.321*DPMM}/>
-        })}
-        </>);
+    return (
+        <div style={{
+            display:"flex",
+            justifyContent: "space-around",
+            alignItems:"flex-end"
+        }}>
+            <div>
+                <Editor  editorState={editorState} onChange={onChange} handleKeyCommand={handleKeyCommand}/>
+            </div>
+            <div>
+                {editorState.getCurrentContent().getBlocksAsArray().map((block, key)=>{
+                    return <Bullet text={block.getText()} width={202.321*DPMM}/>
+                })}
+            </div>
+        </div>);
 }
-//
+/*
+            <div>
+                {editorState.getCurrentContent().getBlocksAsArray().map((block, key)=>{
+                    return <Bullet text={block.getText()} width={202.321*DPMM}/>
+                })}
+            </div>
+
+*/
 
 
+// note that props.width should be specified in pixels.
 function Bullet(props){
     const canvasRef = React.useRef(null);
-    const [results, setResults] = React.useState('');
-    React.useEffect(() => {
-        const canvas = canvasRef.current;
-        const context = canvas.getContext('2d');
+    const [outputText, setOutputText] = React.useState(' ');
+    
+    const [color, setColor] = React.useState('inherit');
+    const [loading, setLoading] = React.useState(true);
+    const [optimStatus, setOptimStatus] = React.useState(BULLET.NOT_OPT);    
+    const [rendering, setBulletRendering] = React.useState({text:''});
 
+    const [optimJob, setOptimJob] = React.useState();
+
+    const getContext = (canvas)=>{
         //now we can draw in 2d here.
+        const context = canvas.getContext('2d');
         context.font = '12pt AdobeTimes';
+        return context;
+    }
+
+    // This effect updates the text rendering (i.e. enforces width constraints by inserting newlines)
+    //   whenever the props text input is updated.
+    React.useEffect(() => {
+        
+        const context = getContext(canvasRef.current)
         //context.fillText(props.text, 50,50);
-        setResults(evaluator(props.text, context, props.width))
+        setBulletRendering(renderBulletText(props.text, context, props.width));
+
     }, [props.text]);
     // [] indicates that this happens once after the component mounts.
-    // [props.text] indicates that this happens every time the text changes.
-    
-    // the style properties help lock the canvas in the same spot and make it essentially invisible.
-    const canvas = <canvas 
-        ref={canvasRef} 
-        style={{
-            visibility:"hidden", 
-            position:"absolute",
-            top:"0px",
-            left: "0px"   
-        }}/>;
+    // [props.text] indicates that this happens every time the text changes from the user
 
+    // This effect happens after bullet rendering changes. It evaluates the rendered bullet and
+    //  sees how it can be improved with modified spaces. 
+    React.useEffect(()=>{
+        setLoading(BULLET.LOADING);
+
+        const optimizer = (text)=>renderBulletText(text, getContext(canvasRef.current),props.width);
+        const optimResults = optimize(rendering.text, optimizer);
+
+        setLoading(BULLET.DONE);
+
+        setOptimStatus(optimResults.status);
+        setOutputText(optimResults.rendering.text);  
+        //setOutputText(rendering.text)
+    },[rendering]);
+
+    //color effect
+    React.useEffect(()=>{
+        if(loading){
+            setColor("gray")
+        }else if(optimStatus === BULLET.FAILED_OPT){
+            setColor("red");
+        }else{
+            setColor("inherit");
+        }
+    }, [loading, outputText])
+
+    // the style properties help lock the canvas in the same spot and make it essentially invisible.
     //whitespace: pre-wrap is essential as it allows javascript string line breaks to appear properly.
     return (
         <>
-        {canvas}
-        <div style={{whiteSpace:'pre-wrap'}}>
-        {results}
+        <canvas 
+            ref={canvasRef} 
+            style={{
+                visibility:"hidden", 
+                position:"absolute",
+                top:"-1000px",
+                left: "-1000px"   
+        }}/>
+        <div style={{
+            height:props.height,
+            whiteSpace: 'pre-wrap',
+            color: color,
+            }} onMouseUp={props.onHighlight} >
+            {outputText == '' ? ' ' : outputText}
         </div>
         </>
     );
     //return canvas;
 }
 
+
+function optimize(sentence, evalFcn) {
+    
+    const smallerSpace = "\u2006";
+    const largerSpace = "\u2004";
+
+    //initialization of optimized words array
+    let optWords = BULLET.Tokenize(sentence);
+    
+    const initResults = evalFcn(sentence);
+    
+    if(initResults.overflow == 0){
+        return initResults;
+    }
+
+    //initial instantiation of previousResults
+    let prevResults = initResults;
+    let finalResults = initResults;
+    const newSpace = (initResults.overflow >= 0 )? smallerSpace: largerSpace;
+    
+    let finalOptimStatus = BULLET.NOT_OPT;
+    
+    function getRandomInt(seed,max){
+        return Math.floor( Math.abs((Math.floor(9*seed.hashCode()+5) % 100000) / 100000) * Math.floor(max));
+    }
+    
+    
+    while(finalResults.overflow > 0 || finalResults.overflow < BULLET.MAX_UNDERFLOW){
+        //don't select the first space after the dash- that would be noticeable and look wierd.
+        // also don't select the last word, don't want to add a space after that.
+        let iReplace = getRandomInt(optWords.join(''), optWords.length -1 -1) + 1;
+        
+        //merges two elements together, joined by the space
+        optWords.splice( 
+            iReplace, 2, 
+            optWords.slice(iReplace,iReplace+2).join(newSpace)
+        );
+
+        //make all other spaces the normal space size
+        let newSentence = optWords.join(' ');
+        
+        let newResults = evalFcn(newSentence);
+
+        if(initResults.overflow <= 0 && newResults.overflow > 0){            
+            //console.log("Note: Can't add more spaces without overflow, reverting to previous" );
+            finalResults = prevResults;
+            finalOptimStatus = BULLET.OPTIMIZED;
+            break;
+        } else if(initResults.overflow > 0  && newResults.overflow < 0){
+            //console.log("Removed enough spaces. Terminating." );
+            finalResults = newResults;
+            finalOptimStatus = BULLET.OPTIMIZED;
+            break;
+        } else if(optWords.length <= 2){ //this conditional needs to be last
+            //console.log("\tWarning: Can't replace any more spaces");
+            finalResults = newResults;
+            finalOptimStatus = BULLET.FAILED_OPT;
+            break;
+        }
+        prevResults = newResults;
+    } 
+    return {
+        status: finalOptimStatus,
+        rendering: finalResults,
+    };
+}
+        
 // all widths in this function are in pixels
-function evaluator(text, context, width){
+function renderBulletText(text, context, width){
     
     const getWidth = (txt)=> (context.measureText(txt)).width;
-    const fullWidth = getWidth(text);
+    const fullWidth = getWidth(text.trimEnd());
     if(fullWidth < width){
-        return text;
+        return {
+            text: text,
+            fullWidth: fullWidth,
+            lines: 1,
+            overflow: fullWidth - width,
+        };
     }else{
         // Regex- split after one of the following: \s ? / | - % ! 
         // but ONLY if immediately followed by: [a-zA-z] [0-9] + \
-        const textSplit = text.split(/(?<=[ \?\/\|\-\%\!])(?=[a-zA-Z0-9\+\\])/) ;
+        const textSplit = text.split(/(?<=[\s\?\/\|\-\%\!])(?=[a-zA-Z0-9\+\\])/) ;
         
         if(textSplit.length > 1){
             let answerIdx = 0;
@@ -200,9 +254,16 @@ function evaluator(text, context, width){
                     break;
                 }
             }
+            const recursedResult = renderBulletText(textSplit.slice(answerIdx,textSplit.length).join(''), context, width);
             
-            return textSplit.slice(0,answerIdx).join('') + '\n' + evaluator(textSplit.slice(answerIdx,textSplit.length).join(''), context, width)
+            return {
+                text: textSplit.slice(0,answerIdx).join('') + '\n' + recursedResult.text,
+                fullWidth: fullWidth,
+                lines: 1 + recursedResult.lines,
+                overflow: fullWidth - width,
+            }
         }else{
+            //corner case where text is one long string without spaces in it.
             const avgCharWidth = fullWidth/(text.length);
             const guessIndex = parseInt(width / avgCharWidth);
             const firstGuessWidth = getWidth(text.substring(0,guessIndex)) 
@@ -225,28 +286,21 @@ function evaluator(text, context, width){
                     }
                 }
             }
+            const recursedResult = renderBulletText(text.substring(answerIdx,text.length), context, width);
             
-            return text.substring(0,answerIdx) + '\n' + evaluator(text.substring(answerIdx,text.length), context, width)
+            return {
+                text: text.substring(0,answerIdx) + '\n' + recursedResult.text,
+                fullWidth: fullWidth,
+                lines: 1 + recursedResult.lines,
+                overflow: fullWidth - width,
+            }
         }
     }
 }
 
-// optimization status codes
-// status codes for optimization direction 
-// had to move this to a floating object because MS Edge doesn't support static variables
-const BULLET = {
-    OPTIMIZED: 0,
-    FAILED_OPT: 1,
-    NOT_OPT: -1,
-    ADD_SPACE: 1,
-    REM_SPACE: -1,
-    MAX_UNDERFLOW: -4
-}
-class BulletOld extends React.PureComponent{
-    constructor(props){
-        super(props);
-        this.renderRef = React.createRef();
-    }
+
+class BulletUtils{
+
     render(){
         return(
             <div style={{width: this.props.width, height:this.props.height}} onMouseUp={this.props.onHighlight} >
@@ -326,69 +380,7 @@ class BulletOld extends React.PureComponent{
     }
 }
 
-class BulletEditor extends React.PureComponent{
-    constructor(props){
-        super(props);
-        this.ref = React.createRef();
-    }
-    handleChange = (e) => {
-        this.props.handleTextChange(e)
-        this.fixHeight();
-    }
-    handleInput = (e) => {
-        
-        this.fixHeight();
-    }
-    fixHeight = () => {
 
-        this.ref.current.style.height = 'auto';
-        this.ref.current.style.height = Math.max(this.ref.current.scrollHeight, this.props.minHeight) + 'px';
-        
-    }
-    componentDidMount(){
-        this.fixHeight();
-        
-    }
-    componentDidUpdate(prevProps){
-        
-        
-        this.fixHeight();
-        if(this.props.textSelRange.trigger !== prevProps.textSelRange.trigger){
-            
-            let start, end;
-            if(this.props.textSelRange.start < this.props.textSelRange.end){
-                start = this.props.textSelRange.start;
-                end = this.props.textSelRange.end;
-            }else{
-                start = this.props.textSelRange.end;
-                end = this.props.textSelRange.start;
-            }
-            this.ref.current.setSelectionRange(start, end)
-        }
-        
-
-    }
-    render(){
-        return (
-            <div className="border" >
-                <textarea 
-                    ref={this.ref}
-                    onChange={this.handleChange} 
-                    value={this.props.text} 
-                    onInput={this.handleInput}
-                    style={{
-                        width: this.props.width,
-                        maxHeight: "unset",
-                    }}
-                    onMouseUp={this.props.onHighlight}
-                    onKeyUp={this.props.onHighlight}
-                    
-                    className="bullets textarea is-paddingless is-marginless"></textarea>
-            </div>
-        )
-    }
-}
-//how do i get lines to line up between the output and editor?
 class BulletOutputViewer extends React.PureComponent{
     constructor(props){
         super(props);
@@ -697,9 +689,7 @@ class OptimizedBullet extends React.PureComponent{
             res(finalResults.optimization)
         })
     };
-    componentDidUpdate(prevProps){
 
-    }
     componentDidMount(){  
         this.update();
         this.setState({height: this.props.height})
@@ -782,13 +772,7 @@ class BulletComparator extends React.PureComponent {
             <div className="columns is-multiline">
                 <div className="column is-narrow">
                 <h2 className='subtitle'>Input Bullets Here:</h2>
-                <BulletEditor 
-                    textSelRange={this.props.textSelRange}
-                    text={this.props.text} 
-                    handleTextChange={this.props.handleTextChange} 
-                    width={this.props.width}
-                    onHighlight={this.handleSelect}
-                    minHeight={100}/>
+
                 </div>
                 <div className="column is-narrow">
                 <h2 className='subtitle'>View Output Here:</h2>
@@ -806,4 +790,4 @@ class BulletComparator extends React.PureComponent {
     }
 }
 
-export {Bullet, BulletComparator, evaluator, Skeleton};
+export {Bullet, BulletComparator, renderBulletText, Skeleton};
