@@ -94,12 +94,8 @@ class SynonymList extends React.PureComponent{
     handleCardClick = (word) => {
         return (e) => {
             e.preventDefault();
-            if(document.activeElement === window.getSelection().anchorNode.firstChild){
-                const ta = document.activeElement;
-                this.props.onSelReplace(ta.selectionStart, ta.selectionEnd, word);
-                
-                
-            }
+                this.props.onSelReplace(word);
+            
         }
     }
     render(){

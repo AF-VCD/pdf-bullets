@@ -6,6 +6,10 @@ import SynonymViewer from "./thesaurus.js"
  // booleans for debugging
 
 
+const DPI = 96;
+const MM_PER_IN = 25.4;
+const DPMM = DPI / MM_PER_IN;
+
 class BulletApp extends React.Component {
     constructor(props){
         super(props);
@@ -27,6 +31,7 @@ class BulletApp extends React.Component {
         this.state.currentTab = 0;
         this.abbrsViewerRef = React.createRef();
         this.state.showThesaurus = false;
+        this.state.replacedWord = '';
 
     }
     static ParseSettings = (settingsAll) => {
@@ -223,26 +228,8 @@ class BulletApp extends React.Component {
         const oldState = this.state.showThesaurus;
         this.setState({showThesaurus: !oldState});
     }
-    handleSelReplace = (start,end, word) => {
-        const oldText = this.state.text;
-        const beforeText = oldText.substring(0,start);
-        const replacedText = oldText.substring(start,end);
-        const match = replacedText.match(/^(\s*).*?(\s*)$/);
-        const beforeSpaces = match[1];
-        const afterSpaces = match[2];
-        let newWord
-        if(replacedText.match(/^\s*[A-Z]/)){
-            newWord = word.split(/\s/).map((subword)=>{return subword[0].toUpperCase() + subword.slice(1)}).join(' ')
-        }else{ newWord = word }
-        
-        const afterText = oldText.substring(end);
-        console.log(beforeText+beforeSpaces, beforeText+beforeSpaces+newWord)
-        console.log((beforeText+beforeSpaces).length, (beforeText+beforeSpaces+newWord).length)
-        this.setState({
-            text: beforeText+beforeSpaces+newWord+afterSpaces+afterText,
-            textSelRange:  {trigger: Math.random(), start: (beforeText+beforeSpaces).length, end: (beforeText+beforeSpaces+newWord).length}
-        })
-        
+    handleSelReplace = (word) => {
+        this.setState({replacedWord: word});
     }
     handleCaseChange = () => {
         this.setState((state)=>{
@@ -288,9 +275,12 @@ class BulletApp extends React.Component {
                     </div>
                     {this.state.currentTab===0? (
                     <div className='column is-full'>
-                        <BulletComparator text={this.state.text} textSelRange={this.state.textSelRange}
+                        <BulletComparator text={this.state.text} 
                             abbrReplacer={abbrReplacer} handleTextChange={this.handleTextChange}
-                            width={this.state.enableOptim? (parseFloat(this.state.width.replace(/[a-zA-Z]/g,''))-0.00)+'mm':this.state.width} 
+                            width={
+                                this.state.enableOptim? (parseFloat(this.state.width.replace(/[a-zA-Z]/g,''))-0.00)+'mm':this.state.width
+                            } 
+                            replacedWord={this.state.replacedWord}
                             onSelect={this.handleSelect} enableOptim={this.state.enableOptim} />
                     </div> ) : '' }
                     <div className={'column is-full' + ' ' + (this.state.currentTab !== 1?'is-invisible':'')}>

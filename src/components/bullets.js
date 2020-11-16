@@ -1,13 +1,12 @@
 import React from "react"
-import {Editor, EditorState, RichUtils, ContentState, ContentBlock} from "draft-js"
+import {Editor, EditorState, RichUtils, ContentState, Modifier} from "draft-js"
 import "draft-js/dist/Draft.css";
+import { toSetSeq } from "draft-js/lib/DefaultDraftBlockRenderMap";
 const DPI = 96;
 const MM_PER_IN = 25.4;
 const DPMM = DPI / MM_PER_IN;
 
-let testText;
-testText = 'iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii';
-testText = '- This is a test of the emergency notification system; I repeat-- this is a test. test. test. test. test. test. test. test. test. test. ';
+
 // optimization status codes
 // status codes for optimization direction 
 // had to move this to a floating object because MS Edge doesn't support static variables
@@ -26,9 +25,20 @@ const BULLET = {
 function BulletComparator(props){
     
     const [editorState, setEditorState] = React.useState(()=>{
-            return EditorState.createWithContent(ContentState.createFromText(testText))
+            return EditorState.createWithContent(ContentState.createFromText(props.text))
         }
     );
+
+    // effect to handle replacing word 
+    React.useEffect(()=>{
+        // this block of code gets the selected text from the editor.
+        const selectionState = editorState.getSelection();
+        const currentContent = editorState.getCurrentContent();
+        const newContent = Modifier.replaceText(currentContent, selectionState, props.replacedWord + ' ');
+        const newEditorState = EditorState.push(editorState,newContent,'insert-characters');
+        
+        setEditorState(newEditorState);
+    },[props.replacedWord])
 
     // Editor callback that adds rich text editor keybinds
     const handleKeyCommand = (command, editorState) => {
@@ -41,8 +51,11 @@ function BulletComparator(props){
     }
 
     // Editor callback that runs whenever edits or selection changes occur.
-    const onChange = (editorState)=>{
-        setEditorState(editorState);
+    const onChange = (newEditorState)=>{
+        
+        const textChanged = editorState.getCurrentContent() !== newEditorState.getCurrentContent();
+        
+        setEditorState(newEditorState);
         const content = editorState.getCurrentContent();
         // ordered map has a key and a block associasted with it
         //const blockMap = content.getBlockMap();
@@ -61,9 +74,11 @@ function BulletComparator(props){
         const end = selectionState.getEndOffset();
         const selectedText = currentContentBlock.getText().slice(start, end);
         
-        if(props.onSelect) props.onSelect(selectedText);
+        if(props.onSelect && selectedText !== '') props.onSelect(selectedText);
+        if(props.onTextChange && textChanged) props.handleTextChange()
     }
 
+    // This other bullet selection is for when things are selected on the optimized output
     const onBulletSelect = (event)=>{
         const selection = window.getSelection().toString();
         if(selection !== ""){
@@ -93,7 +108,7 @@ function BulletComparator(props){
         <div style={{
             display:"flex",
             justifyContent: "space-around",
-            alignItems:"flex-end"
+            alignItems:"flex-start"
         }}>
             <div>
                 <Editor editorState={editorState} onChange={onChange} handleKeyCommand={handleKeyCommand}/>
