@@ -75,7 +75,7 @@ function BulletComparator(props){
         const selectedText = currentContentBlock.getText().slice(start, end);
         
         if(props.onSelect && selectedText !== '') props.onSelect(selectedText);
-        if(props.onTextChange && textChanged) props.handleTextChange()
+        if(props.onTextChange && textChanged) props.handleTextChange(editorState.getCurrentContent().getPlainText('\n'))
     }
 
     // This other bullet selection is for when things are selected on the optimized output

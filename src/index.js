@@ -10,10 +10,7 @@ import 'handsontable/dist/handsontable.full.css'
 
 import * as serviceWorker from './serviceWorker';
 import WebFont from 'webfontloader';
-
-const initialText = '- This is a custom built bullet writing tool; abbreviations will be replaced according to table in the abbreviations tab--you will see output on the right\n\
-- This tool can optimize spacing; output will be red if the optimizer could not fix spacing with 2004 or 2006 Unicode spaces\n\
-- Click the thesaurus button to show one; select a word in this or the output box to view synonyms--words in parentheses are abbreviations that are configured';
+import update from 'immutability-helper';
 
 const tableData = [{
   enabled: true,
@@ -49,57 +46,6 @@ String.prototype.hashCode = function () {
   return hash;
 };
 
-const tableSettings = {
-  columns: [{
-    data: 'enabled',
-    type: 'checkbox',
-    disableVisualSelection: true,
-    width: 20
-  }, {
-    data: 'value',
-    type: 'text'
-  }, {
-    data: 'abbr',
-    type: 'text'
-  },
-  ],
-  stretchH: 'all',
-  width: 500,
-  autoWrapRow: true,
-  height: 500,
-  maxRows: Infinity,
-  manualRowResize: true,
-  manualColumnResize: true,
-  rowHeaders: true,
-  colHeaders: [
-    'Enabled',
-    'Word',
-    'Abbreviation',
-  ],
-  trimWhitespace: false,
-  enterBeginsEditing: false,
-  manualRowMove: true,
-  manualColumnMove: true,
-  columnSorting: {
-    indicator: true
-  },
-  autoColumnSize: false,
-  minRows: 15,
-  contextMenu: true,
-  licenseKey: 'non-commercial-and-evaluation',
-  search: {
-    queryMethod: function (queryStr, value) {
-      return queryStr.toString() === value.toString();
-    },
-    callback: function (instance, row, col, value, result) {
-      const DEFAULT_CALLBACK = function (instance, row, col, data, testResult) {
-        instance.getCellMeta(row, col).isSearchResult = testResult;
-      };
-
-      DEFAULT_CALLBACK.apply(this, arguments);
-    },
-  },
-};
 
 let settings;
 try {
@@ -128,10 +74,24 @@ WebFont.load({
 
 // <BulletApp savedSettings={settings} tableSettings={tableSettings} abbrData={tableData} initialText={initialText} initialWidth={"202.321mm"} />
 
+const initialText = settings.text? settings.text : '- This is a custom built bullet writing tool; abbreviations will be replaced according to table in the abbreviations tab--you will see output on the right\n\
+- This tool can optimize spacing; output will be red if the optimizer could not fix spacing with 2004 or 2006 Unicode spaces\n\
+- Click the thesaurus button to show one; select a word in this or the output box to view synonyms--words in parentheses are abbreviations that are configured';
+;
+const initialWidth = settings.width? settings.width : "202.321mm";
+const initialAbbrData = settings.abbrData ? settings.abbrData.map((row) => {
+  return {
+      enabled: row[0],
+      value: row[1],
+      abbr: row[2],
+  }
+}) : tableData;
+
+console.log(initialAbbrData);
 ReactDOM.render(
-  <React.StrictMode>
+  <>
     <div className="section" id="stuff" >
-      <BulletApp savedSettings={settings} tableSettings={tableSettings} abbrData={tableData} initialText={initialText} initialWidth={"202.321mm"} />
+      <BulletApp initialAbbrData={initialAbbrData} initialText={initialText} initialWidth={initialWidth} />
     </div>
     <div className="container" id="footer">
       <div>If you have feedback, submit
@@ -142,7 +102,7 @@ ReactDOM.render(
       <div>This site has basic analytics to track the total number of visits to the page. See <a href="https://github.com/ckhordiasma/log-bullet-visitors">here</a> for details</div>
       <div>Maintained by Christopher Kodama </div>
     </div>
-  </React.StrictMode>
+  </>
 , document.getElementById('root'));
 
 incrementVisitors();
