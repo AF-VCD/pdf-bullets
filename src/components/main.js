@@ -4,7 +4,7 @@ import { Logo, DocumentTools } from "./tools.js"
 import AbbrsViewer from "./abbrs.js"
 import SynonymViewer from "./thesaurus.js"
 // booleans for debugging
-
+import {EditorState, ContentState, Modifier, SelectionState} from "draft-js"
 
 const DPI = 96;
 const MM_PER_IN = 25.4;
@@ -22,9 +22,11 @@ function BulletApp({ initialText, initialWidth, initialAbbrData }) {
     const [currentTab, setCurrentTab] = React.useState(0);
     const [showThesaurus, setShowThesaurus] = React.useState(false);
     const [replacedWord, setReplacedWord] = React.useState('');
-
+    const [editorState, setEditorState] = React.useState(()=>{
+        return EditorState.createWithContent(ContentState.createFromText(initialText))
+    });
+    
     function handleJSONImport(settings) {
-
         setText(settings.text)
         setEnableOptim(settings.enableOptim);
         setWidth(settings.width);
@@ -153,9 +155,27 @@ function BulletApp({ initialText, initialWidth, initialAbbrData }) {
         setShowThesaurus(!showThesaurus)
     }
     function handleSelReplace(word) {
-        setReplacedWord(word);
-    }
+        const selectionState = editorState.getSelection();
+        const anchorKey = selectionState.getAnchorKey();
+        const currentContent = editorState.getCurrentContent();
+        const currentContentBlock = currentContent.getBlockForKey(anchorKey);
+        const start = selectionState.getStartOffset();
+        const end = selectionState.getEndOffset();
+        
+        const selectedText = currentContentBlock.getText().slice(start, end);
+        const trailingSpaces = selectedText.match(/\s*$/)[0];
+        const newEnd = start + word.length + trailingSpaces.length;
 
+        const newSelectionState = SelectionState.createEmpty(anchorKey).merge({
+            anchorOffset: start,
+            focusOffset: newEnd,
+        })
+        const newContent = Modifier.replaceText(currentContent, selectionState, word + trailingSpaces);
+        const newEditorState = EditorState.push(editorState,newContent,'insert-characters');
+        const newEditorStateSelect = EditorState.forceSelection(newEditorState, newSelectionState);
+        
+        setEditorState(newEditorStateSelect);
+    }
 
     const tabs = ['Bullets', 'Abbreviations'];
 
@@ -197,6 +217,8 @@ function BulletApp({ initialText, initialWidth, initialAbbrData }) {
                 {currentTab === 0 ? (
                     <div className='column is-full'>
                         <BulletComparator text={text}
+                            editorState={editorState}
+                            setEditorState={setEditorState}
                             abbrReplacer={createAbbrReplacer(abbrDict)} handleTextChange={handleTextChange}
                             width={
                                 enableOptim ? (parseFloat(width.replace(/[a-zA-Z]/g, '')) - 0.00) + 'mm' : width

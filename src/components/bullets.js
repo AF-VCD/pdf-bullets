@@ -22,14 +22,11 @@ const BULLET = {
     },
 }
 
-function BulletComparator(props){
+function BulletComparator({editorState, setEditorState, ...props}){
     
-    const [editorState, setEditorState] = React.useState(()=>{
-            return EditorState.createWithContent(ContentState.createFromText(props.text))
-        }
-    );
+  
 
-    // effect to handle replacing word 
+/*     // effect to handle replacing word 
     React.useEffect(()=>{
         // this block of code gets the selected text from the editor.
         const selectionState = editorState.getSelection();
@@ -38,7 +35,7 @@ function BulletComparator(props){
         const newEditorState = EditorState.push(editorState,newContent,'insert-characters');
         
         setEditorState(newEditorState);
-    },[props.replacedWord])
+    },[props.replacedWord]) */
 
     // Editor callback that adds rich text editor keybinds
     const handleKeyCommand = (command, editorState) => {
