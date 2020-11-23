@@ -87,7 +87,6 @@ const initialAbbrData = settings.abbrData ? settings.abbrData.map((row) => {
   }
 }) : tableData;
 
-console.log(initialAbbrData);
 ReactDOM.render(
   <>
     <div className="section" id="stuff" >

@@ -42,15 +42,27 @@ function AbbrTools({ data, setData, ...props}) {
                 type: 'binary',
                 raw: true,
             });
-            const rows = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]],
-                { 'header': ['enabled', 'value', 'abbr'] });
-            props.updater(rows)
+            const rows = XLSX.utils.sheet_to_json(
+                workbook.Sheets[workbook.SheetNames[0]],
+                { 'header': ['enabled', 'value', 'abbr'] })
+                .map(({enabled, value, abbr})=>{
+                        return {enabled, value, abbr}
+                });
+            
+            // checks first row, enabled value and see if it matches header text
+            // normally enabled is a boolean.
+            if((rows[0].enabled).match(/enabled/i)){
+                setData(rows.slice(1));
+            } else{
+                setData(rows);
+            }
+            
         };
         reader.readAsBinaryString(file)
     }
     function exportToXLS() {
         const wb = XLSX.utils.book_new();
-        const sht = XLSX.utils.aoa_to_sheet(props.getter());
+        const sht = XLSX.utils.json_to_sheet(data);
         XLSX.utils.book_append_sheet(wb, sht, 'abbrs')
         XLSX.writeFile(wb, 'abbrs.xlsx');
     }
@@ -75,7 +87,6 @@ function AbbrTools({ data, setData, ...props}) {
 }
 
 function AbbrsViewer({ data, setData }) {
-    console.log(data);
     return (
         <div>
             <AbbrTools setData={setData} data={data} />

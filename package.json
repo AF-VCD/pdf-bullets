@@ -5,6 +5,7 @@
   "dependencies": {
     "@ckhordiasma/pdfjs-dist": "^2.7.41",
     "@fortawesome/fontawesome-svg-core": "^1.2.30",
+    "@fortawesome/free-regular-svg-icons": "^5.15.1",
     "@fortawesome/free-solid-svg-icons": "^5.14.0",
     "@fortawesome/react-fontawesome": "^0.1.11",
     "@handsontable/react": "^4.0.0",
