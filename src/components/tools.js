@@ -386,4 +386,22 @@ const Forms  = {
        return {'pullBullets': pullBullets, 'getPageInfo':getPageInfo};
    }
 
-export {Logo,DocumentTools};
+function getSelectionInfo(editorState){
+    // this block of code gets the selected text from the editor.
+    const selectionState = editorState.getSelection();
+    const anchorKey = selectionState.getAnchorKey();
+    const contentBlock = editorState.getCurrentContent().getBlockForKey(anchorKey);
+    const start = selectionState.getStartOffset();
+    const end = selectionState.getEndOffset();
+    const selectedText = contentBlock.getText().slice(start, end);
+    return {
+        selectionState,
+        anchorKey, 
+        contentBlock, 
+        start, 
+        end, 
+        selectedText,
+    }
+}
+
+export {Logo,DocumentTools, getSelectionInfo};

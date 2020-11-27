@@ -2,6 +2,7 @@ import React from "react"
 import {Editor, EditorState, RichUtils, ContentState, Modifier} from "draft-js"
 import "draft-js/dist/Draft.css";
 import { toSetSeq } from "draft-js/lib/DefaultDraftBlockRenderMap";
+import {getSelectionInfo} from './tools.js'
 const DPI = 96;
 const MM_PER_IN = 25.4;
 const DPMM = DPI / MM_PER_IN;
@@ -24,18 +25,7 @@ const BULLET = {
 
 function BulletComparator({editorState, setEditorState, ...props}){
     
-  
-
-/*     // effect to handle replacing word 
-    React.useEffect(()=>{
-        // this block of code gets the selected text from the editor.
-        const selectionState = editorState.getSelection();
-        const currentContent = editorState.getCurrentContent();
-        const newContent = Modifier.replaceText(currentContent, selectionState, props.replacedWord + ' ');
-        const newEditorState = EditorState.push(editorState,newContent,'insert-characters');
-        
-        setEditorState(newEditorState);
-    },[props.replacedWord]) */
+    const bulletOutputID = "bulletOutput";
 
     // Editor callback that adds rich text editor keybinds
     const handleKeyCommand = (command, editorState) => {
@@ -60,16 +50,7 @@ function BulletComparator({editorState, setEditorState, ...props}){
             console.log(block.getText());
         }
         */
-    
-        // this block of code gets the selected text from the editor.
-        const selectionState = newEditorState.getSelection();
-        const anchorKey = selectionState.getAnchorKey();
-        const currentContent = newEditorState.getCurrentContent();
-        const currentContentBlock = currentContent.getBlockForKey(anchorKey);
-        const start = selectionState.getStartOffset();
-        const end = selectionState.getEndOffset();
-        const selectedText = currentContentBlock.getText().slice(start, end);
-
+        const {selectedText} = getSelectionInfo(newEditorState)
         if(props.onSelect && selectedText !== '') props.onSelect(selectedText);
         if(props.onTextChange && textChanged) props.handleTextChange(newEditorState.getCurrentContent().getPlainText('\n'))
         setEditorState(newEditorState);
@@ -85,21 +66,22 @@ function BulletComparator({editorState, setEditorState, ...props}){
 
     // TODO add control-a selectability on the bullet outputs
 
-    /*
-        selectOutput = (e)=>{
+    
+    function selectOutput (e){
+
         if(e.ctrlKey && e.keyCode === 65){
             e.preventDefault();
             //console.log('control-a')
             //console.log(this.outputRef.current)
-            if (window.getSelection) { 
+            if (e.target.id.match(new RegExp(bulletOutputID))) { 
                 const range = document.createRange();
-                range.selectNode(this.outputRef.current);
+                range.selectNode(e.target);
                 window.getSelection().removeAllRanges();
                 window.getSelection().addRange(range);
             }
         }
     }
-    */
+    
 
     return (
         <div style={{
@@ -110,7 +92,7 @@ function BulletComparator({editorState, setEditorState, ...props}){
             <div >
                 <Editor editorState={editorState} onChange={onChange} handleKeyCommand={handleKeyCommand}/>
             </div>
-            <div onMouseUp={onBulletSelect}>
+            <div id={bulletOutputID} onMouseUp={onBulletSelect} onKeyDown={selectOutput} tabIndex="0">
                 {editorState.getCurrentContent().getBlocksAsArray().map((block, key)=>{
                     let text = block.getText();
                     if(props.abbrReplacer) text = props.abbrReplacer(text);

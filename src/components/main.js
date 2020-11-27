@@ -1,10 +1,10 @@
 import React from "react"
 import { BULLET, BulletComparator } from "./bullets.js"
-import { Logo, DocumentTools } from "./tools.js"
+import { Logo, DocumentTools, getSelectionInfo } from "./tools.js"
 import AbbrsViewer from "./abbrs.js"
 import SynonymViewer from "./thesaurus.js"
 // booleans for debugging
-import {EditorState, ContentState, Modifier, SelectionState} from "draft-js"
+import { EditorState, ContentState, Modifier, SelectionState } from "draft-js"
 
 const DPI = 96;
 const MM_PER_IN = 25.4;
@@ -21,10 +21,10 @@ function BulletApp({ initialText, initialWidth, initialAbbrData }) {
     const [selection, setSelection] = React.useState('');
     const [currentTab, setCurrentTab] = React.useState(0);
     const [showThesaurus, setShowThesaurus] = React.useState(false);
-    const [editorState, setEditorState] = React.useState(()=>{
+    const [editorState, setEditorState] = React.useState(() => {
         return EditorState.createWithContent(ContentState.createFromText(initialText))
     });
-    
+
     function handleJSONImport(settings) {
         setText(settings.text)
         setEnableOptim(settings.enableOptim);
@@ -154,30 +154,24 @@ function BulletApp({ initialText, initialWidth, initialAbbrData }) {
     }
     function handleSelReplace(word) {
 
-        if(! document.activeElement.className.match(/public-DraftEditor-content/)){
-            return;
+        if (document.activeElement.className.match(/public-DraftEditor-content/)) {
+
+            const { selectedText, start, anchorKey, selectionState } = getSelectionInfo(editorState);
+
+            const trailingSpaces = selectedText.match(/\s*$/)[0];
+            const newEnd = start + word.length + trailingSpaces.length;
+
+            const newSelectionState = SelectionState.createEmpty(anchorKey).merge({
+                anchorOffset: start,
+                focusOffset: newEnd,
+            })
+
+            const newContent = Modifier.replaceText(editorState.getCurrentContent(), selectionState, word + trailingSpaces);
+            const newEditorState = EditorState.push(editorState, newContent, 'insert-characters');
+            const newEditorStateSelect = EditorState.forceSelection(newEditorState, newSelectionState);
+
+            setEditorState(newEditorStateSelect);
         };
-
-        const selectionState = editorState.getSelection();
-        const anchorKey = selectionState.getAnchorKey();
-        const currentContent = editorState.getCurrentContent();
-        const currentContentBlock = currentContent.getBlockForKey(anchorKey);
-        const start = selectionState.getStartOffset();
-        const end = selectionState.getEndOffset();
-
-        const selectedText = currentContentBlock.getText().slice(start, end);
-        const trailingSpaces = selectedText.match(/\s*$/)[0];
-        const newEnd = start + word.length + trailingSpaces.length;
-
-        const newSelectionState = SelectionState.createEmpty(anchorKey).merge({
-            anchorOffset: start,
-            focusOffset: newEnd,
-        })
-        const newContent = Modifier.replaceText(currentContent, selectionState, word + trailingSpaces);
-        const newEditorState = EditorState.push(editorState,newContent,'insert-characters');
-        const newEditorStateSelect = EditorState.forceSelection(newEditorState, newSelectionState);
-        
-        setEditorState(newEditorStateSelect);
     }
 
     const tabs = ['Bullets', 'Abbreviations'];
