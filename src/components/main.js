@@ -21,7 +21,6 @@ function BulletApp({ initialText, initialWidth, initialAbbrData }) {
     const [selection, setSelection] = React.useState('');
     const [currentTab, setCurrentTab] = React.useState(0);
     const [showThesaurus, setShowThesaurus] = React.useState(false);
-    const [replacedWord, setReplacedWord] = React.useState('');
     const [editorState, setEditorState] = React.useState(()=>{
         return EditorState.createWithContent(ContentState.createFromText(initialText))
     });
@@ -110,7 +109,6 @@ function BulletApp({ initialText, initialWidth, initialAbbrData }) {
         setEnableOptim(!enableOptim);
     }
     function handleSelect(newSel) {
-
         const maxWords = 8;
         if (newSel.trim() !== '') {
             setSelection(BULLET.Tokenize(newSel.trim()).slice(0, maxWords).join(' '));
@@ -161,7 +159,7 @@ function BulletApp({ initialText, initialWidth, initialAbbrData }) {
         const currentContentBlock = currentContent.getBlockForKey(anchorKey);
         const start = selectionState.getStartOffset();
         const end = selectionState.getEndOffset();
-        
+
         const selectedText = currentContentBlock.getText().slice(start, end);
         const trailingSpaces = selectedText.match(/\s*$/)[0];
         const newEnd = start + word.length + trailingSpaces.length;
@@ -223,7 +221,6 @@ function BulletApp({ initialText, initialWidth, initialAbbrData }) {
                             width={
                                 enableOptim ? (parseFloat(width.replace(/[a-zA-Z]/g, '')) - 0.00) + 'mm' : width
                             }
-                            replacedWord={replacedWord}
                             onSelect={handleSelect} enableOptim={enableOptim} />
                     </div>) : ''}
                 <div className={'column is-full' + ' ' + (currentTab !== 1 ? 'is-invisible' : '')}>

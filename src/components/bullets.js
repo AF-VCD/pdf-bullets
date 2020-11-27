@@ -41,6 +41,7 @@ function BulletComparator({editorState, setEditorState, ...props}){
     const handleKeyCommand = (command, editorState) => {
         const newState = RichUtils.handleKeyCommand(editorState, command);
         if(newState){
+            console.log('here!');
             setEditorState(newState);
             return 'handled';
         }
@@ -52,8 +53,8 @@ function BulletComparator({editorState, setEditorState, ...props}){
         
         const textChanged = editorState.getCurrentContent() !== newEditorState.getCurrentContent();
         
-        setEditorState(newEditorState);
-        const content = editorState.getCurrentContent();
+        
+        //const content = editorState.getCurrentContent();
         // ordered map has a key and a block associasted with it
         //const blockMap = content.getBlockMap();
         /*
@@ -63,16 +64,18 @@ function BulletComparator({editorState, setEditorState, ...props}){
         */
     
         // this block of code gets the selected text from the editor.
-        const selectionState = editorState.getSelection();
+        const selectionState = newEditorState.getSelection();
         const anchorKey = selectionState.getAnchorKey();
-        const currentContent = editorState.getCurrentContent();
+        const currentContent = newEditorState.getCurrentContent();
         const currentContentBlock = currentContent.getBlockForKey(anchorKey);
         const start = selectionState.getStartOffset();
         const end = selectionState.getEndOffset();
         const selectedText = currentContentBlock.getText().slice(start, end);
-        
+        console.log("selected text: " + selectedText);
+        console.log({start, end, selectedText})
         if(props.onSelect && selectedText !== '') props.onSelect(selectedText);
-        if(props.onTextChange && textChanged) props.handleTextChange(editorState.getCurrentContent().getPlainText('\n'))
+        if(props.onTextChange && textChanged) props.handleTextChange(newEditorState.getCurrentContent().getPlainText('\n'))
+        setEditorState(newEditorState);
     }
 
     // This other bullet selection is for when things are selected on the optimized output
@@ -110,7 +113,7 @@ function BulletComparator({editorState, setEditorState, ...props}){
             <div>
                 <Editor editorState={editorState} onChange={onChange} handleKeyCommand={handleKeyCommand}/>
             </div>
-            <div onMouseUp={onBulletSelect}>
+            <div >
                 {editorState.getCurrentContent().getBlocksAsArray().map((block, key)=>{
                     let text = block.getText();
                     if(props.abbrReplacer) text = props.abbrReplacer(text);
