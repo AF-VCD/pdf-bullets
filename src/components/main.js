@@ -153,6 +153,11 @@ function BulletApp({ initialText, initialWidth, initialAbbrData }) {
         setShowThesaurus(!showThesaurus)
     }
     function handleSelReplace(word) {
+
+        if(! document.activeElement.className.match(/public-DraftEditor-content/)){
+            return;
+        };
+
         const selectionState = editorState.getSelection();
         const anchorKey = selectionState.getAnchorKey();
         const currentContent = editorState.getCurrentContent();
