@@ -200,7 +200,7 @@ function Bullet({ text, widthPx, ...props }) {
                     left: "-1000px"
                 }} />
             <div style={{
-                height: props.height,
+                minHeight: props.height,
                 whiteSpace: 'pre-wrap',
                 color: color,
             }} onMouseUp={props.onHighlight} >
