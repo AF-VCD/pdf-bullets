@@ -119,7 +119,7 @@ function BulletApp({ initialText, initialWidth, initialAbbrData }) {
         setText(text);
     }
     function handleWidthChange(e) {
-        setWidth(e.target.value + 'mm')
+        setWidth(parseFloat(e.target.value))
     }
     function handleTextNorm() {
         setText(
@@ -217,9 +217,7 @@ function BulletApp({ initialText, initialWidth, initialAbbrData }) {
                             editorState={editorState}
                             setEditorState={setEditorState}
                             abbrReplacer={createAbbrReplacer(abbrDict)} handleTextChange={handleTextChange}
-                            width={
-                                enableOptim ? (parseFloat(width.replace(/[a-zA-Z]/g, '')) - 0.00) + 'mm' : width
-                            }
+                            width={width}
                             onSelect={handleSelect} enableOptim={enableOptim} />
                     </div>) : ''}
                 <div className={'column is-full' + ' ' + (currentTab !== 1 ? 'is-invisible' : '')}>

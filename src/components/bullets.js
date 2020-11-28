@@ -23,7 +23,8 @@ const BULLET = {
     },
 }
 
-function BulletComparator({editorState, setEditorState, ...props}){
+
+function BulletComparator({editorState, setEditorState, width, ...props}){
     
     const bulletOutputID = "bulletOutput";
 
@@ -84,20 +85,26 @@ function BulletComparator({editorState, setEditorState, ...props}){
     
 
     return (
-        <div style={{
-            display:"flex",
-            justifyContent: "space-around",
-            alignItems:"flex-start"
-        }}>
-            <div >
-                <Editor editorState={editorState} onChange={onChange} handleKeyCommand={handleKeyCommand}/>
+        <div className="bullets columns is-multiline" >
+            <div className="column" style={{
+                width: width+'mm',
+                }}>
+                <h2 className='subtitle'>Input Bullets Here:</h2>
+                <div className="border" style={{maxWidth: width*1.01+'mm'}}>
+                    <Editor className="border" 
+                    editorState={editorState} onChange={onChange} handleKeyCommand={handleKeyCommand}/>
+                </div>
             </div>
-            <div id={bulletOutputID} onMouseUp={onBulletSelect} onKeyDown={selectOutput} tabIndex="0">
-                {editorState.getCurrentContent().getBlocksAsArray().map((block, key)=>{
-                    let text = block.getText();
-                    if(props.abbrReplacer) text = props.abbrReplacer(text);
-                    return <Bullet text={text} width={202.321*DPMM} enableOptim={props.enableOptim}/>
-                })}
+            <div className="column" id={bulletOutputID} style={{width: width+'mm'}}
+                onMouseUp={onBulletSelect} onKeyDown={selectOutput} tabIndex="0">
+                <h2 className='subtitle'>View Output Here:</h2>
+                <div className="border">
+                    {editorState.getCurrentContent().getBlocksAsArray().map((block, key)=>{
+                        let text = block.getText();
+                        if(props.abbrReplacer) text = props.abbrReplacer(text);
+                        return <Bullet text={text} widthPx={width*DPMM} enableOptim={props.enableOptim}/>
+                    })}
+                </div>
             </div>
         </div>);
 }
@@ -112,8 +119,8 @@ function BulletComparator({editorState, setEditorState, ...props}){
 
 
 
-// <Bullet text={bulletText} width={widthInPixels} height={heightInPixels} enableOptim={true} onHighlight={highlightCallback} />
-function Bullet(props){
+
+function Bullet({text, widthPx, ...props}){
     const canvasRef = React.useRef(null);
     const [outputText, setOutputText] = React.useState(' ');
     
@@ -134,10 +141,10 @@ function Bullet(props){
     React.useEffect(() => {
         
         const context = getContext(canvasRef.current)
-        //context.fillText(props.text, 50,50);
-        setBulletRendering(renderBulletText(props.text, context, props.width));
+        //context.fillText(text, 50,50);
+        setBulletRendering(renderBulletText(text, context, widthPx));
 
-    }, [props.text]);
+    }, [text, widthPx]);
     // [] indicates that this happens once after the component mounts.
     // [props.text] indicates that this happens every time the text changes from the user
 
@@ -147,7 +154,7 @@ function Bullet(props){
         
         if(props.enableOptim){
             setLoading(BULLET.LOADING);
-            const optimizer = (text)=>renderBulletText(text, getContext(canvasRef.current),props.width);
+            const optimizer = (text)=>renderBulletText(text, getContext(canvasRef.current),widthPx);
             const optimResults = optimize(rendering.text, optimizer);
     
             setLoading(BULLET.DONE);
@@ -277,11 +284,14 @@ function renderBulletText(text, context, width){
             overflow: fullWidth - width,
         };
     }else{
+        // Scenario where the width of the text is wider than desired.
+        //  In this case, work needs to be done to figure out where the line breaks should be. 
+
         // Regex- split after one of the following: \s ? / | - % ! 
         // but ONLY if immediately followed by: [a-zA-z] [0-9] + \
         const textSplit = text.split(/(?<=[\s\?\/\|\-\%\!])(?=[a-zA-Z0-9\+\\])/) ;
         
-        if(textSplit.length > 1){
+        if(getWidth(textSplit[0]) < width){
             let answerIdx = 0;
             for(let i = 1; i <= textSplit.length; i++){
                 const evalText = textSplit.slice(0,i).join('').trimEnd();
@@ -291,7 +301,18 @@ function renderBulletText(text, context, width){
                     break;
                 }
             }
-            const recursedResult = renderBulletText(textSplit.slice(answerIdx,textSplit.length).join(''), context, width);
+            const recursedText = textSplit.slice(answerIdx,textSplit.length).join('');
+
+            if(recursedText == text){
+                console.warn("Can't fit \"" + text + "\" on a single line");
+                return {
+                    text, 
+                    fullWidth,
+                    lines: 1,
+                    overflow: fullWidth - width,
+                };
+            }
+            const recursedResult = renderBulletText(recursedText, context, width);
             
             return {
                 text: textSplit.slice(0,answerIdx).join('') + '\n' + recursedResult.text,
@@ -323,7 +344,17 @@ function renderBulletText(text, context, width){
                     }
                 }
             }
-            const recursedResult = renderBulletText(text.substring(answerIdx,text.length), context, width);
+            const recursedText = text.substring(answerIdx,text.length);
+            if(recursedText == text){
+                console.warn("Could not even fit first character of \"" + text + "\" on a single line");
+                return {
+                    text, 
+                    fullWidth,
+                    lines: 1,
+                    overflow: fullWidth - width
+                };
+            }
+            const recursedResult = renderBulletText(recursedText, context, width);
             
             return {
                 text: text.substring(0,answerIdx) + '\n' + recursedResult.text,
