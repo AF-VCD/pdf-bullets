@@ -15,6 +15,7 @@ function BulletApp({ initialText, initialWidth, initialAbbrData }) {
     const [abbrData, setAbbrData] = React.useState(React.useMemo(() => initialAbbrData));
 
     const [abbrDict, setAbbrDict] = React.useState({});
+    
     const [selection, setSelection] = React.useState('');
     const [currentTab, setCurrentTab] = React.useState(0);
     const [showThesaurus, setShowThesaurus] = React.useState(false);
@@ -29,13 +30,8 @@ function BulletApp({ initialText, initialWidth, initialAbbrData }) {
         setAbbrData(settings.abbrData);
 
     }
-    //need to replace this with a react useEffect
+
     React.useEffect(() => {
-        setAbbrDict(createAbbrDict(abbrData));
-    }, [abbrData]);
-
-    function createAbbrDict(abbrData) {
-
         const newAbbrDict = {};
         abbrData.map((row) => {
             let fullWord = String(row.value).replace(/\s/g, ' ');
@@ -52,16 +48,15 @@ function BulletApp({ initialText, initialWidth, initialAbbrData }) {
             }
         })
 
-        return newAbbrDict;
+        setAbbrDict(newAbbrDict);
+    }, [abbrData]);
 
-    }
-    const createAbbrReplacer = React.useCallback((newAbbrDict) => {
-        return (sentence) => {
+    const abbrReplacer = React.useCallback((sentence) => {
 
             const finalAbbrDict = {};
-            Object.keys(newAbbrDict).map(
+            Object.keys(abbrDict).map(
                 (word) => {
-                    const abbrs = newAbbrDict[word]; //an array
+                    const abbrs = abbrDict[word]; //an array
                     //if there is at least one enabled abbreviation, take the lowest most element of it.
                     if (abbrs.enabled) {
                         finalAbbrDict[word] = abbrs.enabled[abbrs.enabled.length - 1];
@@ -97,11 +92,11 @@ function BulletApp({ initialText, initialWidth, initialAbbrData }) {
                     return p1 + abbr + p3;
                 }
             );
-
-
             return newSentence;
         }
-    }, []);
+    , [abbrDict])
+
+
     function handleOptimChange() {
         setEnableOptim(!enableOptim);
     }
@@ -172,7 +167,18 @@ function BulletApp({ initialText, initialWidth, initialAbbrData }) {
     }
 
     const tabs = ['Bullets', 'Abbreviations'];
-
+    const tabContents = [
+    <BulletComparator text={text}
+        editorState={editorState}
+        setEditorState={setEditorState}
+        abbrReplacer={abbrReplacer} handleTextChange={handleTextChange}
+        width={width}
+        onSelect={handleSelect} enableOptim={enableOptim} />,
+    <AbbrsViewer
+        data={abbrData}
+        setData={setAbbrData} />
+    ];
+    
     return (
 
         <div className="container is-fluid">
@@ -193,7 +199,7 @@ function BulletApp({ initialText, initialWidth, initialAbbrData }) {
                 </div>
 
                 <div className={'column is-full' + ' ' + (showThesaurus ? "" : "is-hidden")}>
-                    <SynonymViewer word={selection} onSelReplace={handleSelReplace} abbrDict={abbrDict} abbrReplacer={createAbbrReplacer(abbrDict)}
+                    <SynonymViewer word={selection} onSelReplace={handleSelReplace} abbrDict={abbrDict} abbrReplacer={abbrReplacer}
                         onHide={handleThesaurusHide} />
                 </div>
                 <div className="column is-full">
@@ -208,19 +214,8 @@ function BulletApp({ initialText, initialWidth, initialAbbrData }) {
                         </ul>
                     </div>
                 </div>
-                {currentTab === 0 ? (
-                    <div className='column is-full'>
-                        <BulletComparator text={text}
-                            editorState={editorState}
-                            setEditorState={setEditorState}
-                            abbrReplacer={createAbbrReplacer(abbrDict)} handleTextChange={handleTextChange}
-                            width={width}
-                            onSelect={handleSelect} enableOptim={enableOptim} />
-                    </div>) : ''}
-                <div className={'column is-full' + ' ' + (currentTab !== 1 ? 'is-invisible' : '')}>
-                    <AbbrsViewer
-                        data={abbrData}
-                        setData={setAbbrData} />
+                <div className='column is-full'>
+                    {tabContents[currentTab]}
                 </div>
             </div>
         </div>
