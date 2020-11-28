@@ -95,10 +95,10 @@ function BulletComparator({ editorState, setEditorState, width, ...props }) {
                         editorState={editorState} onChange={onChange} handleKeyCommand={handleKeyCommand} />
                 </div>
             </div>
-            <div className="column" id={bulletOutputID} style={{ width: width + 'mm' }}
-                onMouseUp={onBulletSelect} onKeyDown={selectOutput} tabIndex="0">
+            <div className="column"  style={{ width: width + 'mm' }}>
                 <h2 className='subtitle'>View Output Here:</h2>
-                <div className="border">
+                <div className="border" id={bulletOutputID} 
+                    onMouseUp={onBulletSelect} onKeyDown={selectOutput} tabIndex="0">
                     {editorState.getCurrentContent().getBlocksAsArray().map((block, key) => {
                         let text = block.getText();
                         if (props.abbrReplacer) text = props.abbrReplacer(text);
