@@ -102,7 +102,14 @@ function BulletComparator({ editorState, setEditorState, width, ...props }) {
                     {editorState.getCurrentContent().getBlocksAsArray().map((block, key) => {
                         let text = block.getText();
                         if (props.abbrReplacer) text = props.abbrReplacer(text);
-                        return <Bullet text={text} widthPx={width * DPMM} enableOptim={props.enableOptim} />
+                        const blockKey = block.getKey();
+                        const blockDiv = document.querySelector(`div[data-offset-key="${blockKey}-0-0"]`);
+                        
+                        let height;
+                        if(blockDiv) height = blockDiv.getBoundingClientRect().height;
+                        
+                        return <Bullet text={text} widthPx={width * DPMM} height={height} 
+                            enableOptim={props.enableOptim} />
                     })}
                 </div>
             </div>
