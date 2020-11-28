@@ -97,7 +97,7 @@ function BulletComparator({ editorState, setEditorState, width, ...props }) {
             </div>
             <div className="column"  style={{ width: width + 'mm' }}>
                 <h2 className='subtitle'>View Output Here:</h2>
-                <div className="border" id={bulletOutputID} 
+                <div className="border" id={bulletOutputID} style={{ maxWidth: width * 1.01 + 'mm' }}
                     onMouseUp={onBulletSelect} onKeyDown={selectOutput} tabIndex="0">
                     {editorState.getCurrentContent().getBlocksAsArray().map((block, key) => {
                         let text = block.getText();
@@ -132,7 +132,7 @@ function Bullet({ text, widthPx, ...props }) {
     const [outputText, setOutputText] = React.useState(' ');
 
     const [color, setColor] = React.useState('inherit');
-    const [loading, setLoading] = React.useState(true);
+    const [loading, setLoading] = React.useState(false);
     const [optimStatus, setOptimStatus] = React.useState(BULLET.NOT_OPT);
     const [rendering, setBulletRendering] = React.useState({ text: '' });
 
@@ -146,9 +146,8 @@ function Bullet({ text, widthPx, ...props }) {
     // This effect updates the text rendering (i.e. enforces width constraints by inserting newlines)
     //   whenever the props text input is updated.
     React.useEffect(() => {
-
+ 
         const context = getContext(canvasRef.current)
-        //context.fillText(text, 50,50);
         setBulletRendering(renderBulletText(text, context, widthPx));
 
     }, [text, widthPx]);
@@ -159,27 +158,39 @@ function Bullet({ text, widthPx, ...props }) {
     //  sees how it can be improved with modified spaces. 
     React.useEffect(() => {
 
-        if (props.enableOptim) {
-            setLoading(BULLET.LOADING);
-            const optimizer = (text) => renderBulletText(text, getContext(canvasRef.current), widthPx);
-            const optimResults = optimize(rendering.text, optimizer);
-
-            setLoading(BULLET.DONE);
-
-            setOptimStatus(optimResults.status);
-            setOutputText(optimResults.rendering.text);
-
-        } else {
-            setOutputText(rendering.text);
+        if(loading){
+            clearTimeout(loading)
         }
+        setOutputText(rendering.text);
+        setLoading(
+            setTimeout(
+                ()=>{
+                    if (props.enableOptim) {
+                        const optimizer = (text) => renderBulletText(text, getContext(canvasRef.current), widthPx);
+                        const optimResults = optimize(rendering.text, optimizer);
+                        setLoading(false)
+                        setOptimStatus(optimResults.status);
+                        setOutputText(optimResults.rendering.text);
+            
+                    } else {
+                        setOutputText(rendering.text);
+                    }
+                }
+            , 250)
+        );
+        
 
+        return function cleanup(){
+            if(loading) clearTimeout(loading);
+        }
+        
 
     }, [rendering]);
 
     //color effect
     React.useEffect(() => {
         if (loading) {
-            setColor("gray")
+            setColor("silver")
         } else if (optimStatus === BULLET.FAILED_OPT) {
             setColor("red");
         } else {
