@@ -97,7 +97,7 @@ function BulletComparator({ editorState, setEditorState, width, ...props }) {
             </div>
             <div className="column"  style={{ width: width + 'mm' }}>
                 <h2 className='subtitle'>View Output Here:</h2>
-                <div className="border" id={bulletOutputID} style={{ maxWidth: width * 1.01 + 'mm' }}
+                <div className="border" id={bulletOutputID} style={{ width: width * 1.01 + 'mm' }}
                     onMouseUp={onBulletSelect} onKeyDown={selectOutput} tabIndex="0">
                     {editorState.getCurrentContent().getBlocksAsArray().map((block, key) => {
                         let text = block.getText();
@@ -150,7 +150,7 @@ function Bullet({ text, widthPx, ...props }) {
         const context = getContext(canvasRef.current)
         setBulletRendering(renderBulletText(text, context, widthPx));
 
-    }, [text, widthPx]);
+    }, [text, widthPx, props.enableOptim]);
     // [] indicates that this happens once after the component mounts.
     // [props.text] indicates that this happens every time the text changes from the user
 
@@ -173,6 +173,7 @@ function Bullet({ text, widthPx, ...props }) {
                         setOutputText(optimResults.rendering.text);
             
                     } else {
+                        setLoading(false)
                         setOutputText(rendering.text);
                     }
                 }
