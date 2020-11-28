@@ -108,7 +108,7 @@ function BulletComparator({ editorState, setEditorState, width, ...props }) {
                         let height;
                         if(blockDiv) height = blockDiv.getBoundingClientRect().height;
                         
-                        return <Bullet text={text} widthPx={width * DPMM} height={height} 
+                        return <Bullet key={blockKey} text={text} widthPx={width * DPMM} height={height} 
                             enableOptim={props.enableOptim} />
                     })}
                 </div>

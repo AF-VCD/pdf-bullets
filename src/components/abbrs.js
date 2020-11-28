@@ -51,7 +51,7 @@ function AbbrTools({ data, setData, ...props}) {
             
             // checks first row, enabled value and see if it matches header text
             // normally enabled is a boolean.
-            if((rows[0].enabled).match(/enabled/i)){
+            if((rows[0].enabled.toString()).match(/enabled/i)){
                 setData(rows.slice(1));
             } else{
                 setData(rows);

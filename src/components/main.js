@@ -6,16 +6,13 @@ import SynonymViewer from "./thesaurus.js"
 // booleans for debugging
 import { EditorState, ContentState, Modifier, SelectionState } from "draft-js"
 
-const DPI = 96;
-const MM_PER_IN = 25.4;
-const DPMM = DPI / MM_PER_IN;
-
+// Note that all width measurements in this file are in millimeters.
 function BulletApp({ initialText, initialWidth, initialAbbrData }) {
 
     const [enableOptim, setEnableOptim] = React.useState(true);
     const [text, setText] = React.useState(initialText);
     const [width, setWidth] = React.useState(initialWidth);
-    const [abbrData, setAbbrData] = React.useState(React.useMemo(() => initialAbbrData, []));
+    const [abbrData, setAbbrData] = React.useState(React.useMemo(() => initialAbbrData));
 
     const [abbrDict, setAbbrDict] = React.useState({});
     const [selection, setSelection] = React.useState('');
