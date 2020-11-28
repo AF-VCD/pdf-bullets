@@ -19,5 +19,6 @@ import './commands'
 
 // added for react unit testing capabilities
 require('cypress-react-unit-test/support')
+
 // Alternatively you can use CommonJS syntax:
 // require('./commands')

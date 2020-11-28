@@ -2,7 +2,7 @@ import React from 'react'
 import { mount} from 'cypress-react-unit-test'
 
 
-import {evaluator} from '../../src/components/bullets.js';
+import {renderBulletText} from '../../src/components/bullets.js';
 
 const DPI = 96;
 const MM_PER_IN = 25.4;
@@ -10,7 +10,7 @@ const DPMM = DPI / MM_PER_IN;
 
 
 // This is like a pared down version of the Bullet function, specifically to test evaluator capabilities
-function EvaluatorTester(props){
+function RenderBulletTextTester(props){
     const canvasRef = React.useRef(null);
     const [results, setResults] = React.useState('');
     React.useEffect(() => {
@@ -20,7 +20,7 @@ function EvaluatorTester(props){
         //TODO how does cypress know how to load the AdobeTimes font??
         context.font = '12pt AdobeTimes'
         //context.fillText(props.text, 50,50);
-        setResults(evaluator(props.text, context, props.width))
+        setResults(renderBulletText(props.text, context, props.width).text)
     }, [props.text]);
     // [] indicates that this happens once after the component mounts.
     // [props.text] indicates that this happens every time the text changes.
@@ -101,7 +101,7 @@ describe('checking bullets', () => {
         mount(
             <>
                 {bullets.map((entry)=>{
-                    return < EvaluatorTester id={entry.id} text={entry.input} width={width} />
+                    return < RenderBulletTextTester id={entry.id} text={entry.input} width={width} />
                 })}
             </>);
 
