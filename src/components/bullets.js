@@ -25,9 +25,9 @@ const BULLET = {
 
 
 function BulletComparator({ editorState, setEditorState, width, ...props }) {
-
+    
     const bulletOutputID = "bulletOutput";
-
+    const [heightMap, setHeightMap] = React.useState(new Map());
     // Editor callback that adds rich text editor keybinds
     const handleKeyCommand = (command, editorState) => {
         const newState = RichUtils.handleKeyCommand(editorState, command);
@@ -80,6 +80,14 @@ function BulletComparator({ editorState, setEditorState, width, ...props }) {
         }
     }
 
+    React.useEffect(()=>{
+        let newHeightMap = new Map();
+        editorState.getCurrentContent().getBlockMap().forEach((block, key)=>{
+            const blockDiv = document.querySelector(`div[data-offset-key="${key}-0-0"]`);
+            if(blockDiv) newHeightMap.set(key, blockDiv.getBoundingClientRect().height);
+        });
+        setHeightMap(newHeightMap);
+    },[editorState])
 
     return (
         <div className="bullets columns is-multiline" >
@@ -88,7 +96,7 @@ function BulletComparator({ editorState, setEditorState, width, ...props }) {
             }}>
                 <h2 className='subtitle'>Input Bullets Here:</h2>
                 <div className="border" style={{ maxWidth: width * 1.01 + 'mm' }}>
-                    <Editor className="border"
+                    <Editor 
                         editorState={editorState} onChange={onChange} handleKeyCommand={handleKeyCommand} />
                 </div>
             </div>
@@ -96,16 +104,11 @@ function BulletComparator({ editorState, setEditorState, width, ...props }) {
                 <h2 className='subtitle'>View Output Here:</h2>
                 <div className="border" id={bulletOutputID} style={{ width: width * 1.01 + 'mm' }}
                     onMouseUp={onBulletSelect} onKeyDown={selectOutput} tabIndex="0">
-                    {editorState.getCurrentContent().getBlocksAsArray().map((block, key) => {
+                    {Array.from(editorState.getCurrentContent().getBlockMap(), ([key, block]) => {
                         let text = block.getText();
                         if (props.abbrReplacer) text = props.abbrReplacer(text);
-                        const blockKey = block.getKey();
-                        const blockDiv = document.querySelector(`div[data-offset-key="${blockKey}-0-0"]`);
                         
-                        let height;
-                        if(blockDiv) height = blockDiv.getBoundingClientRect().height;
-                        console.log(blockKey+text);
-                        return <Bullet key={blockKey+text} text={text} widthPx={width * DPMM} height={height} 
+                        return <Bullet key={key} text={text} widthPx={width * DPMM} height={heightMap.get(key)} 
                             enableOptim={props.enableOptim} />
                     })}
                 </div>
@@ -130,7 +133,6 @@ function Bullet({ text, widthPx, ...props }) {
 
     const [color, setColor] = React.useState('inherit');
     const [loading, setLoading] = React.useState(false);
-    const [optimRunner, setOptimRunner] = React.useState();
     const [optimStatus, setOptimStatus] = React.useState(BULLET.NOT_OPT);
     const [rendering, setBulletRendering] = React.useState({ text: '' });
 
@@ -159,7 +161,6 @@ function Bullet({ text, widthPx, ...props }) {
         setLoading(true);
         setOutputText(rendering.text);
         if (props.enableOptim) {
-            console.log({outputText, text, test: canvasRef.current.getContext('2d')})
             const optimizer = (txt) => renderBulletText(txt, getContext(canvasRef.current), widthPx);
             const optimResults = optimize(rendering.text, optimizer);
             setLoading(false);
