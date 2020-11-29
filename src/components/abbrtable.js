@@ -102,7 +102,7 @@ const SelectCheckbox = ({
 }) => {
     // We need to keep and update the state of the cell normally
     
-    const {onChange: onSelChange, style, ...rowSelectProps} = 
+    const {onChange: onSelChange, style, indeterminate, ...rowSelectProps} = 
         React.useMemo(()=>row.getToggleRowSelectedProps(),[row]);
     
     const onChange = React.useCallback((e) => {
