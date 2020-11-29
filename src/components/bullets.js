@@ -65,11 +65,8 @@ function BulletComparator({ editorState, setEditorState, width, ...props }) {
         }
     }
 
-    // TODO add control-a selectability on the bullet outputs
-
-
+    // control-a selectability on bullet outputs
     function selectOutput(e) {
-
         if (e.ctrlKey && e.keyCode === 65) {
             e.preventDefault();
             //console.log('control-a')
@@ -107,8 +104,8 @@ function BulletComparator({ editorState, setEditorState, width, ...props }) {
                         
                         let height;
                         if(blockDiv) height = blockDiv.getBoundingClientRect().height;
-                        
-                        return <Bullet key={blockKey} text={text} widthPx={width * DPMM} height={height} 
+                        console.log(blockKey+text);
+                        return <Bullet key={blockKey+text} text={text} widthPx={width * DPMM} height={height} 
                             enableOptim={props.enableOptim} />
                     })}
                 </div>
@@ -133,6 +130,7 @@ function Bullet({ text, widthPx, ...props }) {
 
     const [color, setColor] = React.useState('inherit');
     const [loading, setLoading] = React.useState(false);
+    const [optimRunner, setOptimRunner] = React.useState();
     const [optimStatus, setOptimStatus] = React.useState(BULLET.NOT_OPT);
     const [rendering, setBulletRendering] = React.useState({ text: '' });
 
@@ -158,33 +156,20 @@ function Bullet({ text, widthPx, ...props }) {
     //  sees how it can be improved with modified spaces. 
     React.useEffect(() => {
 
-        if(loading){
-            clearTimeout(loading)
-        }
+        setLoading(true);
         setOutputText(rendering.text);
-        setLoading(
-            setTimeout(
-                ()=>{
-                    if (props.enableOptim) {
-                        const optimizer = (text) => renderBulletText(text, getContext(canvasRef.current), widthPx);
-                        const optimResults = optimize(rendering.text, optimizer);
-                        setLoading(false)
-                        setOptimStatus(optimResults.status);
-                        setOutputText(optimResults.rendering.text);
-            
-                    } else {
-                        setLoading(false)
-                        setOutputText(rendering.text);
-                    }
-                }
-            , 250)
-        );
-        
+        if (props.enableOptim) {
+            console.log({outputText, text, test: canvasRef.current.getContext('2d')})
+            const optimizer = (txt) => renderBulletText(txt, getContext(canvasRef.current), widthPx);
+            const optimResults = optimize(rendering.text, optimizer);
+            setLoading(false);
+            setOptimStatus(optimResults.status);
+            setOutputText(optimResults.rendering.text);
 
-        return function cleanup(){
-            if(loading) clearTimeout(loading);
+        } else {
+            setOutputText(rendering.text);
+            setLoading(false);
         }
-        
 
     }, [rendering]);
 
