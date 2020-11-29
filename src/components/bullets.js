@@ -82,10 +82,10 @@ function BulletComparator({ editorState, setEditorState, width, ...props }) {
 
     React.useEffect(()=>{
         let newHeightMap = new Map();
-        editorState.getCurrentContent().getBlockMap().forEach((block, key)=>{
+        for(let key of editorState.getCurrentContent().getBlockMap().keys()){
             const blockDiv = document.querySelector(`div[data-offset-key="${key}-0-0"]`);
             if(blockDiv) newHeightMap.set(key, blockDiv.getBoundingClientRect().height);
-        });
+        };
         setHeightMap(newHeightMap);
     },[editorState])
 
