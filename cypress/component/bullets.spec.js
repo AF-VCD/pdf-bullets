@@ -3,6 +3,7 @@ import { mount} from 'cypress-react-unit-test'
 
 
 import {renderBulletText} from '../../src/components/bullets.js';
+import { flexRender } from 'react-table/dist/react-table.development';
 
 const DPI = 96;
 const MM_PER_IN = 25.4;
@@ -12,13 +13,13 @@ const DPMM = DPI / MM_PER_IN;
 // This is like a pared down version of the Bullet function, specifically to test evaluator capabilities
 function RenderBulletTextTester(props){
     const canvasRef = React.useRef(null);
-    const [results, setResults] = React.useState('');
+    const [results, setResults] = React.useState(['']);
     React.useEffect(() => {
         const canvas = canvasRef.current;
         const context = canvas.getContext('2d');
 
         //TODO how does cypress know how to load the AdobeTimes font??
-        context.font = '12pt AdobeTimes'
+        context.font = '12pt Times New Roman'
         //context.fillText(props.text, 50,50);
         setResults(renderBulletText(props.text, context, props.width).text)
     }, [props.text]);
@@ -38,9 +39,9 @@ function RenderBulletTextTester(props){
     return (
         <>
             {canvas}
-            <div id={props.id} style={{}}>
+            <div id={props.id} >
                 <pre>
-                    {results}
+                    {results.join('\n')}
                 </pre>
             </div>
         </>
