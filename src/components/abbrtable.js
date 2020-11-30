@@ -330,12 +330,12 @@ const Row = ({ row, index, rowOps }) => {
                 return <td {...cell.getCellProps()}>{cell.render('Cell')}</td>
             })}
             <td>
-                <span className="icon is-large" onClick={() => rowOps.appendRow(index)}>
+                <a className="icon is-large" onClick={() => rowOps.appendRow(index)}>
                     <FontAwesomeIcon icon={faCopy} size="2x" />
-                </span>
-                <span className="icon is-large" onClick={() => rowOps.deleteRow(index)}>
+                </a>
+                <a className="icon is-large" onClick={() => rowOps.deleteRow(index)}>
                     <FontAwesomeIcon icon={faTrash} size="2x"/>
-                </span>
+                </a>
             </td>
         </tr>
     )
