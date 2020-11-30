@@ -249,6 +249,19 @@ function optimize(sentence, evalFcn) {
         return Math.floor(Math.abs((Math.floor(9 * hashCode(seed) + 5) % 100000) / 100000) * Math.floor(max));
     }
 
+    
+    const worstCaseResults = evalFcn(optWords.join(newSpace));
+
+    if( (newSpace === smallerSpace && worstCaseResults.overflow > 0) || 
+            (newSpace === largerSpace && worstCaseResults.overflow < BULLET.MAX_UNDERFLOW) ){
+            // this means that there is no point in trying to optimize.
+            
+            return {
+                status: BULLET.FAILED_OPT,
+                rendering: worstCaseResults,
+            };
+        
+    }
 
     while (finalResults.overflow > 0 || finalResults.overflow < BULLET.MAX_UNDERFLOW) {
         //don't select the first space after the dash- that would be noticeable and look wierd.
