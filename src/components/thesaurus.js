@@ -49,8 +49,8 @@ class SynonymViewer extends React.PureComponent{
                             abbr={replacedWord===this.props.word ? "" : replacedWord} 
                             otherAbbrs={otherAbbrs}/>
         const synonyms =  <SynonymList onSelReplace={this.props.onSelReplace} key={this.state.synonyms.join('')} synonyms={this.state.synonyms} abbrDict={this.props.abbrDict} abbrReplacer={this.props.abbrReplacer} />;
-        const explanation = <a className="panel-block" key='init'>Auto-thesaurus box - highlight a word or phrase below to show synonyms in this box</a>;
-        const noResults = <a className="panel-block"  key='none'>no results found</a>;
+        const explanation = <span className="panel-block" key='init'>Auto-thesaurus box - highlight a word or phrase below to show synonyms in this box</span>;
+        const noResults = <span className="panel-block"  key='none'>no results found</span>;
         let mainBody;
         if(this.props.word === ''){
             mainBody = explanation;
@@ -63,14 +63,14 @@ class SynonymViewer extends React.PureComponent{
         return (
             <div className="card">
                 <header className="card-header has-background-light	is-shadowless">
-                    <a className="card-header-title" >
+                    <span className="card-header-title" >
                         <span style={{marginRight:'5px'}}>Thesaurus{this.props.word===''?'':":"}</span>
                         {header} 
-                    </a>
-                    <a className="card-header-icon" onClick={this.props.onHide}>
+                    </span>
+                    <span className="card-header-icon" onClick={this.props.onHide}>
                         <span className="delete"> 
                         </span>
-                    </a>
+                    </span>
                 </header>
                 <div className="card-content" style={{height:"275px", overflow:"auto"}} >
                     
@@ -81,16 +81,11 @@ class SynonymViewer extends React.PureComponent{
         )
     }
 }
-var ceil = Math.ceil;
 
-Object.defineProperty(Array.prototype, 'chunk', {value: function(n) {
-    return Array(ceil(this.length/n)).fill().map((_,i) => this.slice(i*n,i*n+n));
-}});
+
 
 class SynonymList extends React.PureComponent{
-    constructor(props){
-        super(props);
-    }
+
     handleCardClick = (word) => {
         return (e) => {
             e.preventDefault();
@@ -99,9 +94,7 @@ class SynonymList extends React.PureComponent{
         }
     }
     render(){
-        const words = 75;
-        const cols = 10;
-        const filler = (new Array(cols - words%cols)).join('.').split('.');
+        
         return (
             <div>
                 <div className="columns is-multiline">
@@ -115,8 +108,7 @@ class SynonymList extends React.PureComponent{
                                 abbr={replacedWord===word ? "" : replacedWord} 
                                 otherAbbrs={otherAbbrs}/>
                                 
-                                <a className="icon is-small" onMouseDown={this.handleCardClick(word)}>
-                                    
+                                <a href="?#" className="icon is-small" onMouseDown={this.handleCardClick(word)}>
                                     <FontAwesomeIcon  icon={faPlus} size="xs" color="#51cf66"/> 
                                 </a>
                                

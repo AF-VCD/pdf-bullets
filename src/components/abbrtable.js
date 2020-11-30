@@ -46,9 +46,8 @@ function GlobalFilter({
 
 // Define a default UI for filtering
 function DefaultColumnFilter({
-    column: { filterValue, preFilteredRows, setFilter },
+    column: { filterValue, setFilter },
 }) {
-    const count = preFilteredRows.length
 
     return (
         <input className="input"
@@ -108,7 +107,7 @@ const SelectCheckbox = ({
     const onChange = React.useCallback((e) => {
         updateDataAfterInput(row.index, id, e.target.checked);
         onSelChange(e);
-    },[onSelChange])
+    },[onSelChange, id, row.index, updateDataAfterInput])
     
     const mergedStyle = update(style, {'$merge': {display:"none"}})
     return (
@@ -331,12 +330,12 @@ const Row = ({ row, index, rowOps }) => {
                 return <td {...cell.getCellProps()}>{cell.render('Cell')}</td>
             })}
             <td>
-                <a className="icon is-large" onClick={() => rowOps.appendRow(index)}>
+                <span className="icon is-large" onClick={() => rowOps.appendRow(index)}>
                     <FontAwesomeIcon icon={faCopy} size="2x" />
-                </a>
-                <a className="icon is-large" onClick={() => rowOps.deleteRow(index)}>
+                </span>
+                <span className="icon is-large" onClick={() => rowOps.deleteRow(index)}>
                     <FontAwesomeIcon icon={faTrash} size="2x"/>
-                </a>
+                </span>
             </td>
         </tr>
     )

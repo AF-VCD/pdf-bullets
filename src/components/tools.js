@@ -81,7 +81,7 @@ class ImportTools extends React.PureComponent {
     render() {
         const menuState = this.state.hovering ? "is-active" : "";
         return (
-            <div className={"dropdown" + ' ' + menuState}>
+            <div className={"dropdown " + menuState}>
                 <input type="file" onChange={this.importFile} style={{ display: "none" }} ref={this.fileInputRef}></input>
                 <div className="dropdown-trigger">
                     <div className="buttons has-addons">
@@ -96,8 +96,8 @@ class ImportTools extends React.PureComponent {
                 </div>
                 <div className="dropdown-menu" id="import-menu" role="menu" onMouseLeave={this.hoverOut}>
                     <div className="dropdown-content">
-                        <a className="dropdown-item" onClick={this.inputClick('PDF')}>PDF</a>
-                        <a className="dropdown-item" onClick={this.inputClick('JSON')}>JSON</a>
+                        <a href="?#" className="dropdown-item" onClick={this.inputClick('PDF')}>PDF</a>
+                        <a href="?#" className="dropdown-item" onClick={this.inputClick('JSON')}>JSON</a>
                     </div>
                 </div>
             </div>
@@ -125,17 +125,17 @@ class OutputTools extends React.PureComponent {
                         <span className='icon is-right'>mm</span>
                     </div>
                     <div className="control buttons has-addons">
-                        <a className={"button is-primary" + ' ' + (this.props.width === widthAWD ? '' : 'is-outlined')}
+                        <a href="?#" className={"button is-primary "  + (this.props.width === widthAWD ? '' : 'is-outlined')}
                             onClick={this.props.onWidthUpdate(widthAWD)}>AWD</a>
-                        <a className={"button is-success" + ' ' + (this.props.width === widthEPR ? '' : 'is-outlined')}
+                        <a href="?#" className={"button is-success "  + (this.props.width === widthEPR ? '' : 'is-outlined')}
                             onClick={this.props.onWidthUpdate(widthEPR)}>EPR</a>
-                        <a className={"button is-link" + ' ' + (this.props.width === widthOPR ? '' : 'is-outlined')}
+                        <a href="?#" className={"button is-link " + (this.props.width === widthOPR ? '' : 'is-outlined')}
                             onClick={this.props.onWidthUpdate(widthOPR)}>OPR</a>
                     </div>
 
                 </div>
 
-                <a className={"control button is-dark" + (this.props.enableOptim ? '' : "is-outlined")}
+                <a href="?#" className={"control button is-dark" + (this.props.enableOptim ? '' : "is-outlined")}
                     onClick={this.props.onOptimChange} id="enableOptim">Auto-Space</a>
             </div>
         );
@@ -143,9 +143,6 @@ class OutputTools extends React.PureComponent {
 }
 // normalize spaces
 class InputTools extends React.PureComponent {
-    constructor(props) {
-        super(props);
-    }
 
     render() {
         return (
@@ -195,7 +192,7 @@ class SaveTools extends React.PureComponent {
     render() {
         const menuState = this.state.hovering ? "is-active" : "";
         return (
-            <div className={'dropdown' + ' ' + menuState}>
+            <div className={'dropdown ' + menuState}>
                 <div className="dropdown-trigger">
                     <div className="buttons has-addons">
                         <button className="button" onClick={this.onSave}>Save </button>
@@ -208,12 +205,12 @@ class SaveTools extends React.PureComponent {
                 </div>
                 <div className="dropdown-menu" id="save-menu" role="menu" onMouseLeave={this.hoverOut}>
                     <div className="dropdown-content">
-                        <a className="dropdown-item" onClick={this.onSave}>Cookie</a>
-                        <a className="dropdown-item" onClick={this.onExport}>JSON</a>
+                        <a href="?#" className="dropdown-item" onClick={this.onSave}>Cookie</a>
+                        <a href="?#" className="dropdown-item" onClick={this.onExport}>JSON</a>
                     </div>
                 </div>
 
-                <a style={{ display: "none" }} download='settings.json' ref={this.exportRef}></a>
+                <a href="?#" style={{ display: "none" }} download='settings.json' ref={this.exportRef}></a>
             </div>
         );
     }
@@ -233,7 +230,7 @@ class Logo extends React.PureComponent {
 class ThesaurusTools extends React.PureComponent {
     render() {
         return (
-            <a className="button" onClick={this.props.onHide} aria-haspopup="true" aria-controls="thesaurus-menu" >
+            <a href="?#" className="button" onClick={this.props.onHide} aria-haspopup="true" aria-controls="thesaurus-menu" >
                 <span>Thesaurus</span><span className="icon"  >
                     <FontAwesomeIcon icon={faAngleDown} />
                 </span>
@@ -242,9 +239,6 @@ class ThesaurusTools extends React.PureComponent {
     }
 }
 class DocumentTools extends React.PureComponent {
-    constructor(props) {
-        super(props);
-    }
     render() {
         return (
             <nav className="navbar" role="navigation" aria-label="main navigation">

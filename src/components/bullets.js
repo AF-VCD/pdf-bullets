@@ -172,7 +172,7 @@ function Bullet({ text, widthPx, ...props }) {
             setLoading(false);
         }
 
-    }, [rendering]);
+    }, [rendering, props.enableOptim, text, widthPx]);
 
     //color effect
     React.useEffect(() => {
@@ -183,7 +183,7 @@ function Bullet({ text, widthPx, ...props }) {
         } else {
             setColor("inherit");
         }
-    }, [loading, outputText])
+    }, [loading, outputText, optimStatus])
 
     // the style properties help lock the canvas in the same spot and make it essentially invisible.
     //whitespace: pre-wrap is essential as it allows javascript string line breaks to appear properly.
@@ -223,7 +223,7 @@ function optimize(sentence, evalFcn) {
 
     const initResults = evalFcn(sentence);
 
-    if (initResults.overflow == 0) {
+    if (initResults.overflow === 0) {
         return initResults;
     }
 
@@ -234,8 +234,19 @@ function optimize(sentence, evalFcn) {
 
     let finalOptimStatus = BULLET.NOT_OPT;
 
+    function hashCode (str) {
+        let hash = 0, i, chr;
+        if (str.length === 0) return hash;
+        for (i = 0; i < str.length; i++) {
+          chr = str.charCodeAt(i);
+          hash = ((hash << 5) - hash) + chr;
+          hash |= 0; // Convert to 32bit integer
+        }
+        return hash;
+      };
+
     function getRandomInt(seed, max) {
-        return Math.floor(Math.abs((Math.floor(9 * seed.hashCode() + 5) % 100000) / 100000) * Math.floor(max));
+        return Math.floor(Math.abs((Math.floor(9 * hashCode(seed) + 5) % 100000) / 100000) * Math.floor(max));
     }
 
 
@@ -301,7 +312,7 @@ function renderBulletText(text, context, width) {
 
         // Regex- split after one of the following: \s ? / | - % ! 
         // but ONLY if immediately followed by: [a-zA-z] [0-9] + \
-        const textSplit = text.split(/(?<=[\s\?\/\|\-\%\!])(?=[a-zA-Z0-9\+\\])/);
+        const textSplit = text.split(/(?<=[\s?/|\-%!])(?=[a-zA-Z0-9+\\])/);
 
         // check to make sure the first token is smaller than the desired width.
         //   This is usually true, unless the desired width is abnormally small, or the 
@@ -318,7 +329,7 @@ function renderBulletText(text, context, width) {
             }
             const recursedText = textSplit.slice(answerIdx, textSplit.length).join('');
 
-            if (recursedText == text) {
+            if (recursedText === text) {
                 console.warn("Can't fit \"" + text + "\" on a single line");
                 return {
                     text: [text],
@@ -362,7 +373,7 @@ function renderBulletText(text, context, width) {
                 }
             }
             const recursedText = text.substring(answerIdx, text.length);
-            if (recursedText == text) {
+            if (recursedText === text) {
                 console.warn("Could not even fit first character of \"" + text + "\" on a single line");
                 return {
                     text: [text],

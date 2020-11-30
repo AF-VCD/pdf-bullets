@@ -11,7 +11,7 @@ function BulletApp({ initialText, initialWidth, initialAbbrData }) {
 
     const [enableOptim, setEnableOptim] = React.useState(true);
     const [width, setWidth] = React.useState(initialWidth);
-    const [abbrData, setAbbrData] = React.useState(React.useMemo(() => initialAbbrData));
+    const [abbrData, setAbbrData] = React.useState(initialAbbrData);
 
     const [abbrDict, setAbbrDict] = React.useState({});
     
@@ -35,7 +35,7 @@ function BulletApp({ initialText, initialWidth, initialAbbrData }) {
 
     React.useEffect(() => {
         const newAbbrDict = {};
-        abbrData.map((row) => {
+        abbrData.forEach((row) => {
             let fullWord = String(row.value).replace(/\s/g, ' ');
             let abbr = row.abbr;
             let enabled = row.enabled;
@@ -56,7 +56,7 @@ function BulletApp({ initialText, initialWidth, initialAbbrData }) {
     const abbrReplacer = React.useCallback((sentence) => {
 
             const finalAbbrDict = {};
-            Object.keys(abbrDict).map(
+            Object.keys(abbrDict).forEach(
                 (word) => {
                     const abbrs = abbrDict[word]; //an array
                     //if there is at least one enabled abbreviation, take the lowest most element of it.
@@ -211,7 +211,7 @@ function BulletApp({ initialText, initialWidth, initialAbbrData }) {
                     />
                 </div>
 
-                <div className={'column is-full' + ' ' + (showThesaurus ? "" : "is-hidden")}>
+                <div className={'column is-full ' + (showThesaurus ? "" : "is-hidden")}>
                     <SynonymViewer word={selection} onSelReplace={handleSelReplace} abbrDict={abbrDict} abbrReplacer={abbrReplacer}
                         onHide={handleThesaurusHide} />
                 </div>
@@ -220,7 +220,7 @@ function BulletApp({ initialText, initialWidth, initialAbbrData }) {
                         <ul>
                             {tabs.map((tab, i) => {
                                 return (
-                                    <li key={i} className={currentTab === i ? "is-active" : ''} ><a onClick={handleTabChange(i)}>{tab}</a></li>
+                                    <li key={i} className={currentTab === i ? "is-active" : ''} ><a href="##" onClick={handleTabChange(i)}>{tab}</a></li>
                                 )
                             }
                             )}
