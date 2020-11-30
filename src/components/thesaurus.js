@@ -102,7 +102,7 @@ class SynonymList extends React.PureComponent {
                         const replacedWord = this.props.abbrReplacer(word);
                         const otherAbbrs = this.props.abbrDict[word];
                         return (
-                            <span className='tag ' >
+                            <span className='tag' key={i} >
                                 <Synonym word={word}
                                     abbr={replacedWord === word ? "" : replacedWord}
                                     otherAbbrs={otherAbbrs} />
