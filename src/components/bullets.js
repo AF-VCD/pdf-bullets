@@ -41,7 +41,7 @@ function BulletComparator({ editorState, setEditorState, width, ...props }) {
     // Editor callback that runs whenever edits or selection changes occur.
     const onChange = (newEditorState) => {
 
-        const textChanged = editorState.getCurrentContent() !== newEditorState.getCurrentContent();
+        
 
         //const content = editorState.getCurrentContent();
         // ordered map has a key and a block associasted with it
@@ -53,7 +53,7 @@ function BulletComparator({ editorState, setEditorState, width, ...props }) {
         */
         const { selectedText } = getSelectionInfo(newEditorState)
         if (props.onSelect && selectedText !== '') props.onSelect(selectedText);
-        if (props.onTextChange && textChanged) props.handleTextChange(newEditorState.getCurrentContent().getPlainText('\n'))
+        
         setEditorState(newEditorState);
     }
 
@@ -199,10 +199,11 @@ function Bullet({ text, widthPx, ...props }) {
                 }} />
             <div style={{
                 minHeight: props.height,
-                whiteSpace: 'pre-wrap',
                 color: color,
             }} onMouseUp={props.onHighlight} >
-                {outputText == '' ? ' ' : outputText}
+                {outputText == '' ? ' ' : outputText.split('\n').map((line)=>{
+                    return <span style={{width:'100%', display:"inline-block"}}>{line}</span>;
+                })}
             </div>
         </>
     );

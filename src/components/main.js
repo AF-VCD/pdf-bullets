@@ -1,6 +1,6 @@
 import React from "react"
 import { BULLET, BulletComparator } from "./bullets.js"
-import { Logo, DocumentTools, getSelectionInfo } from "./tools.js"
+import { Logo, DocumentTools, getSelectionInfo, findWithRegex} from "./tools.js"
 import AbbrsViewer from "./abbrs.js"
 import SynonymViewer from "./thesaurus.js"
 // booleans for debugging
@@ -10,7 +10,6 @@ import { EditorState, ContentState, Modifier, SelectionState } from "draft-js"
 function BulletApp({ initialText, initialWidth, initialAbbrData }) {
 
     const [enableOptim, setEnableOptim] = React.useState(true);
-    const [text, setText] = React.useState(initialText);
     const [width, setWidth] = React.useState(initialWidth);
     const [abbrData, setAbbrData] = React.useState(React.useMemo(() => initialAbbrData));
 
@@ -19,16 +18,14 @@ function BulletApp({ initialText, initialWidth, initialAbbrData }) {
     const [selection, setSelection] = React.useState('');
     const [currentTab, setCurrentTab] = React.useState(0);
     const [showThesaurus, setShowThesaurus] = React.useState(false);
-    const [editorState, setEditorState] = React.useState(() => {
-        return EditorState.createWithContent(ContentState.createFromText(initialText))
-    });
+    const [editorState, setEditorState] = React.useState(
+        EditorState.createWithContent(ContentState.createFromText(initialText)));
 
     function handleJSONImport(settings) {
-        setText(settings.text)
+        setEditorState(EditorState.createWithContent(ContentState.createFromText(settings.text)))
         setEnableOptim(settings.enableOptim);
         setWidth(settings.width);
         setAbbrData(settings.abbrData);
-
     }
 
     React.useEffect(() => {
@@ -107,22 +104,34 @@ function BulletApp({ initialText, initialWidth, initialAbbrData }) {
         }
 
     }
-    function handleTextChange(text) {
-        setText(text);
-    }
+
     function handleWidthChange(e) {
         setWidth(parseFloat(e.target.value))
     }
     function handleTextNorm() {
-        setText(
-            text.split('\n')
-                .map((line) => line.replace(/\s+/g, ' '))
-                .join('\n')
-        );
+        
+        const selectionsToReplace = [];
+        const contentState = editorState.getCurrentContent();
+        contentState.getBlockMap().forEach((block, key)=>{
+            findWithRegex(/\s+/g, block, (anchorOffset, focusOffset) =>{
+                const selection = SelectionState.createEmpty(key).merge({anchorOffset, focusOffset});
+                selectionsToReplace.push(selection);
+            });
+        });
+        
+        let newContentState = contentState;
+        // need to reverse the selections list, because otherwise as the newContentState is iteratively changed, 
+        //  subsequent selections will get shifted and get all jacked up. This problem can be avoided by going backwards.
+        selectionsToReplace.reverse().forEach(selection => {
+            newContentState = Modifier.replaceText(newContentState, selection, ' ');
+        });
+
+        setEditorState(EditorState.createWithContent(newContentState));
+
 
     }
     function handleTextUpdate(newText) {
-        return () => setText(newText);
+        return () => setEditorState(EditorState.createWithContent(ContentState.createFromText(newText)));
     }
     function handleWidthUpdate(newWidth) {
         return () => setWidth(newWidth);
@@ -131,11 +140,9 @@ function BulletApp({ initialText, initialWidth, initialAbbrData }) {
 
         return {
             width: width,
-            text: text,
-            //TODO
-            abbrData: [],
+            text: editorState.getCurrentContent().getPlainText('\n'),
+            abbrData: abbrData,
             enableOptim: enableOptim,
-            //do I need to add abbrReplacer?
         }
     }
     function handleTabChange(newTab) {
@@ -168,10 +175,10 @@ function BulletApp({ initialText, initialWidth, initialAbbrData }) {
 
     const tabs = ['Bullets', 'Abbreviations'];
     const tabContents = [
-    <BulletComparator text={text}
+    <BulletComparator 
         editorState={editorState}
         setEditorState={setEditorState}
-        abbrReplacer={abbrReplacer} handleTextChange={handleTextChange}
+        abbrReplacer={abbrReplacer} 
         width={width}
         onSelect={handleSelect} enableOptim={enableOptim} />,
     <AbbrsViewer
