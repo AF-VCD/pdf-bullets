@@ -220,7 +220,7 @@ function BulletApp({ initialText, initialWidth, initialAbbrData }) {
                         <ul>
                             {tabs.map((tab, i) => {
                                 return (
-                                    <li key={i} className={currentTab === i ? "is-active" : ''} ><a href="##" onClick={handleTabChange(i)}>{tab}</a></li>
+                                    <li key={i} className={currentTab === i ? "is-active" : ''} ><a  onClick={handleTabChange(i)}>{tab}</a></li>
                                 )
                             }
                             )}

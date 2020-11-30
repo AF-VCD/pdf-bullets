@@ -125,17 +125,17 @@ class OutputTools extends React.PureComponent {
                         <span className='icon is-right'>mm</span>
                     </div>
                     <div className="control buttons has-addons">
-                        <a href="?#" className={"button is-primary "  + (this.props.width === widthAWD ? '' : 'is-outlined')}
+                        <a  className={"button is-primary "  + (this.props.width === widthAWD ? '' : 'is-outlined')}
                             onClick={this.props.onWidthUpdate(widthAWD)}>AWD</a>
-                        <a href="?#" className={"button is-success "  + (this.props.width === widthEPR ? '' : 'is-outlined')}
+                        <a className={"button is-success "  + (this.props.width === widthEPR ? '' : 'is-outlined')}
                             onClick={this.props.onWidthUpdate(widthEPR)}>EPR</a>
-                        <a href="?#" className={"button is-link " + (this.props.width === widthOPR ? '' : 'is-outlined')}
+                        <a  className={"button is-link " + (this.props.width === widthOPR ? '' : 'is-outlined')}
                             onClick={this.props.onWidthUpdate(widthOPR)}>OPR</a>
                     </div>
 
                 </div>
 
-                <a href="?#" className={"control button is-dark" + (this.props.enableOptim ? '' : "is-outlined")}
+                <a  className={"control button is-dark" + (this.props.enableOptim ? '' : "is-outlined")}
                     onClick={this.props.onOptimChange} id="enableOptim">Auto-Space</a>
             </div>
         );
@@ -230,7 +230,7 @@ class Logo extends React.PureComponent {
 class ThesaurusTools extends React.PureComponent {
     render() {
         return (
-            <a href="?#" className="button" onClick={this.props.onHide} aria-haspopup="true" aria-controls="thesaurus-menu" >
+            <a  className="button" onClick={this.props.onHide} aria-haspopup="true" aria-controls="thesaurus-menu" >
                 <span>Thesaurus</span><span className="icon"  >
                     <FontAwesomeIcon icon={faAngleDown} />
                 </span>
