@@ -95,12 +95,12 @@ function BulletComparator({ editorState, setEditorState, width, ...props }) {
                 width: width + 'mm',
             }}>
                 <h2 className='subtitle'>Input Bullets Here:</h2>
-                <div className="border" style={{ maxWidth: width * 1.01 + 'mm' }}>
+                <div className="border" style={{ maxWidth: width + 'mm' }}>
                     <Editor 
                         editorState={editorState} onChange={onChange} handleKeyCommand={handleKeyCommand} />
                 </div>
             </div>
-            <div className="column"  style={{ width: width + 'mm' }}>
+            <div className="column" >
                 <h2 className='subtitle'>View Output Here:</h2>
                 <div className="border" id={bulletOutputID} style={{ width: width * 1.01 + 'mm' }}
                     onMouseUp={onBulletSelect} onKeyDown={selectOutput} tabIndex="0">
@@ -200,9 +200,10 @@ function Bullet({ text, widthPx, ...props }) {
             <div style={{
                 minHeight: props.height,
                 color: color,
+                display:'table',
             }} onMouseUp={props.onHighlight} >
                 {outputText == '' ? ' ' : outputText.split('\n').map((line)=>{
-                    return <span style={{width:'100%', display:"inline-block"}}>{line}</span>;
+                    return <span style={{whiteSpace:"pre"}}>{line}</span>;
                 })}
             </div>
         </>
