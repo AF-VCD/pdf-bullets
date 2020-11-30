@@ -6,10 +6,7 @@ import { faPlus } from "@fortawesome/free-solid-svg-icons"
 const handleCardClick = (word, This) => {
     return (e) => {
         e.preventDefault();
-        if (document.activeElement === window.getSelection().anchorNode.firstChild) {
-            const ta = document.activeElement;
-            This.props.onSelReplace(ta.selectionStart, ta.selectionEnd, word);
-        }
+        This.props.onSelReplace(word);
     }
 }
 
