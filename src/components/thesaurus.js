@@ -3,6 +3,15 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPlus } from "@fortawesome/free-solid-svg-icons"
 
 
+const handleCardClick = (word, This) => {
+    return (e) => {
+        e.preventDefault();
+        if (document.activeElement === window.getSelection().anchorNode.firstChild) {
+            const ta = document.activeElement;
+            This.props.onSelReplace(ta.selectionStart, ta.selectionEnd, word);
+        }
+    }
+}
 
 class SynonymViewer extends React.PureComponent {
     constructor(props) {
@@ -63,14 +72,17 @@ class SynonymViewer extends React.PureComponent {
         return (
             <div className="card">
                 <header className="card-header has-background-light	is-shadowless">
-                    <span className="card-header-title" >
+                    <div className="card-header-title" >
                         <span style={{ marginRight: '5px' }}>Thesaurus{this.props.word === '' ? '' : ":"}</span>
                         {header}
-                    </span>
-                    <span className="card-header-icon" onClick={this.props.onHide}>
+                        <a className="icon is-small" onMouseDown={handleCardClick(this.props.word, this)}>
+                            <FontAwesomeIcon icon={faPlus} size="xs" color="#51cf66" />
+                        </a>
+                    </div>
+                    <a className="card-header-icon" onClick={this.props.onHide}>
                         <span className="delete">
                         </span>
-                    </span>
+                    </a>
                 </header>
                 <div className="card-content" style={{ height: "290px", overflow: "auto" }} >
 
@@ -106,7 +118,7 @@ class SynonymList extends React.PureComponent {
                                 <Synonym word={word}
                                     abbr={replacedWord === word ? "" : replacedWord}
                                     otherAbbrs={otherAbbrs} />
-                                <a className="icon" onMouseDown={this.handleCardClick(word)}>
+                                <a className="icon" onMouseDown={handleCardClick(word, this)}>
                                     <FontAwesomeIcon icon={faPlus} size="xs" color="#51cf66" />
                                 </a>
                             </span>
