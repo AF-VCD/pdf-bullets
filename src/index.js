@@ -97,7 +97,7 @@ ReactDOM.render(
           an <a href='https://github.com/AF-VCD/pdf-bullets/issues'>issue</a>
           or a <a href="https://github.com/AF-VCD/pdf-bullets/pulls">pull request</a>
       </div>
-      <div>This site utilizes PDF.JS (pdf import), HandsOnTable (spreadsheet), the DataMuse API (thesaurus), and Bulma (CSS).</div>
+      <div>This site utilizes PDF.JS (pdf import), react-table (spreadsheet), draft-js (editor), the DataMuse API (thesaurus), and Bulma (CSS).</div>
       <div>This site has basic analytics to track the total number of visits to the page. See <a href="https://github.com/ckhordiasma/log-bullet-visitors">here</a> for details</div>
       <div>Maintained by Christopher Kodama </div>
     </div>
