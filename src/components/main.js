@@ -21,11 +21,16 @@ function BulletApp({ initialText, initialWidth, initialAbbrData }) {
     const [editorState, setEditorState] = React.useState(
         EditorState.createWithContent(ContentState.createFromText(initialText)));
 
-    function handleJSONImport(settings) {
-        setEditorState(EditorState.createWithContent(ContentState.createFromText(settings.text)))
+    function handleJSONImport(settingsArray) {
+        const settings = settingsArray[0]; //preparing for possible eventual several tabs of stuff
         setEnableOptim(settings.enableOptim);
         setWidth(settings.width);
         setAbbrData(settings.abbrData);
+
+        setEditorState(
+            settings.editorState? EditorState.fromJS(settings.editorState) : 
+            EditorState.createWithContent(ContentState.createFromText(settings.text))
+        );
     }
 
     React.useEffect(() => {
@@ -141,6 +146,7 @@ function BulletApp({ initialText, initialWidth, initialAbbrData }) {
         return {
             width: width,
             text: editorState.getCurrentContent().getPlainText('\n'),
+            editorState: editorState.toJS(),
             abbrData: abbrData,
             enableOptim: enableOptim,
         }

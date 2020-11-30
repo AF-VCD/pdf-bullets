@@ -70,7 +70,7 @@ class ImportTools extends React.PureComponent{
             
             const data = JSON.parse(e.target.result);
             
-            this.props.onJSONImport(BulletApp.ParseSettings(data));
+            this.props.onJSONImport(data);
         };
         reader.readAsText(file)
     }
