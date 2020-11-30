@@ -71,11 +71,12 @@ const initialText = settings?.text?? '- This is a custom built bullet writing to
 ;
 const initialWidth = settings?.width??  202.321;
 const initialAbbrData = settings?.abbrData ?? tableData;
+const initialEditorState = settings?.editorState ?? undefined;
 
 ReactDOM.render(
   <>
     <div className="section" id="stuff" >
-      <BulletApp initialAbbrData={initialAbbrData} initialText={initialText} initialWidth={initialWidth} />
+      <BulletApp initialAbbrData={initialAbbrData} initialText={initialText} initialWidth={initialWidth} initialEditorState={initialEditorState}/>
     </div>
     <div className="container" id="footer">
       <div>If you have feedback, submit

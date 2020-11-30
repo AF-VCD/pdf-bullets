@@ -7,7 +7,7 @@ import SynonymViewer from "./thesaurus.js"
 import { EditorState, ContentState, Modifier, SelectionState } from "draft-js"
 
 // Note that all width measurements in this file are in millimeters.
-function BulletApp({ initialText, initialWidth, initialAbbrData }) {
+function BulletApp({ initialText, initialWidth, initialAbbrData, initialEditorState}) {
 
     const [enableOptim, setEnableOptim] = React.useState(true);
     const [width, setWidth] = React.useState(initialWidth);
@@ -19,7 +19,7 @@ function BulletApp({ initialText, initialWidth, initialAbbrData }) {
     const [currentTab, setCurrentTab] = React.useState(0);
     const [showThesaurus, setShowThesaurus] = React.useState(false);
     const [editorState, setEditorState] = React.useState(
-        EditorState.createWithContent(ContentState.createFromText(initialText)));
+        initialEditorState? EditorState.fromJS(initialEditorState) : EditorState.createWithContent(ContentState.createFromText(initialText)));
 
     function handleJSONImport(settingsArray) {
         const settings = settingsArray[0]; //preparing for possible eventual several tabs of stuff
