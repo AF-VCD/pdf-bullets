@@ -179,7 +179,7 @@ class SaveTools extends React.PureComponent {
         const dataURI = 'data:application/JSON;charset=utf-8,' + encodeURIComponent(storedData);
         this.exportRef.current.href = dataURI;
         this.exportRef.current.click();
-        console.log("exported settings/data to local storage with character length " + storedData.length);
+        console.log("exported settings/data to JSON file with character length " + storedData.length);
 
     }
     hoverOut = () => {
