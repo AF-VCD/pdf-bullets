@@ -42,7 +42,7 @@ let settings;
 try {
 
   if (localStorage.getItem('bullet-settings')) {
-    settings = JSON.parse(localStorage.getItem("bullet-settings"));
+    settings = JSON.parse(localStorage.getItem("bullet-settings"))[0];
 
 
   }
@@ -65,18 +65,12 @@ WebFont.load({
 
 // <BulletApp savedSettings={settings} tableSettings={tableSettings} abbrData={tableData} initialText={initialText} initialWidth={"202.321mm"} />
 
-const initialText = settings && settings.text? settings.text : '- This is a custom built bullet writing tool; abbreviations will be replaced according to table in the abbreviations tab--you will see output on the right\n\
+const initialText = settings?.text?? '- This is a custom built bullet writing tool; abbreviations will be replaced according to table in the abbreviations tab--you will see output on the right\n\
 - This tool can optimize spacing; output will be red if the optimizer could not fix spacing with 2004 or 2006 Unicode spaces\n\
 - Click the thesaurus button to show one; select a word in this or the output box to view synonyms--words in parentheses are abbreviations that are configured';
 ;
-const initialWidth = settings && settings.width? settings.width : 202.321;
-const initialAbbrData = settings && settings.abbrData ? settings.abbrData.map((row) => {
-  return {
-      enabled: row[0],
-      value: row[1],
-      abbr: row[2],
-  }
-}) : tableData;
+const initialWidth = settings?.width??  202.321;
+const initialAbbrData = settings?.abbrData ?? tableData;
 
 ReactDOM.render(
   <>
