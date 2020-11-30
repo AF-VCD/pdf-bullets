@@ -57,26 +57,37 @@ try {
 
 
 WebFont.load({
-    custom: {
-        families: ['AdobeTimes']
-    }
+  custom: {
+    families: ['AdobeTimes']
+  }
 });
 
 
 // <BulletApp savedSettings={settings} tableSettings={tableSettings} abbrData={tableData} initialText={initialText} initialWidth={"202.321mm"} />
 
-const initialText = settings?.text?? '- This is a custom built bullet writing tool; abbreviations will be replaced according to table in the abbreviations tab--you will see output on the right\n\
+const initialText = settings?.text ?? '- This is a custom built bullet writing tool; abbreviations will be replaced according to table in the abbreviations tab--you will see output on the right\n\
 - This tool can optimize spacing; output will be red if the optimizer could not fix spacing with 2004 or 2006 Unicode spaces\n\
 - Click the thesaurus button to show one; select a word in this or the output box to view synonyms--words in parentheses are abbreviations that are configured';
 ;
-const initialWidth = settings?.width??  202.321;
-const initialAbbrData = settings?.abbrData ?? tableData;
+const initialWidth = settings?.width ?? 202.321;
+let initialAbbrData = settings?.abbrData ?? tableData;
 const initialEditorState = settings?.editorState ?? undefined;
+
+// for backwards compatibility 
+if (Array.isArray(initialAbbrData[0])){
+  initialAbbrData = initialAbbrData.map((row) => {
+    return {
+      enabled: row[0],
+      value: row[1],
+      abbr: row[2],
+    };
+  })
+}
 
 ReactDOM.render(
   <>
     <div className="section" id="stuff" >
-      <BulletApp initialAbbrData={initialAbbrData} initialText={initialText} initialWidth={initialWidth} initialEditorState={initialEditorState}/>
+      <BulletApp initialAbbrData={initialAbbrData} initialText={initialText} initialWidth={initialWidth} initialEditorState={initialEditorState} />
     </div>
     <div className="container" id="footer">
       <div>If you have feedback, submit
@@ -88,7 +99,7 @@ ReactDOM.render(
       <div>Maintained by Christopher Kodama </div>
     </div>
   </>
-, document.getElementById('root'));
+  , document.getElementById('root'));
 
 incrementVisitors();
 
@@ -100,21 +111,21 @@ serviceWorker.register();
 function incrementVisitors() {
   // code for incrementing visitor count    
   const xh = new XMLHttpRequest();
-  xh.onreadystatechange = () => {  
-    if(xh.readyState === XMLHttpRequest.DONE) {
+  xh.onreadystatechange = () => {
+    if (xh.readyState === XMLHttpRequest.DONE) {
       var status = xh.status;
 
       // Not sure what status codes are acceptable.. using MDN successful responses and redirects range as a guide
       if ((status >= 200 && status < 400)) {
-          // The request has been completed successfully
-          const count = JSON.parse(xh.response).Count;
-          console.log("The bullets site(s) have been visited " + count + " times.");
+        // The request has been completed successfully
+        const count = JSON.parse(xh.response).Count;
+        console.log("The bullets site(s) have been visited " + count + " times.");
 
       } else {
         console.log("Visitor count increment: task failed successfully");
       }
     }
   }
-  xh.open("POST", "https://g5z50elklh.execute-api.us-east-2.amazonaws.com/default/LogVisitors",true); 
+  xh.open("POST", "https://g5z50elklh.execute-api.us-east-2.amazonaws.com/default/LogVisitors", true);
   xh.send();
 }
