@@ -1,7 +1,6 @@
 import React from "react"
-import { Editor, EditorState, RichUtils, ContentState, Modifier } from "draft-js"
+import { Editor,  RichUtils } from "draft-js"
 import "draft-js/dist/Draft.css";
-import { toSetSeq } from "draft-js/lib/DefaultDraftBlockRenderMap";
 import { getSelectionInfo } from './tools.js'
 const DPI = 96;
 const MM_PER_IN = 25.4;

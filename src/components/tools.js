@@ -1,5 +1,4 @@
 import React from "react"
-import BulletApp from "./main.js"
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faAngleDown } from "@fortawesome/free-solid-svg-icons"
 
