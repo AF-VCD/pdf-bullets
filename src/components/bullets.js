@@ -129,7 +129,7 @@ function BulletComparator({ editorState, setEditorState, width, ...props }) {
 
 function Bullet({ text, widthPx, ...props }) {
     const canvasRef = React.useRef(null);
-    const [outputText, setOutputText] = React.useState(' ');
+    const [outputText, setOutputText] = React.useState([' ']);
 
     const [color, setColor] = React.useState('inherit');
     const [loading, setLoading] = React.useState(false);
@@ -139,7 +139,8 @@ function Bullet({ text, widthPx, ...props }) {
     const getContext = (canvas) => {
         //now we can draw in 2d here.
         const context = canvas.getContext('2d');
-        context.font = '12pt AdobeTimes';
+        context.font = '12pt Times New Roman';
+        context.textAlign = 'left';
         return context;
     }
 
@@ -162,11 +163,11 @@ function Bullet({ text, widthPx, ...props }) {
         setOutputText(rendering.text);
         if (props.enableOptim) {
             const optimizer = (txt) => renderBulletText(txt, getContext(canvasRef.current), widthPx);
-            const optimResults = optimize(rendering.text, optimizer);
+            const optimResults = optimize(text, optimizer);
             setLoading(false);
             setOptimStatus(optimResults.status);
             setOutputText(optimResults.rendering.text);
-
+            
         } else {
             setOutputText(rendering.text);
             setLoading(false);
@@ -200,10 +201,11 @@ function Bullet({ text, widthPx, ...props }) {
             <div style={{
                 minHeight: props.height,
                 color: color,
-                display:'table',
+                display:'flex',
+                flexDirection:'column',
             }} onMouseUp={props.onHighlight} >
-                {outputText == '' ? ' ' : outputText.split('\n').map((line)=>{
-                    return <span style={{whiteSpace:"pre"}}>{line}</span>;
+                {outputText.map((line)=>{
+                    return <span key={line} style={{whiteSpace:"pre"}}>{line}</span>;
                 })}
             </div>
         </>
@@ -280,12 +282,16 @@ function optimize(sentence, evalFcn) {
 
 // all widths in this function are in pixels
 function renderBulletText(text, context, width) {
-
+    // this function expects a single line of text with no line breaks.
+    if(text.match('\n')){
+        console.error('renderBulletText expects a single line of text');
+    }
     const getWidth = (txt) => (context.measureText(txt)).width;
     const fullWidth = getWidth(text.trimEnd());
+
     if (fullWidth < width) {
         return {
-            text: text,
+            text: [text],
             fullWidth: fullWidth,
             lines: 1,
             overflow: fullWidth - width,
@@ -316,7 +322,7 @@ function renderBulletText(text, context, width) {
             if (recursedText == text) {
                 console.warn("Can't fit \"" + text + "\" on a single line");
                 return {
-                    text,
+                    text: [text],
                     fullWidth,
                     lines: 1,
                     overflow: fullWidth - width,
@@ -325,7 +331,7 @@ function renderBulletText(text, context, width) {
                 const recursedResult = renderBulletText(recursedText, context, width);
 
                 return {
-                    text: textSplit.slice(0, answerIdx).join('') + '\n' + recursedResult.text,
+                    text: [textSplit.slice(0, answerIdx).join(''), ...recursedResult.text],
                     fullWidth: fullWidth,
                     lines: 1 + recursedResult.lines,
                     overflow: fullWidth - width,
@@ -360,7 +366,7 @@ function renderBulletText(text, context, width) {
             if (recursedText == text) {
                 console.warn("Could not even fit first character of \"" + text + "\" on a single line");
                 return {
-                    text,
+                    text: [text],
                     fullWidth,
                     lines: 1,
                     overflow: fullWidth - width
@@ -369,7 +375,7 @@ function renderBulletText(text, context, width) {
                 const recursedResult = renderBulletText(recursedText, context, width);
 
                 return {
-                    text: text.substring(0, answerIdx) + '\n' + recursedResult.text,
+                    text: [text.substring(0, answerIdx), ...recursedResult.text],
                     fullWidth: fullWidth,
                     lines: 1 + recursedResult.lines,
                     overflow: fullWidth - width,
