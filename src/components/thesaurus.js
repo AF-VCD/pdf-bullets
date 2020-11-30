@@ -54,9 +54,16 @@ class SynonymViewer extends React.PureComponent {
     render() {
         const replacedWord = this.props.abbrReplacer(this.props.word);
         const otherAbbrs = this.props.abbrDict[this.props.word];
-        const header = <Synonym word={this.props.word} key={this.props.word}
-            abbr={replacedWord === this.props.word ? "" : replacedWord}
-            otherAbbrs={otherAbbrs} />
+        const header =
+            <span className="tag is-medium">
+                <Synonym word={this.props.word} key={this.props.word}
+                    abbr={replacedWord === this.props.word ? "" : replacedWord}
+                    otherAbbrs={otherAbbrs} />
+                <a className="icon is-small" onMouseDown={handleCardClick(this.props.word, this)}>
+                    <FontAwesomeIcon icon={faPlus} size="xs" color="#51cf66" />
+                </a>
+            </span>;
+
         const synonyms = <SynonymList onSelReplace={this.props.onSelReplace} key={this.state.synonyms.join('')} synonyms={this.state.synonyms} abbrDict={this.props.abbrDict} abbrReplacer={this.props.abbrReplacer} />;
         const explanation = <span className="panel-block" key='init'>Auto-thesaurus box - highlight a word or phrase below to show synonyms in this box</span>;
         const noResults = <span className="panel-block" key='none'>no results found</span>;
@@ -73,11 +80,8 @@ class SynonymViewer extends React.PureComponent {
             <div className="card">
                 <header className="card-header has-background-light	is-shadowless">
                     <div className="card-header-title" >
-                        <span style={{ marginRight: '5px' }}>Thesaurus{this.props.word === '' ? '' : ":"}</span>
-                        {header}
-                        <a className="icon is-small" onMouseDown={handleCardClick(this.props.word, this)}>
-                            <FontAwesomeIcon icon={faPlus} size="xs" color="#51cf66" />
-                        </a>
+                        <span >Thesaurus{this.props.word ? ':' : ""}</span>
+                        {this.props.word ? header : ''}
                     </div>
                     <a className="card-header-icon" onClick={this.props.onHide}>
                         <span className="delete">
