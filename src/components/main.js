@@ -24,7 +24,7 @@ function BulletApp({ initialText, initialWidth, initialAbbrData, initialEditorSt
     function handleJSONImport(settingsArray) {
         const settings = settingsArray[0]; //preparing for possible eventual several tabs of stuff
         setEnableOptim(settings.enableOptim);
-        setWidth(settings.width);
+        setWidth(parseFloat(settings.width));
         setAbbrData(settings.abbrData);
 
         setEditorState(
