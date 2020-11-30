@@ -69,9 +69,12 @@ const initialText = settings?.text ?? '- This is a custom built bullet writing t
 - This tool can optimize spacing; output will be red if the optimizer could not fix spacing with 2004 or 2006 Unicode spaces\n\
 - Click the thesaurus button to show one; select a word in this or the output box to view synonyms--words in parentheses are abbreviations that are configured';
 ;
-const initialWidth = settings?.width ?? 202.321;
+let initialWidth = settings?.width ?? 202.321;
 let initialAbbrData = settings?.abbrData ?? tableData;
 const initialEditorState = settings?.editorState ?? undefined;
+
+//for backwards compatibility
+initialWidth = parseFloat(initialWidth);
 
 // for backwards compatibility 
 if (Array.isArray(initialAbbrData[0])){
