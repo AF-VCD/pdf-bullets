@@ -57,7 +57,7 @@ function incrementVisitors() {
       if ((status >= 200 && status < 400)) {
         // The request has been completed successfully
         const count = JSON.parse(xh.response).Count;
-        console.log("The bullets site(s) have been visited " + count + " times.");
+        console.log("The bullets site(s) have been visited " + count + " times in the last 7 days.");
 
       } else {
         console.log("Visitor count increment: task failed successfully");
