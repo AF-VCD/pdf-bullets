@@ -3,7 +3,6 @@ import { mount} from 'cypress-react-unit-test'
 
 
 import {renderBulletText} from '../../src/components/bullets.js';
-import { flexRender } from 'react-table/dist/react-table.development';
 
 const DPI = 96;
 const MM_PER_IN = 25.4;
@@ -18,7 +17,6 @@ function RenderBulletTextTester(props){
         const canvas = canvasRef.current;
         const context = canvas.getContext('2d');
 
-        //TODO how does cypress know how to load the AdobeTimes font??
         context.font = '12pt Times New Roman'
         //context.fillText(props.text, 50,50);
         setResults(renderBulletText(props.text, context, props.width).text)
