@@ -91,10 +91,10 @@ function BulletComparator({ editorState, setEditorState, width, ...props }) {
     return (
         <div className="bullets columns is-multiline" >
             <div className="column" style={{
-                width: width + 'mm',
+                // width: width + 'mm',
             }}>
                 <h2 className='subtitle'>Input Bullets Here:</h2>
-                <div className="border" style={{ maxWidth: (width+1) + 'mm' }}>
+                <div className="border" style={{ width: (width+1) + 'mm'}}>
                     <Editor 
                         editorState={editorState} onChange={onChange} handleKeyCommand={handleKeyCommand} />
                 </div>
