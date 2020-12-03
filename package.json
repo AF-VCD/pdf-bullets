@@ -8,12 +8,8 @@
     "@fortawesome/free-regular-svg-icons": "^5.15.1",
     "@fortawesome/free-solid-svg-icons": "^5.15.1",
     "@fortawesome/react-fontawesome": "^0.1.13",
-    "@handsontable/react": "^4.0.0",
-    "@testing-library/jest-dom": "^4.2.4",
-    "@testing-library/user-event": "^7.1.2",
     "bulma": "^0.9.1",
     "draft-js": "^0.11.7",
-    "gh-pages": "^3.1.0",
     "handsontable": "^8.2.0",
     "immutability-helper": "^3.1.1",
     "node-sass": "^4.14.1",
@@ -28,8 +24,8 @@
   },
   "devDependencies": {
     "@testing-library/react": "^9.5.0",
-    "cypress": "^6.0.0",
-    "cypress-react-unit-test": "^4.17.1",
+    "@testing-library/jest-dom": "^4.2.4",
+    "@testing-library/user-event": "^7.1.2",
     "gh-pages": "^3.1.0"
   },
   "scripts": {

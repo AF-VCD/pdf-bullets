@@ -1,25 +1,26 @@
-import React from 'react'
-import { mount} from 'cypress-react-unit-test'
-
-
+import widthMap from  "./12pt-times.json"
 import {renderBulletText} from '../../src/components/bullets.js';
+import React from 'react';
+import { render, screen } from '@testing-library/react';
+// add custom jest matchers from jest-dom
+
 
 const DPI = 96;
 const MM_PER_IN = 25.4;
 const DPMM = DPI / MM_PER_IN;
 
+function getWidth(text){
+    return text.split('').reduce( (sum, char) => sum+widthMap[char.charCodeAt(0)] , 0 );
+}
 
 // This is like a pared down version of the Bullet function, specifically to test evaluator capabilities
 function RenderBulletTextTester(props){
     const canvasRef = React.useRef(null);
     const [results, setResults] = React.useState(['']);
     React.useEffect(() => {
-        const canvas = canvasRef.current;
-        const context = canvas.getContext('2d');
-
-        context.font = '12pt Times New Roman'
+        
         //context.fillText(props.text, 50,50);
-        setResults(renderBulletText(props.text, context, props.width).text)
+        setResults(renderBulletText(props.text, getWidth, props.width).text)
     }, [props.text]);
     // [] indicates that this happens once after the component mounts.
     // [props.text] indicates that this happens every time the text changes.
@@ -37,8 +38,8 @@ function RenderBulletTextTester(props){
     return (
         <>
             {canvas}
-            <div id={props.id} >
-                <pre>
+            <div  >
+                <pre data-testid={props.id}>
                     {results.join('\n')}
                 </pre>
             </div>
@@ -46,10 +47,6 @@ function RenderBulletTextTester(props){
     );
     //return canvas;
 }
-
-beforeEach(()=>{
-    cy.viewport(1920,1080);
-})
 
 describe('checking bullets', () => {
     it('evaluates various bullets properly', ()=>{
@@ -97,15 +94,15 @@ describe('checking bullets', () => {
             answer:"this bullet is really long and definitely should have multiple line breaks-- chicken duck air force cyber EW space force \nchair force computer error seven swords zelda mario turtle frog dinosaur zebra disaster asteroid aliens frog chicken  \nhello world after chicken birthday party computer error seven swords zelda mario turtle frog dinosaur zebra disaster \nasteroid aliens frog chicken"
         })
 
-        mount(
+        render(
             <>
                 {bullets.map((entry)=>{
-                    return < RenderBulletTextTester id={entry.id} text={entry.input} width={width} />
+                    return < RenderBulletTextTester key={entry.id} id={entry.id} text={entry.input} width={width} />
                 })}
             </>);
 
         for (let entry of bullets){
-            cy.get('#'+entry.id).should('contain',entry.answer);
+            expect(screen.getByTestId(entry.id)).toHaveTextContent(entry.answer, {normalizeWhitespace:false});
         }
         
     });
