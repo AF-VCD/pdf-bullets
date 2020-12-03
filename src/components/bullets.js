@@ -147,8 +147,9 @@ function Bullet({ text, widthPx, ...props }) {
     //   whenever the props text input is updated.
     React.useEffect(() => {
  
-        const context = getContext(canvasRef.current)
-        setBulletRendering(renderBulletText(text, context, widthPx));
+        const context = getContext(canvasRef.current);
+        const getWidth = (txt) => (context.measureText(txt)).width;
+        setBulletRendering(renderBulletText(text, getWidth, widthPx));
 
     }, [text, widthPx, props.enableOptim]);
     // [] indicates that this happens once after the component mounts.
@@ -304,12 +305,12 @@ function optimize(sentence, evalFcn) {
 }
 
 // all widths in this function are in pixels
-function renderBulletText(text, context, width) {
+function renderBulletText(text, getWidth, width) {
     // this function expects a single line of text with no line breaks.
     if(text.match('\n')){
         console.error('renderBulletText expects a single line of text');
     }
-    const getWidth = (txt) => (context.measureText(txt)).width;
+    
     const fullWidth = getWidth(text.trimEnd());
 
     if (fullWidth < width) {
@@ -351,7 +352,7 @@ function renderBulletText(text, context, width) {
                     overflow: fullWidth - width,
                 };
             } else {
-                const recursedResult = renderBulletText(recursedText, context, width);
+                const recursedResult = renderBulletText(recursedText, getWidth, width);
 
                 return {
                     text: [textSplit.slice(0, answerIdx).join(''), ...recursedResult.text],
@@ -395,7 +396,7 @@ function renderBulletText(text, context, width) {
                     overflow: fullWidth - width
                 };
             } else {
-                const recursedResult = renderBulletText(recursedText, context, width);
+                const recursedResult = renderBulletText(recursedText, getWidth, width);
 
                 return {
                     text: [text.substring(0, answerIdx), ...recursedResult.text],
