@@ -23,7 +23,9 @@ const BULLET = {
 }
 
 
-function BulletComparator({ editorState, setEditorState, width, ...props }) {
+function BulletComparator({ 
+    editorState, setEditorState, 
+    width, onSelect, abbrReplacer, enableOptim }) {
     
     const bulletOutputID = "bulletOutput";
     const [heightMap, setHeightMap] = React.useState(new Map());
@@ -51,7 +53,7 @@ function BulletComparator({ editorState, setEditorState, width, ...props }) {
         }
         */
         const { selectedText } = getSelectionInfo(newEditorState)
-        if (props.onSelect && selectedText !== '') props.onSelect(selectedText);
+        if (onSelect && selectedText !== '') onSelect(selectedText);
         
         setEditorState(newEditorState);
     }
@@ -60,7 +62,7 @@ function BulletComparator({ editorState, setEditorState, width, ...props }) {
     const onBulletSelect = (event) => {
         const selection = window.getSelection().toString();
         if (selection !== "") {
-            props.onSelect(selection)
+            onSelect(selection)
         }
     }
 
@@ -105,10 +107,10 @@ function BulletComparator({ editorState, setEditorState, width, ...props }) {
                     onMouseUp={onBulletSelect} onKeyDown={selectOutput} tabIndex="0">
                     {Array.from(editorState.getCurrentContent().getBlockMap(), ([key, block]) => {
                         let text = block.getText();
-                        if (props.abbrReplacer) text = props.abbrReplacer(text);
+                        if (abbrReplacer) text = abbrReplacer(text);
                         
                         return <Bullet key={key} text={text} widthPx={width * DPMM} height={heightMap.get(key)} 
-                            enableOptim={props.enableOptim} />
+                            enableOptim={enableOptim} />
                     })}
                 </div>
             </div>
@@ -126,7 +128,7 @@ function BulletComparator({ editorState, setEditorState, width, ...props }) {
 
 
 
-function Bullet({ text, widthPx, ...props }) {
+function Bullet({ text, widthPx, enableOptim, height, onHighlight }) {
     const canvasRef = React.useRef(null);
     const [outputText, setOutputText] = React.useState([' ']);
 
@@ -151,9 +153,9 @@ function Bullet({ text, widthPx, ...props }) {
         const getWidth = (txt) => (context.measureText(txt)).width;
         setBulletRendering(renderBulletText(text, getWidth, widthPx));
 
-    }, [text, widthPx, props.enableOptim]);
+    }, [text, widthPx, enableOptim]);
     // [] indicates that this happens once after the component mounts.
-    // [props.text] indicates that this happens every time the text changes from the user
+    // [text] indicates that this happens every time the text changes from the user (from props)
 
     // This effect happens after bullet rendering changes. It evaluates the rendered bullet and
     //  sees how it can be improved with modified spaces. 
@@ -161,7 +163,7 @@ function Bullet({ text, widthPx, ...props }) {
 
         setLoading(true);
         setOutputText(rendering.text);
-        if (props.enableOptim) {
+        if (enableOptim) {
             const optimizer = (txt) => renderBulletText(txt, getContext(canvasRef.current), widthPx);
             const optimResults = optimize(text, optimizer);
             setLoading(false);
@@ -173,7 +175,7 @@ function Bullet({ text, widthPx, ...props }) {
             setLoading(false);
         }
 
-    }, [rendering, props.enableOptim, text, widthPx]);
+    }, [rendering, enableOptim, text, widthPx]);
 
     //color effect
     React.useEffect(() => {
@@ -199,11 +201,11 @@ function Bullet({ text, widthPx, ...props }) {
                     left: "-1000px"
                 }} />
             <div style={{
-                minHeight: props.height,
+                minHeight: height,
                 color: color,
                 display:'flex',
                 flexDirection:'column',
-            }} onMouseUp={props.onHighlight} >
+            }} onMouseUp={onHighlight} >
                 {outputText.map((line)=>{
                     return <span key={line} style={{whiteSpace:"pre"}}>{line}</span>;
                 })}
