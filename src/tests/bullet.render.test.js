@@ -1,5 +1,5 @@
 import widthMap from  "./12pt-times.json"
-import {renderBulletText} from '../../src/components/bullets.js';
+import {renderBulletText} from '../components/tools.js';
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 // add custom jest matchers from jest-dom
@@ -19,8 +19,8 @@ function RenderBulletTextTester(props){
     const [results, setResults] = React.useState(['']);
     React.useEffect(() => {
         
-        //context.fillText(props.text, 50,50);
-        setResults(renderBulletText(props.text, getWidth, props.width).text)
+        //context.fillText(props.text, 50,50); 
+        setResults(renderBulletText(props.text, getWidth, props.width).textLines)
     }, [props.text]);
     // [] indicates that this happens once after the component mounts.
     // [props.text] indicates that this happens every time the text changes.

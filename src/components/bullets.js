@@ -1,7 +1,7 @@
 import React from "react"
 import { Editor,  RichUtils } from "draft-js"
 import "draft-js/dist/Draft.css";
-import { getSelectionInfo } from './tools.js'
+import { getSelectionInfo, renderBulletText } from './tools.js'
 const DPI = 96;
 const MM_PER_IN = 25.4;
 const DPMM = DPI / MM_PER_IN;
@@ -23,9 +23,7 @@ const BULLET = {
 }
 
 
-function BulletComparator({ 
-    editorState, setEditorState, 
-    width, onSelect, abbrReplacer, enableOptim }) {
+function BulletComparator({editorState, setEditorState, width, onSelect, abbrReplacer, enableOptim }) {
     
     const bulletOutputID = "bulletOutput";
     const [heightMap, setHeightMap] = React.useState(new Map());
@@ -127,31 +125,27 @@ function BulletComparator({
 
 
 
-
-function Bullet({ text, widthPx, enableOptim, height, onHighlight }) {
+function Bullet({ text="", widthPx=500, enableOptim=false, height, onHighlight }) {
     const canvasRef = React.useRef(null);
-    const [outputText, setOutputText] = React.useState([' ']);
+    const [outputTextLines, setOutputTextLines] = React.useState(() => [' ']);
 
     const [color, setColor] = React.useState('inherit');
     const [loading, setLoading] = React.useState(false);
     const [optimStatus, setOptimStatus] = React.useState(BULLET.NOT_OPT);
-    const [rendering, setBulletRendering] = React.useState({ text: '' });
+    const [rendering, setBulletRendering] = React.useState({ textLines: [''] });
 
-    const getContext = (canvas) => {
-        //now we can draw in 2d here.
+    function getTextWidth(txt, canvas){
         const context = canvas.getContext('2d');
         context.font = '12pt Times New Roman';
         context.textAlign = 'left';
-        return context;
-    }
+        return (context.measureText(txt).width);
+     }
 
     // This effect updates the text rendering (i.e. enforces width constraints by inserting newlines)
     //   whenever the props text input is updated.
     React.useEffect(() => {
- 
-        const context = getContext(canvasRef.current);
-        const getWidth = (txt) => (context.measureText(txt)).width;
-        setBulletRendering(renderBulletText(text, getWidth, widthPx));
+        
+        setBulletRendering(renderBulletText(text, (txt) => getTextWidth(txt,canvasRef.current), widthPx));
 
     }, [text, widthPx, enableOptim]);
     // [] indicates that this happens once after the component mounts.
@@ -162,16 +156,21 @@ function Bullet({ text, widthPx, enableOptim, height, onHighlight }) {
     React.useEffect(() => {
 
         setLoading(true);
-        setOutputText(rendering.text);
+        setOutputTextLines(rendering.textLines);
         if (enableOptim) {
-            const optimizer = (txt) => renderBulletText(txt, getContext(canvasRef.current), widthPx);
+            const optimizer = (txt) => renderBulletText(txt, (txt) => getTextWidth(txt, canvasRef.current), widthPx);
             const optimResults = optimize(text, optimizer);
             setLoading(false);
             setOptimStatus(optimResults.status);
-            setOutputText(optimResults.rendering.text);
+            setOutputTextLines(optimResults.rendering.textLines);
             
         } else {
-            setOutputText(rendering.text);
+            if(rendering.overflow < BULLET.MAX_UNDERFLOW || rendering.overflow > 0){
+                setOptimStatus(BULLET.FAILED_OPT);
+            }else{
+                setOptimStatus(BULLET.OPTIMIZED)
+            }
+            setOutputTextLines(rendering.textLines);
             setLoading(false);
         }
 
@@ -184,9 +183,9 @@ function Bullet({ text, widthPx, enableOptim, height, onHighlight }) {
         } else if (optimStatus === BULLET.FAILED_OPT) {
             setColor("red");
         } else {
-            setColor("inherit");
+            setColor("black");
         }
-    }, [loading, outputText, optimStatus])
+    }, [loading, outputTextLines, optimStatus])
 
     // the style properties help lock the canvas in the same spot and make it essentially invisible.
     //whitespace: pre-wrap is essential as it allows javascript string line breaks to appear properly.
@@ -206,7 +205,7 @@ function Bullet({ text, widthPx, enableOptim, height, onHighlight }) {
                 display:'flex',
                 flexDirection:'column',
             }} onMouseUp={onHighlight} >
-                {outputText.map((line)=>{
+                {outputTextLines.map((line)=>{
                     return <span key={line} style={{whiteSpace:"pre"}}>{line}</span>;
                 })}
             </div>
@@ -306,110 +305,5 @@ function optimize(sentence, evalFcn) {
     };
 }
 
-// all widths in this function are in pixels
-function renderBulletText(text, getWidth, width) {
-    // this function expects a single line of text with no line breaks.
-    if(text.match('\n')){
-        console.error('renderBulletText expects a single line of text');
-    }
-    
-    const fullWidth = getWidth(text.trimEnd());
 
-    if (fullWidth < width) {
-        return {
-            text: [text],
-            fullWidth: fullWidth,
-            lines: 1,
-            overflow: fullWidth - width,
-        };
-    } else {
-        // Scenario where the width of the text is wider than desired.
-        //  In this case, work needs to be done to figure out where the line breaks should be. 
-
-        // Regex- split after one of the following: \s ? / | - % ! 
-        // but ONLY if immediately followed by: [a-zA-z] [0-9] + \
-        const textSplit = text.split(/(?<=[\s?/|\-%!])(?=[a-zA-Z0-9+\\])/);
-
-        // check to make sure the first token is smaller than the desired width.
-        //   This is usually true, unless the desired width is abnormally small, or the 
-        //   input text is one really long word
-        if (getWidth(textSplit[0]) < width) {
-            let answerIdx = 0;
-            for (let i = 1; i <= textSplit.length; i++) {
-                const evalText = textSplit.slice(0, i).join('').trimEnd();
-                const evalWidth = getWidth(evalText);
-                if (evalWidth > width) {
-                    answerIdx = i - 1;
-                    break;
-                }
-            }
-            const recursedText = textSplit.slice(answerIdx, textSplit.length).join('');
-
-            if (recursedText === text) {
-                console.warn("Can't fit \"" + text + "\" on a single line");
-                return {
-                    text: [text],
-                    fullWidth,
-                    lines: 1,
-                    overflow: fullWidth - width,
-                };
-            } else {
-                const recursedResult = renderBulletText(recursedText, getWidth, width);
-
-                return {
-                    text: [textSplit.slice(0, answerIdx).join(''), ...recursedResult.text],
-                    fullWidth: fullWidth,
-                    lines: 1 + recursedResult.lines,
-                    overflow: fullWidth - width,
-                }
-            }
-
-        } else {
-
-            const avgCharWidth = fullWidth / (text.length);
-            const guessIndex = parseInt(width / avgCharWidth);
-            const firstGuessWidth = getWidth(text.substring(0, guessIndex))
-            let answerIdx = guessIndex;
-            if (firstGuessWidth > width) {
-                for (let i = guessIndex - 1; i > 0; i--) {
-                    const nextGuessWidth = getWidth(text.substring(0, i));
-                    if (nextGuessWidth < width) {
-                        answerIdx = i;
-                        break;
-                    }
-                }
-            } else if (firstGuessWidth < width) {
-                for (let i = guessIndex; i <= text.length; i++) {
-
-                    const nextGuessWidth = getWidth(text.substring(0, i));
-                    if (nextGuessWidth > width) {
-                        answerIdx = i - 1;
-                        break;
-                    }
-                }
-            }
-            const recursedText = text.substring(answerIdx, text.length);
-            if (recursedText === text) {
-                console.warn("Could not even fit first character of \"" + text + "\" on a single line");
-                return {
-                    text: [text],
-                    fullWidth,
-                    lines: 1,
-                    overflow: fullWidth - width
-                };
-            } else {
-                const recursedResult = renderBulletText(recursedText, getWidth, width);
-
-                return {
-                    text: [text.substring(0, answerIdx), ...recursedResult.text],
-                    fullWidth: fullWidth,
-                    lines: 1 + recursedResult.lines,
-                    overflow: fullWidth - width,
-                }
-            }
-        }
-    }
-}
-
-
-export { Bullet, BULLET, BulletComparator, renderBulletText };
+export { Bullet, BULLET, BulletComparator };
