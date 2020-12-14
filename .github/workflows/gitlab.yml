@@ -10,8 +10,7 @@ jobs:
       - name: prep and push mirror
         run: |
           USER=project_2367_bot
-          PASS=${{ secrets.GITLAB_PUSH_KEY }}
-          echo 'echo $PASS' > ./creds.sh
+          echo 'echo ${{ secrets.GITLAB_PUSH_KEY }}' > ./creds.sh
           chmod 770 ./creds.sh
           git config --global credential.helper cache
           git config --global credential.username ${USER}
