@@ -16,7 +16,7 @@ jobs:
           git config --global credential.username ${USER}
           git config --global core.askPass ./creds.sh
           git remote add mirror 'https://code.il2.dsop.io/chkodama/pdf-bullets.git'
-          git push mirror
+          git push --force mirror
           
           
           
