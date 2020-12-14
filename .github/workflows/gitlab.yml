@@ -6,17 +6,20 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      - name: configure parameters
+        run: |
+          BRANCH=master
+          GITLAB_REPO='https://code.il2.dsop.io/chkodama/pdf-bullets-kodama.git'
       - uses: actions/checkout@v2
         with: 
-          ref: master
+          ref: "$BRANCH"
           fetch-depth: 0
       - name: prep and push mirror
         run: |
-          USER=project_2367_bot
+          
           echo 'echo ${{ secrets.GITLAB_PUSH_KEY }}' > ./creds.sh
           chmod 770 ./creds.sh
           git config --global credential.helper cache
-          git config --global credential.username ${USER}
           git config --global core.askPass ./creds.sh
-          git remote add mirror 'https://code.il2.dsop.io/chkodama/pdf-bullets-kodama.git'
-          git push -u mirror master:github
+          git remote add mirror "$GITLAB_REPO"
+          git push -u mirror "$BRANCH":github
