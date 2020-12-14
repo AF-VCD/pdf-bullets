@@ -14,10 +14,9 @@ jobs:
       - uses: actions/checkout@v2
         with: 
           ref: "${{ env.BRANCH }}"
-          fetch-depth: 1
+          fetch-depth: 0
       - name: prep and push mirror
         run: |
-          git pull origin "${{ env.BRANCH }}"
           echo 'echo ${{ env.GITLAB_KEY }}' > ./creds.sh
           chmod 770 ./creds.sh
           git config --global credential.helper cache
