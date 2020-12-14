@@ -17,10 +17,10 @@ jobs:
           fetch-depth: 1
       - name: prep and push mirror
         run: |
-          git pull
           echo 'echo ${{ env.GITLAB_KEY }}' > ./creds.sh
           chmod 770 ./creds.sh
           git config --global credential.helper cache
           git config --global core.askPass ./creds.sh
           git remote add mirror "${{ env.GITLAB_REPO }}"
+          git pull mirror "${{ env.DEST_BRANCH }}"
           git push -u mirror "${{ env.BRANCH }}":"${{ env.DEST_BRANCH }}"
