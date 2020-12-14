@@ -1,4 +1,4 @@
-name: Mirror and run GitLab CI
+name: Push to GitLab CI
 
 on: [push]
 
@@ -6,13 +6,9 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v1
-    - name: Mirror + trigger CI
-      uses: SvanBoxel/gitlab-mirror-and-ci-action@master
-      with:
-        args: "https://code.il2.dsop.io/chkodama/pdf-bullets"
-      env:
-        GITLAB_HOSTNAME: "code.il2.dsop.io"
-        GITLAB_USERNAME: "chkodama"
-        GITLAB_PASSWORD: ${{ secrets.GITLAB_PUSH_KEY }} 
-        GITLAB_PROJECT_ID: "2367"
+      - uses: actions/checkout@v1
+      - uses: spyoungtech/mirror-action@master
+        with:
+          REMOTE: 'https://code.il2.dsop.io/chkodama/pdf-bullets.git'
+          GIT_USERNAME: chkodama
+          GIT_PASSWORD: ${{ secrets.GITLAB_PUSH_KEY }}
