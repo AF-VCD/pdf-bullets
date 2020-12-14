@@ -4,15 +4,14 @@ on: [push]
 
 jobs:
   build:
+    env:
+      BRANCH: master
+      GITLAB_REPO: 'https://code.il2.dsop.io/chkodama/pdf-bullets-kodama.git'
     runs-on: ubuntu-latest
     steps:
-      - name: configure parameters
-        run: |
-          BRANCH=master
-          GITLAB_REPO='https://code.il2.dsop.io/chkodama/pdf-bullets-kodama.git'
       - uses: actions/checkout@v2
         with: 
-          ref: "$BRANCH"
+          ref: "${{ env.BRANCH }}"
           fetch-depth: 0
       - name: prep and push mirror
         run: |
@@ -21,5 +20,5 @@ jobs:
           chmod 770 ./creds.sh
           git config --global credential.helper cache
           git config --global core.askPass ./creds.sh
-          git remote add mirror "$GITLAB_REPO"
-          git push -u mirror "$BRANCH":github
+          git remote add mirror "${{ env.GITLAB_REPO }}"
+          git push -u mirror "${{ env.BRANCH }}":github
