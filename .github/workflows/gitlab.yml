@@ -12,3 +12,5 @@ jobs:
           REMOTE: 'https://code.il2.dsop.io/chkodama/pdf-bullets.git'
           GIT_USERNAME: project_2367_bot
           GIT_PASSWORD: ${{ secrets.GITLAB_PUSH_KEY }}
+          PUSH_ALL_REFS: false
+          GIT_PUSH_ARGS: ''
