@@ -18,8 +18,7 @@ jobs:
           git config --global user.email "ckhordiasma@gmail.com"
           git config --global user.name "$USER"
           git remote add mirror 'https://code.il2.dsop.io/chkodama/pdf-bullets.git'
-          git add .
-          git commit -m "porting to gitlab"
+          git checkout master
           git push mirror github
           
           
