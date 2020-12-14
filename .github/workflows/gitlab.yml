@@ -12,6 +12,7 @@ jobs:
           USER=project_2367_bot
           PASS=${{ secrets.GITLAB_PUSH_KEY }}
           echo 'echo $PASS' > ./creds.sh
+          chmod 770 ./creds.sh
           git config --global credential.helper cache
           git config --global credential.username ${USER}
           git config --global core.askPass ./creds.sh
