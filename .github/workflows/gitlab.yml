@@ -7,12 +7,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: spyoungtech/mirror-action@master
-        with:
-          REMOTE: 'https://code.il2.dsop.io/chkodama/pdf-bullets.git'
-          GIT_USERNAME: project_2367_bot
-          GIT_PASSWORD: ${{ secrets.GITLAB_PUSH_KEY }}
-          PUSH_ALL_REFS: "false"
+      - name: prep and push mirror
+        run: |
+          git config --global core.askPass ${{ secrets.GITLAB_PUSH_KEY }}
+          git config --global credential.helper cache
+          git config --global credential.username project_2367_bot
+          git remote add mirror 'https://code.il2.dsop.io/chkodama/pdf-bullets.git'
+          git push mirror
           
           
           
