@@ -10,9 +10,11 @@ jobs:
       - name: prep and push mirror
         run: |
           USER=project_2367_bot
-          git config user.password ${{ secrets.GITLAB_PUSH_KEY }}
-          git config user.name ${USER}
-          git remote add mirror 'https://${USER}@code.il2.dsop.io/chkodama/pdf-bullets.git'
+          PASS=${{ secrets.GITLAB_PUSH_KEY }}
+          git config --global credential.helper cache
+          git config --global credential.username ${USER}
+          git config --global credential.password ${PASS}
+          git remote add mirror 'https://code.il2.dsop.io/chkodama/pdf-bullets.git'
           git push mirror
           
           
