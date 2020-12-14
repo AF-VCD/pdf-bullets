@@ -6,7 +6,9 @@ jobs:
   build:
     env:
       BRANCH: master
+      DEST_BRANCH: github
       GITLAB_REPO: 'https://code.il2.dsop.io/chkodama/pdf-bullets-kodama.git'
+      GITLAB_KEY: ${{ secrets.GITLAB_PUSH_KEY }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -15,10 +17,9 @@ jobs:
           fetch-depth: 0
       - name: prep and push mirror
         run: |
-          
-          echo 'echo ${{ secrets.GITLAB_PUSH_KEY }}' > ./creds.sh
+          echo 'echo ${{ env.GITLAB_KEY }}' > ./creds.sh
           chmod 770 ./creds.sh
           git config --global credential.helper cache
           git config --global core.askPass ./creds.sh
           git remote add mirror "${{ env.GITLAB_REPO }}"
-          git push -u mirror "${{ env.BRANCH }}":github
+          git push -u mirror "${{ env.BRANCH }}":"${{ env.DEST_BRANCH }}"
