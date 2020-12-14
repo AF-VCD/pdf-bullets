@@ -17,6 +17,7 @@ jobs:
           fetch-depth: 1
       - name: prep and push mirror
         run: |
+          git pull
           echo 'echo ${{ env.GITLAB_KEY }}' > ./creds.sh
           chmod 770 ./creds.sh
           git config --global credential.helper cache
