@@ -7,6 +7,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+        with: 
+          ref: master
+          fetch-depth: 0
       - name: prep and push mirror
         run: |
           USER=project_2367_bot
@@ -15,10 +18,5 @@ jobs:
           git config --global credential.helper cache
           git config --global credential.username ${USER}
           git config --global core.askPass ./creds.sh
-          git remote add mirror 'https://code.il2.dsop.io/chkodama/pdf-bullets.git'
+          git remote add mirror 'https://code.il2.dsop.io/chkodama/pdf-bullets-kodama.git'
           git push -u mirror master:github
-          
-          
-          
-          
-          
