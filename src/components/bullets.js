@@ -40,8 +40,6 @@ function BulletComparator({editorState, setEditorState, width, onSelect, abbrRep
     // Editor callback that runs whenever edits or selection changes occur.
     const onChange = (newEditorState) => {
 
-        
-
         //const content = editorState.getCurrentContent();
         // ordered map has a key and a block associasted with it
         //const blockMap = content.getBlockMap();
@@ -251,8 +249,8 @@ function optimize(sentence, evalFcn) {
         return Math.floor(Math.abs((Math.floor(9 * hashCode(seed) + 5) % 100000) / 100000) * Math.floor(max));
     }
 
-    
-    const worstCaseResults = evalFcn(optWords.join(newSpace));
+    // like in the while loop, want to not replace the first space after the dash.
+    const worstCaseResults = evalFcn(optWords[0] + ' ' + optWords.slice(1).join(newSpace));
 
     if( (newSpace === smallerSpace && worstCaseResults.overflow > 0) || 
             (newSpace === largerSpace && worstCaseResults.overflow < BULLET.MAX_UNDERFLOW) ){
@@ -291,12 +289,8 @@ function optimize(sentence, evalFcn) {
             finalResults = newResults;
             finalOptimStatus = BULLET.OPTIMIZED;
             break;
-        } else if (optWords.length <= 2) { //this conditional needs to be last
-            //console.log("\tWarning: Can't replace any more spaces");
-            finalResults = newResults;
-            finalOptimStatus = BULLET.FAILED_OPT;
-            break;
         }
+        
         prevResults = newResults;
     }
     return {
