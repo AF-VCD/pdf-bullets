@@ -2,7 +2,7 @@
 import { Bullet } from '../../src/components/bullets.js';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { act } from "react-dom/test-utils";
+import { render, screen } from '@testing-library/react';
 
 const DPI = 96;
 const MM_PER_IN = 25.4;
@@ -21,7 +21,6 @@ jest.mock('../../src/components/tools.js', () => {
 })
 
 
-
 let container = null;
 beforeEach(() => {
     // setup a DOM element as a render target
@@ -38,27 +37,27 @@ afterEach(() => {
 //Bullet({ text, widthPx, enableOptim, height, onHighlight }) 
 
 it('renders without crashing', ()=>{
-    ReactDOM.render(<Bullet text={'test'} widthPx={500}/>, container)
+    render(<Bullet text={'test'} widthPx={500}/>, container)
 })
 
 it('renders without any arguments', () => {
-    ReactDOM.render(<Bullet />, container);
+    render(<Bullet />, container);
 })
 
 it('renders when the width is undefined ', ()=>{
-    ReactDOM.render(<Bullet text={"A little bit of text"}/>, container)
+    render(<Bullet text={"A little bit of text"}/>, container)
 })
 
 it("should render a short bullet all on one line", () => {
     const text = '- This is a short bullet that should fit on one line.';
     const widthPx = 202.321 * DPMM;
 
-    act(() => {
-        ReactDOM.render(
-            <Bullet text={text} widthPx={widthPx}  />
-            , container);
-    });
-    expect(container.querySelector('span').textContent).toEqual(text)
+    render(
+        <Bullet text={text} widthPx={widthPx}  />
+        , container);
+
+    
+    expect(screen.getByText(/\w+/).textContent).toEqual(text)
 });
 
 
@@ -66,64 +65,87 @@ it("should render a perfect sized bullet all on one line without optimiziation",
     const text = "- This line should render on exactly one line, assuming 60 DPI, 12 pt Times New Roman font and a 202.321 mm width";
     const widthPx = 202.321 * DPMM;
     const enableOptim = false;
-    act(() => {
-        ReactDOM.render(
-            <Bullet text={text} widthPx={widthPx} enableOptim={enableOptim}/>
-            , container);
-    });
-    expect(container.querySelector('span').textContent).toEqual(text)
+
+    render(
+        <Bullet text={text} widthPx={widthPx} enableOptim={enableOptim}/>
+        , container);
+
+    expect(screen.getByText(/\w+/).textContent).toEqual(text)
 });
 
 it("should render a perfect sized bullet all on one line without optimiziation, even with spaces at the end", () => {
     const text = "- This line should render on exactly one line, assuming 60 DPI, 12 pt Times New Roman font and a 202.321 mm width                                                 ";
     const widthPx = 202.321 * DPMM;
     const enableOptim = false;
-    act(() => {
-        ReactDOM.render(
-            <Bullet text={text} widthPx={widthPx} enableOptim={enableOptim}/>
-            , container);
-    });
-    expect(container.querySelector('span').textContent).toEqual(text)
+
+    render(
+        <Bullet text={text} widthPx={widthPx} enableOptim={enableOptim}/>
+        , container);
+
+    expect(screen.getByText(/\w+/).textContent).toEqual(text)
 });
 
-it("should render a perfect sized bullet all on one line without optimiziation, and it should be colored black", () => {
-    const text = "- This line should optimize to fit on exactly one line, using all 2004 or all 2006 Unicode spaces in place of the regular space";
+it("should render a slightly multiline bullet all on one line with optimiziation, and it should be colored black", () => {
+    const text = "- This line should optimize to fit on exactly one line, using 2006 Unicode spaces in place of the regular ones to compress";
     const widthPx = 202.321 * DPMM;
     const enableOptim = true;
-    act(() => {
-        ReactDOM.render(
-            <Bullet text={text} widthPx={widthPx} enableOptim={enableOptim}/>
-            , container);
-    });
+
+    render(
+        <Bullet text={text} widthPx={widthPx} enableOptim={enableOptim}/>
+        , container);
+
     
-    expect(container.querySelectorAll('span').length).toEqual(1);
-    expect(container.querySelector('div').style).toMatchObject({color:'black'})
+    expect(screen.getAllByText(/\w+/).length).toEqual(1)
+    screen.getAllByText(/\w+/).map((el)=>{
+        expect(el.parentElement.style).toMatchObject({color:'black'})
+    })
 });
 
 it("should appear as red if an optimized bullet is longer than one line", () => {
     const text = "- This bullet should be a little bit longer than a line, due to the fact that I am typing all of these words to fill up the space of the bullet.";
     const widthPx = 202.321 * DPMM;
     const enableOptim = true;
-    act(() => {
-        ReactDOM.render(
-            <Bullet text={text} widthPx={widthPx} enableOptim={enableOptim}/>
-            , container);
-    });
+
+    render(
+        <Bullet text={text} widthPx={widthPx} enableOptim={enableOptim}/>
+        , container);
+
     
-    expect(container.querySelectorAll('span').length).toEqual(2)
-    expect(container.querySelector('div').style).toMatchObject({color:'red'})
+    expect(screen.getAllByText(/\w+/).length).toEqual(2)
+    screen.getAllByText(/\w+/).map((el)=>{
+        expect(el.parentElement.style).toMatchObject({color:'red'})
+    })
+    
 });
 
 it("should appear as red if an un-optimized bullet is longer than one line", () => {
     const text = "- This bullet should be a little bit longer than a line, due to the fact that I am typing all of these words to fill up the space of the bullet.";
     const widthPx = 202.321 * DPMM;
     const enableOptim = false;
-    act(() => {
-        ReactDOM.render(
-            <Bullet text={text} widthPx={widthPx} enableOptim={enableOptim}/>
-            , container);
-    });
+
+    render(
+        <Bullet text={text} widthPx={widthPx} enableOptim={enableOptim}/>
+        , container);
+
     
-    expect(container.querySelectorAll('span').length).toEqual(2)
-    expect(container.querySelector('div').style).toMatchObject({color:'red'})
+    expect(screen.getAllByText(/\w+/).length).toEqual(2)
+    screen.getAllByText(/\w+/).map((el)=>{
+        expect(el.parentElement.style).toMatchObject({color:'red'})
+    })
+});
+
+it("should render a slightly shorter bullet expanded out to minimize whitespace optimiziation, and it should be colored black", () => {
+    const text = "- This line should optimize to fit on exactly one line, using 2004 Unicode spaces in place of regular spaces to fill space";
+    const widthPx = 202.321 * DPMM;
+    const enableOptim = true;
+
+    render(
+        <Bullet text={text} widthPx={widthPx} enableOptim={enableOptim}/>
+        , container);
+
+    
+    expect(screen.getAllByText(/\w+/).length).toEqual(1)
+    screen.getAllByText(/\w+/).map((el)=>{
+        expect(el.parentElement.style).toMatchObject({color:'black'})
+    })
 });
