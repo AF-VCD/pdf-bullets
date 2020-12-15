@@ -44,5 +44,5 @@ it('renders without crashing', ()=>{
     const editorState = EditorState.createWithContent(ContentState.createFromText('some text here'));
     const setEditorState = (newState)=>newState;
     ReactDOM.render(<BulletComparator editorState={editorState} setEditorState={setEditorState} 
-        widthPx={500}/>, container)
+        width={202.321}/>, container)
 })
