@@ -2,8 +2,10 @@
   "name": "pdf-bullets-cra",
   "version": "0.1.0",
   "private": true,
-  "jest":{
-    "collectCoverageFrom": ["src/**/*.{js,jsx,ts,tsx}", "!./node_modules/"],
+  "jest": {
+    "collectCoverageFrom": [
+      "src/**/*.{js,jsx,ts,tsx}"
+    ],
     "coverageThreshold": {
       "global": {
         "branches": 90,
@@ -44,7 +46,7 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "test:debug" : "react-scripts --inspect-brk test --runInBand --no-cache",
+    "test:debug": "react-scripts --inspect-brk test --runInBand --no-cache",
     "eject": "react-scripts eject",
     "deploy": "gh-pages -d build",
     "predeploy": "CI=false npm run build",
