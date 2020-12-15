@@ -27,7 +27,7 @@ jobs:
     - name: install dependencies
       run: npm ci
     - name: run tests
-      run: CI=1 npm test -- --coverage
+      run: CI=1 npm test
     - name: build site/deploy
       run: |
         git config --global user.name $user_name
