@@ -105,7 +105,7 @@ function BulletComparator({editorState, setEditorState, width, onSelect, abbrRep
                         let text = block.getText();
                         if (abbrReplacer) text = abbrReplacer(text);
                         
-                        return <Bullet key={key} text={text} widthPx={width * DPMM} height={heightMap.get(key)} 
+                        return <Bullet key={key} text={text} widthPx={ width * DPMM } height={heightMap.get(key)} 
                             enableOptim={enableOptim} />
                     })}
                 </div>
@@ -219,7 +219,7 @@ function optimize(sentence, evalFcn) {
     const largerSpace = "\u2004";
 
     //initialization of optimized words array
-    let optWords = BULLET.Tokenize(sentence);
+    let optWords = BULLET.Tokenize(sentence.trimEnd());
 
     const initResults = evalFcn(sentence);
 

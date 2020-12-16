@@ -20,7 +20,6 @@ textarea.bullets{
     border: none;
     resize: none;
     /*word-break: break-all;*/
-    text-rendering: geometricPrecision;
 }
 .border{
     width:fit-content;
@@ -34,6 +33,7 @@ textarea.bullets{
     font-family: 'Times New Roman'; 
     font-size: 12pt;
     display:inline;
+    font-kerning:none;
     text-rendering: geometricPrecision;
 }
 input.htCheckboxRendererInput{

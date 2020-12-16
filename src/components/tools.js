@@ -407,6 +407,8 @@ const findWithRegex = (regex, contentBlock, callback) => {
 
 // all widths in this function are in pixels
 function renderBulletText(text, getWidth, width) {
+    
+    width = width + 0.55;
     // this function expects a single line of text with no line breaks.
     if(text.match('\n')){
         console.error('renderBulletText expects a single line of text');
@@ -425,9 +427,9 @@ function renderBulletText(text, getWidth, width) {
         // Scenario where the width of the text is wider than desired.
         //  In this case, work needs to be done to figure out where the line breaks should be. 
 
-        // Regex- split after one of the following: \s ? / | - % ! 
+        // Regex- split after one of the following: \u2004 \u2009 \u2006 \s ? / | - % ! 
         // but ONLY if immediately followed by: [a-zA-z] [0-9] + \
-        const textSplit = text.split(/(?<=[\s?/|\-%!])(?=[a-zA-Z0-9+\\])/);
+        const textSplit = text.split(/(?<=[\u2004\u2009\u2006\s?/|\-%!])(?=[a-zA-Z0-9+\\])/);
 
         // check to make sure the first token is smaller than the desired width.
         //   This is usually true, unless the desired width is abnormally small, or the 
