@@ -512,6 +512,8 @@ function renderBulletText(text, getWidth, width) {
     }
 }
 
+function tokenize (sentence) {
+    return sentence.split(/[\s]+/);
+}
 
-
-export { Logo, DocumentTools, getSelectionInfo, findWithRegex, renderBulletText };
+export { Logo, DocumentTools, getSelectionInfo, findWithRegex, renderBulletText, tokenize };

@@ -1,5 +1,5 @@
 
-import { Bullet } from '../../src/components/bullets.js';
+import Bullet from '../../src/components/Bullet.js';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { render, screen } from '@testing-library/react';

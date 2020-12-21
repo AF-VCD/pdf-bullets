@@ -6,7 +6,7 @@
 import React from "react"
 import XLSX from "xlsx"
 import SampleAbbrFile from '../static/abbrs.xlsx'
-import AbbrTable from './abbrtable.js'
+import AbbrTable from './AbbrTable.js'
 
 
 function AbbrTools({ data, setData, ...props}) {

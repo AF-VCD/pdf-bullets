@@ -2,7 +2,7 @@
 // make sure words don't get broken up at the end of the line
 
 
-import { BulletComparator } from '../../src/components/bullets.js';
+import BulletComparator from '../../src/components/BulletComparator.js';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { EditorState, ContentState, Modifier, SelectionState } from "draft-js"

@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 
 
 //import {Bullet, BulletComparator, Skeleton} from "./components/bullets.js"
-import BulletApp from "./components/bulletapp.js"
+import BulletApp from "./BulletApp.js"
 
 import "./styles/index.scss"
 import 'handsontable/dist/handsontable.full.css'

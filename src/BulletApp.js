@@ -1,9 +1,8 @@
 import React from "react"
-import { BULLET, BulletComparator } from "./bullets.js"
-import { Logo, DocumentTools, getSelectionInfo, findWithRegex } from "./tools.js"
-import AbbrsViewer from "./abbrs.js"
-import SynonymViewer from "./thesaurus.js"
-// booleans for debugging
+import BulletComparator from "./components/BulletComparator.js"
+import { Logo, DocumentTools, getSelectionInfo, findWithRegex, tokenize } from "./components/Tools.js"
+import AbbrsViewer from "./components/Abbrs.js"
+import SynonymViewer from "./components/Thesaurus.js"
 import { EditorState, ContentState, Modifier, SelectionState } from "draft-js"
 
 
@@ -170,7 +169,7 @@ function BulletApp() {
     function handleSelect(newSel) {
         const maxWords = 8;
         if (newSel.trim() !== '') {
-            setSelection(BULLET.Tokenize(newSel.trim()).slice(0, maxWords).join(' '));
+            setSelection(tokenize(newSel.trim()).slice(0, maxWords).join(' '));
         }
 
     }
