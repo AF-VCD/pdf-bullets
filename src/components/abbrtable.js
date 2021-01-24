@@ -79,6 +79,7 @@ function BooleanFilter({
             <select
                 value={currentSelection}
                 onChange={e => {
+                    e.preventDefault();
                     setFilter(values[options.indexOf(e.target.value)])
                 }}
             >
@@ -126,17 +127,12 @@ const EditableCellTemplate = ({
     row: { index },
     column: { id },
     updateDataAfterInput,  // This is a custom function that we supplied to our table instance
-},
-    type = 'text') => {
+}) => {
     // We need to keep and update the state of the cell normally
     const [value, setValue] = React.useState(initialValue)
 
     const onChange = e => {
-        if (type === 'checkbox') {
-            setValue(e.target.checked);
-        } else {
             setValue(e.target.value);
-        }
     }
 
     // We'll only update the external data when the input is blurred
@@ -149,8 +145,7 @@ const EditableCellTemplate = ({
         setValue(initialValue)
     }, [initialValue])
 
-
-    return <input className="input" type={type} value={value} onChange={onChange} onBlur={onBlur} />;
+    return <input className="input" type='text' value={value} onChange={onChange} onBlur={onBlur} />;
 
 }
 
@@ -167,6 +162,7 @@ function AbbrTable({ data, setData }) {
             Filter: BooleanFilter,
             filter: 'boolean',
             disableSortBy: true,
+            disableGlobalFilter: true,
         },
         {
             Header: "Word",
@@ -324,16 +320,16 @@ function AbbrTable({ data, setData }) {
 const Row = ({ row, index, rowOps }) => {
 
     return (
-        <tr>
+        <tr data-testid={"row-"+index}>
 
             {row.cells.map(cell => {
                 return <td {...cell.getCellProps()}>{cell.render('Cell')}</td>
             })}
             <td>
-                <a className="icon is-large" onClick={() => rowOps.appendRow(index)}>
+                <a className="icon is-large" data-testid={"copy-"+index} onClick={() => rowOps.appendRow(index)}>
                     <FontAwesomeIcon icon={faCopy} size="2x" />
                 </a>
-                <a className="icon is-large" onClick={() => rowOps.deleteRow(index)}>
+                <a className="icon is-large" data-testid={"trash-"+index} onClick={() => rowOps.deleteRow(index)}>
                     <FontAwesomeIcon icon={faTrash} size="2x"/>
                 </a>
             </td>
