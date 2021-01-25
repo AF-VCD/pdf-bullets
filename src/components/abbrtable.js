@@ -101,22 +101,22 @@ const SelectCheckbox = ({
     updateDataAfterInput,
 }) => {
     // We need to keep and update the state of the cell normally
-    
-    const {onChange: onSelChange, style, indeterminate, ...rowSelectProps} = 
-        React.useMemo(()=>row.getToggleRowSelectedProps(),[row]);
-    
+
+    const { onChange: onSelChange, style, indeterminate, ...rowSelectProps } =
+        React.useMemo(() => row.getToggleRowSelectedProps(), [row]);
+
     const onChange = React.useCallback((e) => {
         updateDataAfterInput(row.index, id, e.target.checked);
         onSelChange(e);
-    },[onSelChange, id, row.index, updateDataAfterInput])
-    
-    const mergedStyle = update(style, {'$merge': {display:"none"}})
+    }, [onSelChange, id, row.index, updateDataAfterInput])
+
+    const mergedStyle = update(style, { '$merge': { display: "none" } })
     return (
-        <div style={{textAlign: "center"}}>
-        <label className="icon is-large">
-            <input type="checkbox" data-testid={"enabled-"+row.index} onChange={onChange} style={mergedStyle} {...rowSelectProps} />
-            <FontAwesomeIcon size="2x" icon={value? faCheckSquare : faSquare} />
-        </label>
+        <div style={{ textAlign: "center" }}>
+            <label className="icon is-large">
+                <input type="checkbox" data-testid={"enabled-" + row.index} onChange={onChange} style={mergedStyle} {...rowSelectProps} />
+                <FontAwesomeIcon size="2x" icon={value ? faCheckSquare : faSquare} />
+            </label>
         </div>
     )
 };
@@ -132,7 +132,7 @@ const EditableCellTemplate = ({
     const [value, setValue] = React.useState(initialValue)
 
     const onChange = e => {
-            setValue(e.target.value);
+        setValue(e.target.value);
     }
 
     // We'll only update the external data when the input is blurred
@@ -145,51 +145,35 @@ const EditableCellTemplate = ({
         setValue(initialValue)
     }, [initialValue])
 
-    return <input className="input" type='text' value={value} onChange={onChange} onBlur={onBlur} data-testid={props.col+'-'+index} />;
+    return <input className="input" type='text' value={value} onChange={onChange} onBlur={onBlur} data-testid={props.col + '-' + index} />;
 
 }
 
 
 
 function AbbrTable({ data, setData }) {
-
+    const skipTableResetRef = React.useRef();
     // mapping of raw data columns to something meaningful
-    const columns = React.useMemo(() => [
-        {
-            Header: "Status",
-            accessor: 'enabled',
-            Cell: SelectCheckbox,
-            Filter: BooleanFilter,
-            filter: 'boolean',
-            disableSortBy: true,
-            disableGlobalFilter: true,
-        },
-        {
-            Header: "Word",
-            accessor: 'value',
-            Cell: (data)=>EditableCellTemplate(data,{col: "value"}),
-        },
-        {
-            Header: 'Abbreviation',
-            accessor: 'abbr',
-            Cell: (data)=>EditableCellTemplate(data,{col: "abbr"}),
-        },
-    ], []);
+
 
     // When our cell renderer calls updateDataAfterInput, we'll use
     // the rowIndex, columnId and new value to update the
     // original data
     const updateDataAfterInput = (rowIndex, columnId, value) => {
-        setData(oldData=>{
-            const newData =  update(oldData, {
-               [rowIndex]: {
-                   [columnId]: {$set: value}}
+        skipTableResetRef.current = true;
+        setData(oldData => {
+            const newData = update(oldData, {
+                [rowIndex]: {
+                    [columnId]: { $set: value }
+                }
             });
-            return newData;  
+            return newData;
         });
     }
 
-
+    React.useEffect(() => {
+        skipTableResetRef.current = false;
+    })
     const filterTypes = React.useMemo(
         () => ({
             // boolean filter
@@ -214,6 +198,7 @@ function AbbrTable({ data, setData }) {
     )
 
     const appendRow = (beforeIndex) => {
+        skipTableResetRef.current = true;
         const beforeRecord = data[beforeIndex];
         setData(
             update(data, {
@@ -225,6 +210,7 @@ function AbbrTable({ data, setData }) {
     };
 
     const deleteRow = (beforeIndex) => {
+        skipTableResetRef.current = true;
         setData(
             update(data, {
                 $splice: [
@@ -233,6 +219,39 @@ function AbbrTable({ data, setData }) {
             })
         );
     };
+    const byValue = React.useMemo(()=> (a, b) => {
+        const cA = String(a.values.value).trimStart();
+        const cB = String(b.values.value).trimStart();
+        return cA.localeCompare(cB, 'en', { numeric: true })
+    } , [])
+    const byAbbr = React.useMemo(()=> (a, b) => {
+        const cA = String(a.values.abbr).trimStart();
+        const cB = String(b.values.abbr).trimStart();
+        return cA.localeCompare(cB, 'en', { numeric: true })
+    } , [])
+    const columns = React.useMemo(() => [
+        {
+            Header: "Status",
+            accessor: 'enabled',
+            Cell: SelectCheckbox,
+            Filter: BooleanFilter,
+            filter: 'boolean',
+            disableSortBy: true,
+            disableGlobalFilter: true,
+        },
+        {
+            Header: "Word",
+            accessor: 'value',
+            sortType: byValue,
+            Cell: (data) => EditableCellTemplate(data, { col: "value" }),
+        },
+        {
+            Header: 'Abbreviation',
+            accessor: 'abbr',
+            sortType: byAbbr,
+            Cell: (data) => EditableCellTemplate(data, { col: "abbr" }),
+        },
+    ], []);
 
     // note that columns and data must be memoized !
     const tableInstance = useTable(
@@ -244,7 +263,8 @@ function AbbrTable({ data, setData }) {
             updateDataAfterInput,
             autoResetSelectedRows: false,
             manualRowSelectedKey: 'enabled',
-
+            autoResetGlobalFilter: !skipTableResetRef.current,
+            autoResetSortBy: !skipTableResetRef.current,
         },
         useFilters,
         useGlobalFilter,
@@ -289,7 +309,10 @@ function AbbrTable({ data, setData }) {
                                 // taking the default header props, then adding in toggle props. can keep chaining if wanted.
                                 return (
                                     <th {...column.getHeaderProps()}>
-                                        <div {...column.getSortByToggleProps()}> {column.render('Header')}<span>{column.isSorted ? (column.isSortedDesc ? ' v' : ' ^') : ''}</span> </div>
+                                        <div {...column.getSortByToggleProps()}>
+                                            {column.render('Header')}
+                                            <span>{column.isSorted ? (column.isSortedDesc ? ' v' : ' ^') : ''}</span>
+                                        </div>
                                         <div>{column.canFilter ? column.render('Filter') : null}</div>
                                     </th>);
                             })}
@@ -320,17 +343,17 @@ function AbbrTable({ data, setData }) {
 const Row = ({ row, index, rowOps }) => {
 
     return (
-        <tr data-testid={"row-"+index}>
+        <tr data-testid={"row-" + index}>
 
             {row.cells.map(cell => {
                 return <td {...cell.getCellProps()}>{cell.render('Cell')}</td>
             })}
             <td>
-                <a className="icon is-large" data-testid={"copy-"+index} onClick={() => rowOps.appendRow(index)}>
+                <a className="icon is-large" data-testid={"copy-" + index} onClick={() => rowOps.appendRow(index)}>
                     <FontAwesomeIcon icon={faCopy} size="2x" />
                 </a>
-                <a className="icon is-large" data-testid={"trash-"+index} onClick={() => rowOps.deleteRow(index)}>
-                    <FontAwesomeIcon icon={faTrash} size="2x"/>
+                <a className="icon is-large" data-testid={"trash-" + index} onClick={() => rowOps.deleteRow(index)}>
+                    <FontAwesomeIcon icon={faTrash} size="2x" />
                 </a>
             </td>
         </tr>

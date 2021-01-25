@@ -1,4 +1,3 @@
-import BulletComparator from '../../src/components/BulletComparator.js';
 import AbbrTable from '../../src/components/AbbrTable.js'
 import React from 'react';
 
@@ -6,7 +5,7 @@ import { render, screen, act, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event'
 
 
-const defaultData = [{
+const defaultData = [{ 
   enabled: true,
   value: 'abbreviations',
   abbr: 'abbrs',
@@ -44,6 +43,8 @@ function AbbrWrapper({ initData }) {
 }
 
 function validateTable(screen, expectedData){
+  expect(screen.getAllByTestId(/row-\d+/).length).toEqual(expectedData.length)
+
   screen.getAllByTestId(/value-\d+/).forEach((input, i)=>{
     expect(input.value).toEqual(expectedData[i].value)
   })
@@ -63,6 +64,11 @@ it('shows all data correctly', () => {
 
   validateTable(screen, defaultData);
 })
+
+ test.todo('sorts data correctly when considering capitalization')
+ test.todo('sorts data correctly when considering numbers')
+ test.todo('sorts data correctly when prefixed spaces')
+
 it('sorts data correctly by abbreviation', () => {
   render(<AbbrWrapper initData={defaultData} />)
   const sorts = screen.getAllByTitle('Toggle SortBy');
@@ -211,7 +217,7 @@ it('copies and inserts row when copy button is pressed', ()=>{
 
 it('changes when information is edited', ()=>{
   render(<AbbrWrapper initData={defaultData} />)
-  
+
   const expectedData = [{
     enabled: true,
     value: 'abbreviations',
@@ -239,15 +245,42 @@ it('changes when information is edited', ()=>{
   validateTable(screen, expectedData);
 })
 
+it('remains filtered on matches on the global search bar after editing info', async () => {
+  render(<AbbrWrapper initData={defaultData} />)
+  const search = screen.getByPlaceholderText(/rows\.\.\./);
+  const expectedData = [{
+    enabled: true,
+    value: 'abbreviations',
+    abbr: 'abbrs',
+  }, {
+    enabled: false,
+    value: 'table',
+    abbr: 'tbl',
+  }, {
+    enabled: true,
+    value: 'parentheses',
+    abbr: 'parens',
+  },
+  ];
 
 
-/*
-it('adds row when add button is pressed', ()=>{
-    expect(true).toEqual(false);
+  userEvent.type(search, 'a')
+  await waitFor(() => expect(screen.getAllByTestId(/row-\d+/).length).toEqual(expectedData.length))
+
+  validateTable(screen, expectedData);
+
+  const target = screen.getByTestId('value-1');
+  expectedData[1].value = 'tbbbl'
+  userEvent.type(target, expectedData[1].value);
+  userEvent.tab();userEvent.tab();userEvent.tab();userEvent.tab();userEvent.tab();
+  //await waitFor(()=> expect(screen.getAllByTestId(/row-\d+/).length).not.toEqual(expectedData.length) )
+  validateTable(screen, expectedData);
+
+  
+
 })
 
-it('filtered view remains active when data is edited', ()=>{
-    expect(true).toEqual(false);
-})
 
-*/
+test.todo('adds row when add button is pressed');
+test.todo('filtered view remains active when data is edited')
+
