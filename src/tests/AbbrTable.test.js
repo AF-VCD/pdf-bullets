@@ -43,18 +43,25 @@ function AbbrWrapper({ initData }) {
   return <AbbrTable data={data} setData={setData} />
 }
 
+function validateTable(screen, expectedData){
+  screen.getAllByTestId(/value-\d+/).forEach((input, i)=>{
+    expect(input.value).toEqual(expectedData[i].value)
+  })
+  screen.getAllByTestId(/abbr-\d+/).forEach((input, i)=>{
+    expect(input.value).toEqual(expectedData[i].abbr)
+  })
+  screen.getAllByTestId(/enabled-\d+/).forEach((input, i)=>{
+      expect(input.checked).toEqual(expectedData[i].enabled)
+  })  
+}
+
 it('renders without crashing', () => {
   render(<AbbrWrapper initData={defaultData} />)
 })
 it('shows all data correctly', () => {
   render(<AbbrWrapper initData={defaultData} />)
-  const rows = screen.getAllByTestId(/row-\d+/);
 
-  rows.forEach((row, i) => {
-    expect(row.querySelector('input[type=checkbox]').checked).toEqual(defaultData[i].enabled)
-    expect(row.querySelectorAll('input[type=text]')[0].value).toEqual(defaultData[i].value)
-    expect(row.querySelectorAll('input[type=text]')[1].value).toEqual(defaultData[i].abbr)
-  })
+  validateTable(screen, defaultData);
 })
 it('sorts data correctly by abbreviation', () => {
   render(<AbbrWrapper initData={defaultData} />)
@@ -63,17 +70,10 @@ it('sorts data correctly by abbreviation', () => {
 
   userEvent.click(sorter)
 
-
-  const rows = screen.getAllByTestId(/row-\d+/);
-
   // need to copy the default data array or else it gets mutated!
   const sortedData = [...defaultData].sort((a, b) => a.abbr.localeCompare(b.abbr));
 
-  rows.forEach((row, i) => {
-    expect(row.querySelector('input[type=checkbox]').checked).toEqual(sortedData[i].enabled)
-    expect(row.querySelectorAll('input[type=text]')[0].value).toEqual(sortedData[i].value)
-    expect(row.querySelectorAll('input[type=text]')[1].value).toEqual(sortedData[i].abbr)
-  })
+  validateTable(screen, sortedData);
 
 });
 
@@ -84,15 +84,11 @@ it('sorts data correctly by word', () => {
 
   userEvent.click(sorter)
 
-  const rows = screen.getAllByTestId(/row-\d+/);
+  
   // need to copy the default data array or else it gets mutated!
   const sortedData = [...defaultData].sort((a, b) => a.value.localeCompare(b.value));
 
-  rows.forEach((row, i) => {
-    expect(row.querySelector('input[type=checkbox]').checked).toEqual(sortedData[i].enabled)
-    expect(row.querySelectorAll('input[type=text]')[0].value).toEqual(sortedData[i].value)
-    expect(row.querySelectorAll('input[type=text]')[1].value).toEqual(sortedData[i].abbr)
-  })
+  validateTable(screen, sortedData);
 
 })
 
@@ -103,15 +99,9 @@ it('filters on enabled abbrs when desired', () => {
 
   userEvent.selectOptions(select, ['Enabled'])
 
-  const rows = screen.getAllByTestId(/row-\d+/);
-
   const filteredData = defaultData.filter((row) => row.enabled);
 
-  rows.forEach((row, i) => {
-    expect(row.querySelector('input[type=checkbox]').checked).toEqual(filteredData[i].enabled)
-    expect(row.querySelectorAll('input[type=text]')[0].value).toEqual(filteredData[i].value)
-    expect(row.querySelectorAll('input[type=text]')[1].value).toEqual(filteredData[i].abbr)
-  })
+  validateTable(screen, filteredData);
 })
 
 it('filters on disabled abbrs when desired', () => {
@@ -120,16 +110,9 @@ it('filters on disabled abbrs when desired', () => {
 
   userEvent.selectOptions(select, ['Disabled'])
 
-
-  const rows = screen.getAllByTestId(/row-\d+/);
-
   const filteredData = defaultData.filter((row) => !row.enabled);
 
-  rows.forEach((row, i) => {
-    expect(row.querySelector('input[type=checkbox]').checked).toEqual(filteredData[i].enabled)
-    expect(row.querySelectorAll('input[type=text]')[0].value).toEqual(filteredData[i].value)
-    expect(row.querySelectorAll('input[type=text]')[1].value).toEqual(filteredData[i].abbr)
-  })
+  validateTable(screen, filteredData);
 })
 
 it('filters on matches on the global search bar', async () => {
@@ -155,13 +138,7 @@ it('filters on matches on the global search bar', async () => {
   await waitFor(() => expect(screen.getAllByTestId(/row-\d+/).length).toEqual(expectedData.length))
 
 
-  const rows = screen.getAllByTestId(/row-\d+/);
-  rows.forEach((row, i) => {
-
-    expect(row.querySelectorAll('input[type=text]')[0].value).toEqual(expectedData[i].value)
-    expect(row.querySelectorAll('input[type=text]')[1].value).toEqual(expectedData[i].abbr)
-    expect(row.querySelector('input[type=checkbox]').checked).toEqual(expectedData[i].enabled)
-  })
+  validateTable(screen, expectedData);
 
 })
 
@@ -190,12 +167,7 @@ it('deletes row when delete button is pressed', async () => {
 
   userEvent.click(screen.getByTestId('trash-1'));
   
-  screen.getAllByTestId(/row-\d+/).forEach((row, i)=>{
-      
-      expect(row.querySelectorAll('input[type=text]')[0].value).toEqual(expectedData[i].value)
-      expect(row.querySelectorAll('input[type=text]')[1].value).toEqual(expectedData[i].abbr)
-      expect(row.querySelector('input[type=checkbox]').checked).toEqual(expectedData[i].enabled)
-  })  
+  validateTable(screen, expectedData);
   
   
 })
@@ -233,13 +205,42 @@ it('copies and inserts row when copy button is pressed', ()=>{
   },
   ];
 
-  screen.getAllByTestId(/row-\d+/).forEach((row, i)=>{
-      
-      expect(row.querySelectorAll('input[type=text]')[0].value).toEqual(expectedData[i].value)
-      expect(row.querySelectorAll('input[type=text]')[1].value).toEqual(expectedData[i].abbr)
-      expect(row.querySelector('input[type=checkbox]').checked).toEqual(expectedData[i].enabled)
-  })  
+  validateTable(screen, expectedData);
+
 })
+
+it('changes when information is edited', ()=>{
+  render(<AbbrWrapper initData={defaultData} />)
+  
+  const expectedData = [{
+    enabled: true,
+    value: 'abbreviations',
+    abbr: 'abbrs',
+  }, {
+    enabled: false,
+    value: 'table',
+    abbr: 'tbl',
+  }, {
+    enabled: true,
+    value: 'optimizeasdf',
+    abbr: 'optim',
+  }, {
+    enabled: false,
+    value: 'with ',
+    abbr: 'w/',
+  }, {
+    enabled: true,
+    value: 'parentheses',
+    abbr: 'parens',
+  },
+  ];
+  const target = screen.getByTestId('value-2');
+  userEvent.type(target, expectedData[2].value);
+  validateTable(screen, expectedData);
+})
+
+
+
 /*
 it('adds row when add button is pressed', ()=>{
     expect(true).toEqual(false);

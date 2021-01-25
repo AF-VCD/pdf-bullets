@@ -114,7 +114,7 @@ const SelectCheckbox = ({
     return (
         <div style={{textAlign: "center"}}>
         <label className="icon is-large">
-            <input type="checkbox" onChange={onChange} style={mergedStyle} {...rowSelectProps} />
+            <input type="checkbox" data-testid={"enabled-"+row.index} onChange={onChange} style={mergedStyle} {...rowSelectProps} />
             <FontAwesomeIcon size="2x" icon={value? faCheckSquare : faSquare} />
         </label>
         </div>
@@ -127,7 +127,7 @@ const EditableCellTemplate = ({
     row: { index },
     column: { id },
     updateDataAfterInput,  // This is a custom function that we supplied to our table instance
-}) => {
+}, props) => {
     // We need to keep and update the state of the cell normally
     const [value, setValue] = React.useState(initialValue)
 
@@ -145,7 +145,7 @@ const EditableCellTemplate = ({
         setValue(initialValue)
     }, [initialValue])
 
-    return <input className="input" type='text' value={value} onChange={onChange} onBlur={onBlur} />;
+    return <input className="input" type='text' value={value} onChange={onChange} onBlur={onBlur} data-testid={props.col+'-'+index} />;
 
 }
 
@@ -167,12 +167,12 @@ function AbbrTable({ data, setData }) {
         {
             Header: "Word",
             accessor: 'value',
-            Cell: EditableCellTemplate,
+            Cell: (data)=>EditableCellTemplate(data,{col: "value"}),
         },
         {
             Header: 'Abbreviation',
             accessor: 'abbr',
-            Cell: EditableCellTemplate,
+            Cell: (data)=>EditableCellTemplate(data,{col: "abbr"}),
         },
     ], []);
 
