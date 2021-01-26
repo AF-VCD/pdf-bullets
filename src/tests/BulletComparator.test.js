@@ -14,8 +14,8 @@ const DPI = 96;
 const MM_PER_IN = 25.4;
 const DPMM = DPI / MM_PER_IN;
 
-jest.mock('../../src/components/tools.js', () => {
-    const Tools = jest.requireActual('../../src/components/tools.js');
+jest.mock('../../src/components/Tools.js', () => {
+    const Tools = jest.requireActual('../../src/components/Tools.js');
     const widthMap = jest.requireActual('./12pt-times.json');
     const getWidthMock = (text) => {
         return text.split('').reduce((sum, char) => sum + widthMap[char.charCodeAt(0)], 0);
