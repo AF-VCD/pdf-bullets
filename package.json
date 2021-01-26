@@ -22,7 +22,7 @@
     "@fortawesome/free-regular-svg-icons": "^5.15.1",
     "@fortawesome/free-solid-svg-icons": "^5.15.1",
     "@fortawesome/react-fontawesome": "^0.1.13",
-
+    "@handsontable/react": "^4.0.0",
     "bulma": "^0.9.1",
     "draft-js": "^0.11.7",
     "handsontable": "^8.2.0",
