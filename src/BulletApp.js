@@ -99,7 +99,7 @@ function BulletApp() {
 
     React.useEffect(() => {
         const newAbbrDict = {};
-        abbrData.forEach((row) => {
+        abbrData.filter((row) => row.value !== null && row.abbr !== null ).forEach((row) => {
             let fullWord = String(row.value).replace(/\s/g, ' ');
             let abbr = row.abbr;
             let enabled = row.enabled;

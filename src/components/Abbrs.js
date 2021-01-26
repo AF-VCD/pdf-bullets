@@ -1,8 +1,3 @@
-//import React from 'react';
-//import ReactDOM from 'react-dom';
-//import { HotTable } from '@handsontable/react';
-//import Handsontable from 'handsontable';
-
 import React from "react"
 import XLSX from "xlsx"
 import SampleAbbrFile from '../static/abbrs.xlsx'
