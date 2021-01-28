@@ -71,7 +71,7 @@ const tableSettings = {
     },
   };
 
-function AbbrTable({data, setData}){
+function AbbreviationTable({data, setData}){
     const tableRef = React.useRef(null)
     
     const update = (payload, source)=>{    
@@ -97,4 +97,4 @@ function AbbrTable({data, setData}){
     />)
 }
 
-export default AbbrTable;
+export default AbbreviationTable;

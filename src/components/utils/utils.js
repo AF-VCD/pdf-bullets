@@ -1,5 +1,5 @@
 import {tokenize} from './Tools'
-import {STATUS} from './Bullet'
+import {STATUS} from '../../const/const'
 
 export const hashCode = (str) => {
     let hash = 0, i, chr;

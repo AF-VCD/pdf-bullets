@@ -1,17 +1,7 @@
 import React from "react"
-import { renderBulletText, tokenize } from './Tools.js'
-import { optimize } from './utils'
-
-// optimization status codes
-// status codes for optimization direction 
-export const STATUS = {
-    OPTIMIZED: 0,
-    FAILED_OPT: 1,
-    NOT_OPT: -1,
-    MAX_UNDERFLOW: -4
-}
-
-// const MAX_UNDERFLOW = -4;
+import { renderBulletText, tokenize } from '../utils/Tools.js'
+import { optimize } from '../utils/utils'
+import {STATUS} from '../../const/const'
 
 function Bullet({ text="", widthPx=500, enableOptim=false, height, onHighlight }) {
     const canvasRef = React.useRef(null);

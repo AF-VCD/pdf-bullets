@@ -1,4 +1,4 @@
-import AbbrTable from '../../src/components/AbbrTable.js'
+import AbbreviationTable from './AbbreviationTable.js'
 import React from 'react';
 
 import { render, screen, act, waitFor } from '@testing-library/react';
@@ -32,7 +32,7 @@ const defaultData = [{
 
 function AbbrWrapper({ initData }) {
   const [data, setData] = React.useState(initData);
-  return <AbbrTable data={data} setData={setData} />
+  return <AbbreviationTable data={data} setData={setData} />
 }
 
 async function validateTable(screen, expectedData){

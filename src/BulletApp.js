@@ -1,38 +1,11 @@
 import React from "react"
-import BulletComparator from "./components/BulletComparator.js"
-import { Logo, DocumentTools, getSelectionInfo, findWithRegex, tokenize } from "./components/Tools.js"
-import AbbrsViewer from "./components/Abbrs.js"
-import SynonymViewer from "./components/Thesaurus.js"
+import BulletComparator from "./components/Bullets/BulletComparator"
+import { Logo, DocumentTools, getSelectionInfo, findWithRegex, tokenize } from "./components/utils/Tools"
+import AbbreviationViewer from "./components/Abbreviation/Abbreviation"
+import SynonymViewer from "./components/utils/Thesaurus.js"
 import { EditorState, ContentState, Modifier, SelectionState } from "draft-js"
+import {defaultAbbrData, defaultText, defaultWidth} from './const/defaults' 
 
-
-const defaultText = '- This is a custom built bullet writing tool; abbreviations will be replaced according to table in the abbreviations tab--you will see output on the right\n\
-- This tool can optimize spacing; output will be red if the optimizer could not fix spacing with 2004 or 2006 Unicode spaces\n\
-- Click the thesaurus button to show one; select a word in this or the output box to view synonyms--words in parentheses are abbreviations that are configured'
-
-const defaultWidth = 202.321;
-const defaultAbbrData = [{
-    enabled: true,
-    value: 'abbreviations',
-    abbr: 'abbrs',
-  }, {
-    enabled: true,
-    value: 'table',
-    abbr: 'tbl',
-  }, {
-    enabled: true,
-    value: 'optimize',
-    abbr: 'optim',
-  }, {
-    enabled: true,
-    value: 'with ',
-    abbr: 'w/',
-  }, {
-    enabled: true,
-    value: 'parentheses',
-    abbr: 'parens',
-  },
-  ];
 
 const defaultEditorState = EditorState.createWithContent(ContentState.createFromText(defaultText));
 
@@ -251,7 +224,7 @@ function BulletApp() {
             abbrReplacer={abbrReplacer}
             width={width}
             onSelect={handleSelect} enableOptim={enableOptim} />,
-        <AbbrsViewer
+        <AbbreviationViewer
             data={abbrData}
             setData={setAbbrData} />
     ];
