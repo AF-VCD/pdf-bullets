@@ -1,4 +1,4 @@
-import widthMap from  "./12pt-times.json"
+import widthMap from  "../../tests/12pt-times.json"
 import {renderBulletText} from '../components/Tools.js';
 import React from 'react';
 import ReactDOM from 'react-dom';

@@ -1,7 +1,7 @@
 import React from "react"
 import XLSX from "xlsx"
-import SampleAbbrFile from '../static/abbrs.xlsx'
-import AbbrTable from './AbbrTable.js'
+import SampleAbbrFile from '../../static/abbrs.xlsx'
+import AbbreviationTable from './AbbreviationTable.js'
 
 
 function AbbrTools({ data, setData, ...props}) {
@@ -81,13 +81,13 @@ function AbbrTools({ data, setData, ...props}) {
 
 }
 
-function AbbrsViewer({ data, setData }) {
+function AbbreviationViewer({ data, setData }) {
     return (
         <div>
             <AbbrTools setData={setData} data={data} />
-            <AbbrTable data={data} setData={setData} />
+            <AbbreviationTable data={data} setData={setData} />
         </div>
     );
 }
 
-export default AbbrsViewer;
+export default AbbreviationViewer;

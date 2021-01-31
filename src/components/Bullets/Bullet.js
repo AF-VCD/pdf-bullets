@@ -1,15 +1,7 @@
 import React from "react"
-import { renderBulletText, tokenize } from './Tools.js'
-
-// optimization status codes
-// status codes for optimization direction 
-const STATUS = {
-    OPTIMIZED: 0,
-    FAILED_OPT: 1,
-    NOT_OPT: -1,
-}
-
-const MAX_UNDERFLOW = -4;
+import { renderBulletText, tokenize } from '../utils/Tools.js'
+import { optimize } from '../utils/utils'
+import {STATUS} from '../../const/const'
 
 function Bullet({ text="", widthPx=500, enableOptim=false, height, onHighlight }) {
     const canvasRef = React.useRef(null);
@@ -51,7 +43,7 @@ function Bullet({ text="", widthPx=500, enableOptim=false, height, onHighlight }
             setOutputTextLines(optimResults.rendering.textLines);
             
         } else {
-            if(rendering.overflow < MAX_UNDERFLOW || rendering.overflow > 0){
+            if(rendering.overflow < STATUS.MAX_UNDERFLOW || rendering.overflow > 0){
                 setOptimStatus(STATUS.FAILED_OPT);
             }else{
                 setOptimStatus(STATUS.OPTIMIZED)
@@ -99,93 +91,5 @@ function Bullet({ text="", widthPx=500, enableOptim=false, height, onHighlight }
     );
     //return canvas;
 }
-
-
-function optimize(sentence, evalFcn) {
-
-    const smallerSpace = "\u2006";
-    const largerSpace = "\u2004";
-
-    //initialization of optimized words array
-    let optWords = tokenize(sentence.trimEnd());
-
-    const initResults = evalFcn(sentence);
-
-    if (initResults.overflow === 0) {
-        return initResults;
-    }
-
-    //initial instantiation of previousResults
-    let prevResults = initResults;
-    let finalResults = initResults;
-    const newSpace = (initResults.overflow >= 0) ? smallerSpace : largerSpace;
-
-    let finalOptimStatus = STATUS.NOT_OPT;
-
-    function hashCode (str) {
-        let hash = 0, i, chr;
-        if (str.length === 0) return hash;
-        for (i = 0; i < str.length; i++) {
-          chr = str.charCodeAt(i);
-          hash = ((hash << 5) - hash) + chr;
-          hash |= 0; // Convert to 32bit integer
-        }
-        return hash;
-      };
-
-    function getRandomInt(seed, max) {
-        return Math.floor(Math.abs((Math.floor(9 * hashCode(seed) + 5) % 100000) / 100000) * Math.floor(max));
-    }
-
-    // like in the while loop, want to not replace the first space after the dash.
-    const worstCaseResults = evalFcn(optWords[0] + ' ' + optWords.slice(1).join(newSpace));
-
-    if( (newSpace === smallerSpace && worstCaseResults.overflow > 0) || 
-            (newSpace === largerSpace && worstCaseResults.overflow < STATUS.MAX_UNDERFLOW) ){
-            // this means that there is no point in trying to optimize.
-            
-            return {
-                status: STATUS.FAILED_OPT,
-                rendering: worstCaseResults,
-            };
-        
-    }
-
-    while (finalResults.overflow > 0 || finalResults.overflow < STATUS.MAX_UNDERFLOW) {
-        //don't select the first space after the dash- that would be noticeable and look wierd.
-        // also don't select the last word, don't want to add a space after that.
-        let iReplace = getRandomInt(optWords.join(''), optWords.length - 1 - 1) + 1;
-
-        //merges two elements together, joined by the space
-        optWords.splice(
-            iReplace, 2,
-            optWords.slice(iReplace, iReplace + 2).join(newSpace)
-        );
-
-        //make all other spaces the normal space size
-        let newSentence = optWords.join(' ');
-
-        let newResults = evalFcn(newSentence);
-
-        if (initResults.overflow <= 0 && newResults.overflow > 0) {
-            //console.log("Note: Can't add more spaces without overflow, reverting to previous" );
-            finalResults = prevResults;
-            finalOptimStatus = STATUS.OPTIMIZED;
-            break;
-        } else if (initResults.overflow > 0 && newResults.overflow < 0) {
-            //console.log("Removed enough spaces. Terminating." );
-            finalResults = newResults;
-            finalOptimStatus = STATUS.OPTIMIZED;
-            break;
-        }
-        
-        prevResults = newResults;
-    }
-    return {
-        status: finalOptimStatus,
-        rendering: finalResults,
-    };
-}
-
 
 export default Bullet;

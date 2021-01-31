@@ -1,8 +1,8 @@
 import React from "react"
 import { Editor,  RichUtils } from "draft-js"
 import "draft-js/dist/Draft.css";
-import { getSelectionInfo } from './Tools.js'
-import Bullet from './Bullet.js'
+import { getSelectionInfo } from '../utils/Tools'
+import Bullet from './Bullet'
 
 const DPI = 96;
 const MM_PER_IN = 25.4;
