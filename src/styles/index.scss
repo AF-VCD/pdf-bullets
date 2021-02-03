@@ -9,6 +9,7 @@
 
 // If need, change your variables before importing Bulma
 // $title-color: #ff0000;
+
 @import "~bulma/bulma.sass";
 
 textarea.bullets{
@@ -20,7 +21,6 @@ textarea.bullets{
     border: none;
     resize: none;
     /*word-break: break-all;*/
-    text-rendering: geometricPrecision;
 }
 .border{
     width:fit-content;
@@ -30,11 +30,11 @@ textarea.bullets{
     margin:10px 10px 0px 0px;
 }
 .bullets{
-    font-family: "AdobeTimes";
-    //font-family: 'Times New Roman'; 
+    //font-family: "AdobeTimes";
+    font-family: 'Times New Roman'; 
     font-size: 12pt;
-    white-space:pre-wrap;
     display:inline;
+    font-kerning:none;
     text-rendering: geometricPrecision;
 }
 input.htCheckboxRendererInput{
@@ -64,7 +64,7 @@ input.htCheckboxRendererInput{
     min-height:10px;
 }
 .logo{
-    color: #6b2706;
+    color: #0F0F0F;
 }
 h1{
     font-family:monospace;
