@@ -26,6 +26,8 @@ jobs:
         node-version: ${{ matrix.node-version }}
     - name: install dependencies
       run: npm ci
+    - name: run tests
+      run: npm test
     - name: build site/deploy
       run: |
         git config --global user.name $user_name
@@ -37,4 +39,3 @@ jobs:
         user_email: 'github-actions[bot]@users.noreply.github.com'
         github_token: ${{ secrets.ACTIONS_DEPLOY_ACCESS_TOKEN }}
         repository: ${{ github.repository }}
-#    - run: npm test
