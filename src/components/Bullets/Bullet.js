@@ -1,6 +1,5 @@
 import React from "react"
-import { renderBulletText, tokenize } from '../utils/Tools.js'
-import { optimize } from '../utils/utils'
+import { optimize, renderBulletText } from './utils'
 import {STATUS} from '../../const/const'
 
 function Bullet({ text="", widthPx=500, enableOptim=false, height, onHighlight }) {
@@ -11,6 +10,7 @@ function Bullet({ text="", widthPx=500, enableOptim=false, height, onHighlight }
     const [loading, setLoading] = React.useState(false);
     const [optimStatus, setOptimStatus] = React.useState(STATUS.NOT_OPT);
     const [rendering, setBulletRendering] = React.useState({ textLines: [''] });
+    const widthPxAdjusted = widthPx + 0.55;
 
     function getTextWidth(txt, canvas){
         const context = canvas.getContext('2d');
@@ -23,9 +23,9 @@ function Bullet({ text="", widthPx=500, enableOptim=false, height, onHighlight }
     //   whenever the props text input is updated.
     React.useEffect(() => {
         
-        setBulletRendering(renderBulletText(text, (txt) => getTextWidth(txt,canvasRef.current), widthPx));
+        setBulletRendering(renderBulletText(text, (txt) => getTextWidth(txt,canvasRef.current), widthPxAdjusted));
 
-    }, [text, widthPx, enableOptim]);
+    }, [text, widthPxAdjusted, enableOptim]);
     // [] indicates that this happens once after the component mounts.
     // [text] indicates that this happens every time the text changes from the user (from props)
 
@@ -36,7 +36,7 @@ function Bullet({ text="", widthPx=500, enableOptim=false, height, onHighlight }
         setLoading(true);
         setOutputTextLines(rendering.textLines);
         if (enableOptim) {
-            const optimizer = (txt) => renderBulletText(txt, (txt) => getTextWidth(txt, canvasRef.current), widthPx);
+            const optimizer = (txt) => renderBulletText(txt, (txt) => getTextWidth(txt, canvasRef.current), widthPxAdjusted);
             const optimResults = optimize(text, optimizer);
             setLoading(false);
             setOptimStatus(optimResults.status);
@@ -52,7 +52,7 @@ function Bullet({ text="", widthPx=500, enableOptim=false, height, onHighlight }
             setLoading(false);
         }
 
-    }, [rendering, enableOptim, text, widthPx]);
+    }, [rendering, enableOptim, text, widthPxAdjusted]);
 
     //color effect
     React.useEffect(() => {

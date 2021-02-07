@@ -1,14 +1,13 @@
-import React from "react"
+import React, {useState, useEffect} from "react"
 import { Editor,  RichUtils } from "draft-js"
 import "draft-js/dist/Draft.css";
-import { getSelectionInfo } from '../utils/Tools'
 import Bullet from './Bullet'
 
 const DPI = 96;
 const MM_PER_IN = 25.4;
 const DPMM = DPI / MM_PER_IN;
 
-function BulletComparator({editorState, setEditorState, width, onSelect, abbrReplacer, enableOptim }) {
+export default function BulletComparator({editorState, setEditorState, width, onSelect, abbrReplacer, enableOptim }) {
     
     const bulletOutputID = "bulletOutput";
     const [heightMap, setHeightMap] = React.useState(new Map());
@@ -98,4 +97,33 @@ function BulletComparator({editorState, setEditorState, width, onSelect, abbrRep
         </div>);
 }
 
-export default BulletComparator;
+
+export const getSelectionInfo = (editorState)=> {
+    // this block of code gets the selected text from the editor.
+    const selectionState = editorState.getSelection();
+    const anchorKey = selectionState.getAnchorKey();
+    const contentBlock = editorState.getCurrentContent().getBlockForKey(anchorKey);
+    const start = selectionState.getStartOffset();
+    const end = selectionState.getEndOffset();
+    const selectedText = contentBlock.getText().slice(start, end);
+    return {
+        selectionState,
+        anchorKey,
+        contentBlock,
+        start,
+        end,
+        selectedText,
+    }
+}
+
+export const findWithRegex = (regex, contentBlock, callback) => {
+    const text = contentBlock.getText();
+    let matchArr, start, end;
+    while ((matchArr = regex.exec(text)) !== null) {
+        start = matchArr.index;
+        end = start + matchArr[0].length;
+        callback(start, end);
+    }
+};
+
+

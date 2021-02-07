@@ -1,6 +1,7 @@
 import React from "react"
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faAngleDown } from "@fortawesome/free-solid-svg-icons"
+import {Forms} from '../../const/const.js'
 
 const pdfjs = require('@ckhordiasma/pdfjs-dist');
 const pdfjsWorker = require('@ckhordiasma/pdfjs-dist/build/pdf.worker.entry');
@@ -267,27 +268,7 @@ class DocumentTools extends React.PureComponent {
     }
 }
 
-// could not do a static class property because of MS edge
-const Forms = {
-    all: {
-        'AF707': {
-            'fields': ['S2DutyTitleDesc', 'S4Assessment', 'S5Assessment', 'S6Assessment'],
-            'likelyWidth': '201.041mm'
-        },
-        'AF1206': {
-            'fields': ['specificAccomplishments', 'p2SpecificAccomplishments'],
-            'likelyWidth': '202.321mm'
-        },
-        'AF910': {
-            'fields': ['KeyDuties', 'IIIComments', 'IVComments', 'VComments', 'VIIIComments', 'IXComments'],
-            'likelyWidth': '202.321mm'
-        },
-        'AF911': {
-            'fields': ['KeyDuties', 'IIIComments', 'IVComments', 'VIIComments', 'VIIIComments', 'IXComments'],
-            'likelyWidth': '202.321mm'
-        },
-    }
-};
+
 function getBulletsFromPdf(filedata) {
 
 
@@ -376,144 +357,6 @@ function getBulletsFromPdf(filedata) {
     return { pullBullets, getPageInfo };
 }
 
-function getSelectionInfo(editorState) {
-    // this block of code gets the selected text from the editor.
-    const selectionState = editorState.getSelection();
-    const anchorKey = selectionState.getAnchorKey();
-    const contentBlock = editorState.getCurrentContent().getBlockForKey(anchorKey);
-    const start = selectionState.getStartOffset();
-    const end = selectionState.getEndOffset();
-    const selectedText = contentBlock.getText().slice(start, end);
-    return {
-        selectionState,
-        anchorKey,
-        contentBlock,
-        start,
-        end,
-        selectedText,
-    }
-}
-
-const findWithRegex = (regex, contentBlock, callback) => {
-    const text = contentBlock.getText();
-    let matchArr, start, end;
-    while ((matchArr = regex.exec(text)) !== null) {
-        start = matchArr.index;
-        end = start + matchArr[0].length;
-        callback(start, end);
-    }
-};
 
 
-// all widths in this function are in pixels
-function renderBulletText(text, getWidth, width) {
-    
-    width = width + 0.55;
-    // this function expects a single line of text with no line breaks.
-    if(text.match('\n')){
-        console.error('renderBulletText expects a single line of text');
-    }
-    
-    const fullWidth = getWidth(text.trimEnd());
-
-    if (fullWidth < width) {
-        return {
-            textLines: [text],
-            fullWidth: fullWidth,
-            lines: 1,
-            overflow: fullWidth - width,
-        };
-    } else {
-        // Scenario where the width of the text is wider than desired.
-        //  In this case, work needs to be done to figure out where the line breaks should be. 
-
-        // Regex- split after one of the following: \u2004 \u2009 \u2006 \s ? / | - % ! 
-        // but ONLY if immediately followed by: [a-zA-z] [0-9] + \
-        const textSplit = text.split(/(?<=[\u2004\u2009\u2006\s?/|\-%!])(?=[a-zA-Z0-9+\\])/);
-
-        // check to make sure the first token is smaller than the desired width.
-        //   This is usually true, unless the desired width is abnormally small, or the 
-        //   input text is one really long word
-        if (getWidth(textSplit[0]) < width) {
-            let answerIdx = 0;
-            for (let i = 1; i <= textSplit.length; i++) {
-                const evalText = textSplit.slice(0, i).join('').trimEnd();
-                const evalWidth = getWidth(evalText);
-                if (evalWidth > width) {
-                    answerIdx = i - 1;
-                    break;
-                }
-            }
-            const recursedText = textSplit.slice(answerIdx, textSplit.length).join('');
-
-            if (recursedText === text) {
-                console.warn("Can't fit \"" + text + "\" on a single line\n", {text, width, fullWidth});
-                return {
-                    textLines: [text],
-                    fullWidth,
-                    lines: 1,
-                    overflow: fullWidth - width,
-                };
-            } else {
-                const recursedResult = renderBulletText(recursedText, getWidth, width);
-
-                return {
-                    textLines: [textSplit.slice(0, answerIdx).join(''), ...recursedResult.textLines],
-                    fullWidth: fullWidth,
-                    lines: 1 + recursedResult.lines,
-                    overflow: fullWidth - width,
-                }
-            }
-
-        } else {
-
-            const avgCharWidth = fullWidth / (text.length);
-            const guessIndex = parseInt(width / avgCharWidth);
-            const firstGuessWidth = getWidth(text.substring(0, guessIndex))
-            let answerIdx = guessIndex;
-            if (firstGuessWidth > width) {
-                for (let i = guessIndex - 1; i > 0; i--) {
-                    const nextGuessWidth = getWidth(text.substring(0, i));
-                    if (nextGuessWidth < width) {
-                        answerIdx = i;
-                        break;
-                    }
-                }
-            } else if (firstGuessWidth < width) {
-                for (let i = guessIndex; i <= text.length; i++) {
-
-                    const nextGuessWidth = getWidth(text.substring(0, i));
-                    if (nextGuessWidth > width) {
-                        answerIdx = i - 1;
-                        break;
-                    }
-                }
-            }
-            const recursedText = text.substring(answerIdx, text.length);
-            if (recursedText === text) {
-                console.warn("Can't fit \"" + text + "\" on a single line\n", {text, width, fullWidth});
-                return {
-                    textLines: [text],
-                    fullWidth,
-                    lines: 1,
-                    overflow: fullWidth - width
-                };
-            } else {
-                const recursedResult = renderBulletText(recursedText, getWidth, width);
-
-                return {
-                    textLines: [text.substring(0, answerIdx), ...recursedResult.textLines],
-                    fullWidth: fullWidth,
-                    lines: 1 + recursedResult.lines,
-                    overflow: fullWidth - width,
-                }
-            }
-        }
-    }
-}
-
-function tokenize (sentence) {
-    return sentence.split(/[\s]+/);
-}
-
-export { Logo, DocumentTools, getSelectionInfo, findWithRegex, renderBulletText, tokenize };
+export { Logo, DocumentTools };

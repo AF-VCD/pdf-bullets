@@ -1,8 +1,9 @@
-import React from "react"
-import BulletComparator from "./components/Bullets/BulletComparator"
-import { Logo, DocumentTools, getSelectionInfo, findWithRegex, tokenize } from "./components/utils/Tools"
+import React, {useState, useEffect} from "react"
+import BulletComparator, {getSelectionInfo, findWithRegex} from "./components/Bullets/BulletComparator"
+import { Logo, DocumentTools } from "./components/Toolbars/Toolbars"
+import {tokenize} from "./components/Bullets/utils"
 import AbbreviationViewer from "./components/Abbreviation/Abbreviation"
-import SynonymViewer from "./components/utils/Thesaurus.js"
+import SynonymViewer from "./components/Toolbars/Thesaurus.js"
 import { EditorState, ContentState, Modifier, SelectionState } from "draft-js"
 import {defaultAbbrData, defaultText, defaultWidth} from './const/defaults' 
 

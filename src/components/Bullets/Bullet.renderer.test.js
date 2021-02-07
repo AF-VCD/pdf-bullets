@@ -1,5 +1,5 @@
-import widthMap from  "../../tests/12pt-times.json"
-import {renderBulletText} from '../components/Tools.js';
+import widthMap from  "../../static/12pt-times.json"
+import {renderBulletText} from './utils';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { render, screen } from '@testing-library/react';
@@ -18,10 +18,12 @@ function getWidth(text){
 function RenderBulletTextTester(props){
     const canvasRef = React.useRef(null);
     const [results, setResults] = React.useState(['']);
+    // width fudge factor here helps fix discrepancy between HTML and PDF forms
+    const widthAdjusted = props.width + 0.55;
     React.useEffect(() => {
         
         //context.fillText(props.text, 50,50); 
-        setResults(renderBulletText(props.text, getWidth, props.width).textLines)
+        setResults(renderBulletText(props.text, getWidth, widthAdjusted).textLines)
     }, [props.text]);
     // [] indicates that this happens once after the component mounts.
     // [props.text] indicates that this happens every time the text changes.
