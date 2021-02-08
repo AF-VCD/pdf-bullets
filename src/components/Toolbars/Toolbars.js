@@ -1,4 +1,4 @@
-import React from "react"
+import {PureComponent, createRef} from "react"
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faAngleDown } from "@fortawesome/free-solid-svg-icons"
 import {Forms} from '../../const/const.js'
@@ -8,10 +8,10 @@ const pdfjsWorker = require('@ckhordiasma/pdfjs-dist/build/pdf.worker.entry');
 pdfjs.GlobalWorkerOptions.workerSrc = pdfjsWorker;
 
 //PDF import
-class ImportTools extends React.PureComponent {
+class ImportTools extends PureComponent {
     constructor(props) {
         super(props);
-        this.fileInputRef = React.createRef();
+        this.fileInputRef = createRef();
         this.state = {
             type: 'none',
             hovering: false,
@@ -106,7 +106,7 @@ class ImportTools extends React.PureComponent {
     }
 }
 // form width, space optimization, select text
-class OutputTools extends React.PureComponent {
+class OutputTools extends PureComponent {
     constructor(props) {
         super(props);
         this.state = {
@@ -143,7 +143,7 @@ class OutputTools extends React.PureComponent {
     }
 }
 // normalize spaces
-class InputTools extends React.PureComponent {
+class InputTools extends PureComponent {
 
     render() {
         return (
@@ -152,10 +152,10 @@ class InputTools extends React.PureComponent {
     }
 }
 // saving settings
-class SaveTools extends React.PureComponent {
+class SaveTools extends PureComponent {
     constructor(props) {
         super(props);
-        this.exportRef = React.createRef();
+        this.exportRef = createRef();
         this.state = { hovering: false };
     }
     onSave = () => {
@@ -216,7 +216,7 @@ class SaveTools extends React.PureComponent {
         );
     }
 }
-class Logo extends React.PureComponent {
+class Logo extends PureComponent {
     render() {
         return (
             <h1 className='title'><span className="logo">AF </span>
@@ -228,7 +228,7 @@ class Logo extends React.PureComponent {
         );
     }
 }
-class ThesaurusTools extends React.PureComponent {
+class ThesaurusTools extends PureComponent {
     render() {
         return (
             <a  className="button" onClick={this.props.onHide} aria-haspopup="true" aria-controls="thesaurus-menu" >
@@ -239,7 +239,7 @@ class ThesaurusTools extends React.PureComponent {
         );
     }
 }
-class DocumentTools extends React.PureComponent {
+class DocumentTools extends PureComponent {
     render() {
         return (
             <nav className="navbar" role="navigation" aria-label="main navigation">

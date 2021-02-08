@@ -1,4 +1,4 @@
-import React from "react"
+import {PureComponent} from "react"
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPlus } from "@fortawesome/free-solid-svg-icons"
 
@@ -10,7 +10,7 @@ const handleCardClick = (word, This) => {
     }
 }
 
-class SynonymViewer extends React.PureComponent {
+class SynonymViewer extends PureComponent {
     constructor(props) {
         super(props)
         this.state = {
@@ -97,7 +97,7 @@ class SynonymViewer extends React.PureComponent {
 
 
 
-class SynonymList extends React.PureComponent {
+class SynonymList extends PureComponent {
 
     handleCardClick = (word) => {
         return (e) => {
@@ -132,7 +132,7 @@ class SynonymList extends React.PureComponent {
 
     }
 }
-class Synonym extends React.PureComponent {
+class Synonym extends PureComponent {
     render() {
         //don't forget! you need to add capability to check on disabled abbreviations
         let mainAbbrDisp = '';

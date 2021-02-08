@@ -1,4 +1,4 @@
-import React from 'react';
+import {useRef} from 'react';
 import { HotTable } from '@handsontable/react';
 import Handsontable from 'handsontable';
 import 'handsontable/dist/handsontable.full.css';
@@ -46,7 +46,7 @@ const tableSettings = {
   };
 
 function AbbreviationTable({data, setData}){
-    const tableRef = React.useRef(null)
+    const tableRef = useRef(null)
     
     const update = (payload, source)=>{    
         //console.log({source, payload, tableRef: tableRef.current , data})

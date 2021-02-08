@@ -1,15 +1,15 @@
-import React from "react"
+import {useRef, useState, useEffect} from "react"
 import { optimize, renderBulletText } from './utils'
 import {STATUS} from '../../const/const'
 
 function Bullet({ text="", widthPx=500, enableOptim=false, height, onHighlight }) {
-    const canvasRef = React.useRef(null);
-    const [outputTextLines, setOutputTextLines] = React.useState(() => [' ']);
+    const canvasRef = useRef(null);
+    const [outputTextLines, setOutputTextLines] = useState(() => [' ']);
 
-    const [color, setColor] = React.useState('inherit');
-    const [loading, setLoading] = React.useState(false);
-    const [optimStatus, setOptimStatus] = React.useState(STATUS.NOT_OPT);
-    const [rendering, setBulletRendering] = React.useState({ textLines: [''] });
+    const [color, setColor] = useState('inherit');
+    const [loading, setLoading] = useState(false);
+    const [optimStatus, setOptimStatus] = useState(STATUS.NOT_OPT);
+    const [rendering, setBulletRendering] = useState({ textLines: [''] });
     const widthPxAdjusted = widthPx + 0.55;
 
     function getTextWidth(txt, canvas){
@@ -21,7 +21,7 @@ function Bullet({ text="", widthPx=500, enableOptim=false, height, onHighlight }
 
     // This effect updates the text rendering (i.e. enforces width constraints by inserting newlines)
     //   whenever the props text input is updated.
-    React.useEffect(() => {
+    useEffect(() => {
         
         setBulletRendering(renderBulletText(text, (txt) => getTextWidth(txt,canvasRef.current), widthPxAdjusted));
 
@@ -31,7 +31,7 @@ function Bullet({ text="", widthPx=500, enableOptim=false, height, onHighlight }
 
     // This effect happens after bullet rendering changes. It evaluates the rendered bullet and
     //  sees how it can be improved with modified spaces. 
-    React.useEffect(() => {
+    useEffect(() => {
 
         setLoading(true);
         setOutputTextLines(rendering.textLines);
@@ -55,7 +55,7 @@ function Bullet({ text="", widthPx=500, enableOptim=false, height, onHighlight }
     }, [rendering, enableOptim, text, widthPxAdjusted]);
 
     //color effect
-    React.useEffect(() => {
+    useEffect(() => {
         if (loading) {
             setColor("silver")
         } else if (optimStatus === STATUS.FAILED_OPT) {

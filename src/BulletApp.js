@@ -1,8 +1,8 @@
-import React, {useState, useEffect} from "react"
+import {useState, useEffect, useCallback} from "react"
 import BulletComparator, {getSelectionInfo, findWithRegex} from "./components/Bullets/BulletComparator"
 import { Logo, DocumentTools } from "./components/Toolbars/Toolbars"
 import {tokenize} from "./components/Bullets/utils"
-import AbbreviationViewer from "./components/Abbreviation/Abbreviation"
+import AbbreviationViewer from "./components/Abbreviation/AbbreviationViewer"
 import SynonymViewer from "./components/Toolbars/Thesaurus.js"
 import { EditorState, ContentState, Modifier, SelectionState } from "draft-js"
 import {defaultAbbrData, defaultText, defaultWidth} from './const/defaults' 
@@ -13,16 +13,16 @@ const defaultEditorState = EditorState.createWithContent(ContentState.createFrom
 // Note that all width measurements in this file are in millimeters.
 function BulletApp() {
 
-    const [enableOptim, setEnableOptim] = React.useState(true);
-    const [width, setWidth] = React.useState(defaultWidth);
-    const [abbrData, setAbbrData] = React.useState(defaultAbbrData);
+    const [enableOptim, setEnableOptim] = useState(true);
+    const [width, setWidth] = useState(defaultWidth);
+    const [abbrData, setAbbrData] = useState(defaultAbbrData);
 
-    const [abbrDict, setAbbrDict] = React.useState({});
+    const [abbrDict, setAbbrDict] = useState({});
 
-    const [selection, setSelection] = React.useState('');
-    const [currentTab, setCurrentTab] = React.useState(0);
-    const [showThesaurus, setShowThesaurus] = React.useState(false);
-    const [editorState, setEditorState] = React.useState(defaultEditorState);
+    const [selection, setSelection] = useState('');
+    const [currentTab, setCurrentTab] = useState(0);
+    const [showThesaurus, setShowThesaurus] = useState(false);
+    const [editorState, setEditorState] = useState(defaultEditorState);
 
     function handleJSONImport(settingsArray) {
         const settings = settingsArray[0]; //preparing for possible eventual several tabs of stuff
@@ -52,7 +52,7 @@ function BulletApp() {
         );
     }
 
-    React.useEffect(() => {
+    useEffect(() => {
 
         let settingsArray;
         try {
@@ -71,7 +71,7 @@ function BulletApp() {
 
     }, [])
 
-    React.useEffect(() => {
+    useEffect(() => {
         const newAbbrDict = {};
         abbrData.filter((row) => row.value !== null && row.abbr !== null ).forEach((row) => {
             let fullWord = String(row.value).replace(/\s/g, ' ');
@@ -91,7 +91,7 @@ function BulletApp() {
         setAbbrDict(newAbbrDict);
     }, [abbrData]);
 
-    const abbrReplacer = React.useCallback((sentence) => {
+    const abbrReplacer = useCallback((sentence) => {
 
         const finalAbbrDict = {};
         Object.keys(abbrDict).forEach(

@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from "react"
+import {useState, useEffect} from "react"
 import { Editor,  RichUtils } from "draft-js"
 import "draft-js/dist/Draft.css";
 import Bullet from './Bullet'
@@ -10,7 +10,7 @@ const DPMM = DPI / MM_PER_IN;
 export default function BulletComparator({editorState, setEditorState, width, onSelect, abbrReplacer, enableOptim }) {
     
     const bulletOutputID = "bulletOutput";
-    const [heightMap, setHeightMap] = React.useState(new Map());
+    const [heightMap, setHeightMap] = useState(new Map());
     // Editor callback that adds rich text editor keybinds
     const handleKeyCommand = (command, editorState) => {
         const newState = RichUtils.handleKeyCommand(editorState, command);
@@ -61,7 +61,7 @@ export default function BulletComparator({editorState, setEditorState, width, on
         }
     }
 
-    React.useEffect(()=>{
+    useEffect(()=>{
         let newHeightMap = new Map();
         for(let key of editorState.getCurrentContent().getBlockMap().keys()){
             const blockDiv = document.querySelector(`div[data-offset-key="${key}-0-0"]`);
