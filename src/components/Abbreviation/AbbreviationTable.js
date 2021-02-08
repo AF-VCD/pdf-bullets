@@ -1,6 +1,5 @@
 import { useRef } from "react";
 import { HotTable } from "@handsontable/react";
-import Handsontable from "handsontable";
 import "handsontable/dist/handsontable.full.css";
 
 const tableSettings = {
