@@ -33,7 +33,7 @@ const defaultData = [
 ];
 
 jest.mock("@handsontable/react", () => {
-  const { Component } = jest.requireActual("React");
+  const { Component } = jest.requireActual("react");
   class MockHotTable extends Component {
     constructor(props) {
       super(props);
