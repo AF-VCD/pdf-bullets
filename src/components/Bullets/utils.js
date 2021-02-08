@@ -91,16 +91,16 @@ export const optimize = (sentence, evalFcn) => {
         //make all other spaces the normal space size
         let newSentence = optWords.join(' ');
 
-        console.log(newSentence.split(' '))
+        //console.log(newSentence.split(' '))
         let newResults = evalFcn(newSentence);
 
         if (initResults.overflow <= 0 && newResults.overflow > 0) {
-            console.log("Note: Can't add more spaces without overflow, reverting to previous" );
+            //console.log("Note: Can't add more spaces without overflow, reverting to previous" );
             finalResults = prevResults;
             finalOptimStatus = STATUS.OPTIMIZED;
             break;
         } else if (initResults.overflow > 0 && newResults.overflow < 0) {
-            console.log("Removed enough spaces. Terminating." );
+            //console.log("Removed enough spaces. Terminating." );
             finalResults = newResults;
             finalOptimStatus = STATUS.OPTIMIZED;
             break;

@@ -2,7 +2,7 @@
 // make sure words don't get broken up at the end of the line
 
 
-import BulletComparator from '../../src/components/BulletComparator.js';
+import BulletComparator from './BulletComparator.js';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { EditorState, ContentState, Modifier, SelectionState } from "draft-js"
@@ -14,9 +14,9 @@ const DPI = 96;
 const MM_PER_IN = 25.4;
 const DPMM = DPI / MM_PER_IN;
 
-jest.mock('../../src/components/Tools.js', () => {
-    const Tools = jest.requireActual('../../src/components/Tools.js');
-    const widthMap = jest.requireActual('./12pt-times.json');
+jest.mock('./utils.js', () => {
+    const Tools = jest.requireActual('./utils.js');
+    const widthMap = jest.requireActual('../../static/12pt-times.json');
     const getWidthMock = (text) => {
         return text.split('').reduce((sum, char) => sum + widthMap[char.charCodeAt(0)], 0);
     }
