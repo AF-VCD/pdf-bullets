@@ -1,27 +1,24 @@
 {
   "files": {
-    "main.css": "./static/css/main.89688268.chunk.css",
-    "main.js": "./static/js/main.9bd294eb.chunk.js",
-    "main.js.map": "./static/js/main.9bd294eb.chunk.js.map",
-    "runtime-main.js": "./static/js/runtime-main.5bbfa871.js",
-    "runtime-main.js.map": "./static/js/runtime-main.5bbfa871.js.map",
-    "static/css/2.19c8f84c.chunk.css": "./static/css/2.19c8f84c.chunk.css",
-    "static/js/2.4c86d8de.chunk.js": "./static/js/2.4c86d8de.chunk.js",
-    "static/js/2.4c86d8de.chunk.js.map": "./static/js/2.4c86d8de.chunk.js.map",
+    "main.css": "./static/css/main.3fbbb676.chunk.css",
+    "main.js": "./static/js/main.ef44fe08.chunk.js",
+    "main.js.map": "./static/js/main.ef44fe08.chunk.js.map",
+    "runtime-main.js": "./static/js/runtime-main.3d835862.js",
+    "runtime-main.js.map": "./static/js/runtime-main.3d835862.js.map",
+    "static/css/2.b69a63ac.chunk.css": "./static/css/2.b69a63ac.chunk.css",
+    "static/js/2.b6a52c5a.chunk.js": "./static/js/2.b6a52c5a.chunk.js",
+    "static/js/2.b6a52c5a.chunk.js.map": "./static/js/2.b6a52c5a.chunk.js.map",
     "index.html": "./index.html",
-    "precache-manifest.7c230cd450fb98ac367fd18d3b954beb.js": "./precache-manifest.7c230cd450fb98ac367fd18d3b954beb.js",
-    "service-worker.js": "./service-worker.js",
-    "static/css/2.19c8f84c.chunk.css.map": "./static/css/2.19c8f84c.chunk.css.map",
-    "static/css/main.89688268.chunk.css.map": "./static/css/main.89688268.chunk.css.map",
-    "static/js/2.4c86d8de.chunk.js.LICENSE.txt": "./static/js/2.4c86d8de.chunk.js.LICENSE.txt",
-    "static/media/index.scss": "./static/media/TimesNewRomanPSMT.f630f93d.ttf",
-    "static/media/abbrs.xlsx": "./static/media/abbrs.914e7438.xlsx"
+    "static/css/2.b69a63ac.chunk.css.map": "./static/css/2.b69a63ac.chunk.css.map",
+    "static/css/main.3fbbb676.chunk.css.map": "./static/css/main.3fbbb676.chunk.css.map",
+    "static/js/2.b6a52c5a.chunk.js.LICENSE.txt": "./static/js/2.b6a52c5a.chunk.js.LICENSE.txt",
+    "static/media/abbrs.ebd0e99b.xlsx": "./static/media/abbrs.ebd0e99b.xlsx"
   },
   "entrypoints": [
-    "static/js/runtime-main.5bbfa871.js",
-    "static/css/2.19c8f84c.chunk.css",
-    "static/js/2.4c86d8de.chunk.js",
-    "static/css/main.89688268.chunk.css",
-    "static/js/main.9bd294eb.chunk.js"
+    "static/js/runtime-main.3d835862.js",
+    "static/css/2.b69a63ac.chunk.css",
+    "static/js/2.b6a52c5a.chunk.js",
+    "static/css/main.3fbbb676.chunk.css",
+    "static/js/main.ef44fe08.chunk.js"
   ]
 }
