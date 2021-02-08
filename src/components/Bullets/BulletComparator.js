@@ -94,6 +94,7 @@ export default function BulletComparator({
             editorState={editorState}
             onChange={onChange}
             handleKeyCommand={handleKeyCommand}
+            stripPastedStyles={true}
           />
         </div>
       </div>
