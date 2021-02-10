@@ -57,7 +57,7 @@ function AbbrToolbar({ data, setData, ...props }) {
       console.log("no file picked");
       return;
     } else {
-      getDataFromXLS(fileInputRef.current.files[0]);
+      getDataFromXLS(fileInputRef.current.files[0], setData);
       fileInputRef.current.value = "";
     }
   }

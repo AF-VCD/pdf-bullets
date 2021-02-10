@@ -56,9 +56,12 @@ export const optimize = (sentence, evalFcn) => {
 
   const initResults = evalFcn(sentence);
 
-  // good
+  // Sentence is fine, don't need to optimize
   if (initResults.overflow === 0) {
-    return initResults;
+    return {
+      status: STATUS.OPTIMIZED,
+      rendering: initResults,
+    };
   }
 
   //initial instantiation of previousResults
@@ -86,10 +89,7 @@ export const optimize = (sentence, evalFcn) => {
     };
   }
 
-  while (
-    initResults.overflow > 0 ||
-    initResults.overflow < STATUS.MAX_UNDERFLOW
-  ) {
+  while (true) {
     //don't select the first space after the dash- that would be noticeable and look wierd.
     // also don't select the last word, don't want to add a space after that.
     let indexToReplace =
@@ -108,20 +108,42 @@ export const optimize = (sentence, evalFcn) => {
     //console.log(newSentence.split(' '))
     let newResults = evalFcn(newSentence);
 
-    if (initResults.overflow <= 0 && newResults.overflow > 0) {
+    if (newSpace === largerSpace && newResults.overflow > 0) {
       //console.log("Note: Can't add more spaces without overflow, reverting to previous" );
       finalResults = prevResults;
       finalOptimStatus = STATUS.OPTIMIZED;
       break;
-    } else if (initResults.overflow > 0 && newResults.overflow < 0) {
+    } else if (newSpace === smallerSpace && newResults.overflow <= 0) {
       //console.log("Removed enough spaces. Terminating." );
       finalResults = newResults;
       finalOptimStatus = STATUS.OPTIMIZED;
+      break;
+    } else if (optWords.length === 2) {
+      // no more optimization could be done.
+      finalResults = newResults;
+      if (
+        newSpace === largerSpace &&
+        finalResults.overflow > STATUS.MAX_UNDERFLOW
+      ) {
+        finalOptimStatus = STATUS.OPTIMIZED;
+      } else {
+        finalOptimStatus = STATUS.FAILED_OPT;
+      }
       break;
     }
 
     prevResults = newResults;
   }
+
+  /*   console.log({
+    sentence,
+    optWords,
+    initResults,
+    finalResults,
+    worstCaseResults,
+    finalOptimStatus,
+  }); */
+
   return {
     status: finalOptimStatus,
     rendering: finalResults,

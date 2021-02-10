@@ -42,63 +42,57 @@ test("should split sentence into several pieces even if there mixed unicode type
   expect(tokenize(text)).toEqual(results);
 });
 
-test("should return overflow of zero", () => {
-  const overflow = { overflow: 0 };
-  const mockfn = jest.fn(() => overflow);
+let mockEvalFn;
 
-  expect(optimize("hello world", mockfn)).toBe(overflow);
+beforeEach(() => {
+  mockEvalFn = jest.fn((sentence) => {
+    const MAX_WIDTH = 25;
+    const CHAR_WIDTH = 2;
+    const SMALL_SPACE_WIDTH = 1;
+    const LARGE_SPACE_WIDTH = 3;
+    const totalChars = sentence.length;
+    const smallSpaces = sentence.match(/[\u2009\u2006]/g)?.length || 0;
+    const largeSpaces = sentence.match(/[\u2004]/g)?.length || 0;
+    const normalChars = totalChars - smallSpaces - largeSpaces;
+
+    const width =
+      normalChars * CHAR_WIDTH +
+      largeSpaces * LARGE_SPACE_WIDTH +
+      smallSpaces * SMALL_SPACE_WIDTH;
+    return {
+      overflow: width - MAX_WIDTH,
+    };
+  });
+});
+
+test("should return overflow of zero, and optimized (status 0)", () => {
+  const optimizeResults = { rendering: { overflow: 0 }, status: 0 };
+
+  expect(optimize("- hello\u2006world", mockEvalFn)).toEqual(optimizeResults);
 });
 
 test("should return a failed_opt status", () => {
-  const overflow = { overflow: 10 };
-  const mockfn = jest.fn(() => overflow);
+  const sentence = "- hello world world";
 
-  const optimizeResults = { rendering: { ...overflow }, status: 1 };
+  const optimizeResults = { rendering: { overflow: 11 }, status: 1 };
 
-  expect(optimize("hello world", mockfn)).toEqual(optimizeResults);
+  expect(optimize(sentence, mockEvalFn)).toEqual(optimizeResults);
 });
 
-test("should return a not optimize status", () => {
-  const sentence = "hello world";
-  const overflow = { overflow: -1 };
+test("should return an optimized status with no overflow (smaller spaces inserted)", () => {
+  const sentence = "- h llo world";
 
-  const mockfn = jest
-    .fn()
-    .mockImplementationOnce(() => ({ overflow: -1 }))
-    .mockImplementationOnce(() => ({ overflow: 0 }));
+  const optimizeResults = { rendering: { overflow: 0 }, status: 0 };
 
-  const optimizeResults = { rendering: { ...overflow }, status: -1 };
-
-  expect(optimize(sentence, mockfn)).toEqual(optimizeResults);
+  expect(optimize(sentence, mockEvalFn)).toEqual(optimizeResults);
 });
 
-test("should return an optimized status with overflow of last mock fn", () => {
-  const sentence = "hello world";
+test("should return an optimized status with no overflow (larger spaces inserted)", () => {
+  const sentence = "- h l o w d";
 
-  const mockfn = jest
-    .fn()
-    .mockImplementationOnce(() => ({ overflow: 1 }))
-    .mockImplementationOnce(() => ({ overflow: 0 }))
-    .mockImplementationOnce(() => ({ overflow: -3 }));
+  const optimizeResults = { rendering: { overflow: 0 }, status: 0 };
 
-  const optimizeResults = { rendering: { overflow: -3 }, status: 0 };
-
-  expect(optimize(sentence, mockfn)).toEqual(optimizeResults);
-});
-
-test("should return an optimized status with overflow of first mock fn", () => {
-  const sentence =
-    "- This tool can optimize spacing; output will be red if the optimizer could not fix spacing with 2004 or 2006 Unicode spaces";
-
-  const mockfn = jest
-    .fn()
-    .mockImplementationOnce(() => ({ overflow: -10 }))
-    .mockImplementationOnce(() => ({ overflow: -1 }))
-    .mockImplementationOnce(() => ({ overflow: 5 }));
-
-  const optimizeResults = { rendering: { overflow: -10 }, status: 0 };
-
-  expect(optimize(sentence, mockfn)).toEqual(optimizeResults);
+  expect(optimize(sentence, mockEvalFn)).toEqual(optimizeResults);
 });
 
 // renderBulletText tests
