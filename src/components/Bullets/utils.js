@@ -56,10 +56,10 @@ export const optimize = (sentence, evalFcn) => {
 
   const initResults = evalFcn(sentence);
 
-  // good
+  // Sentence is fine, don't need to optimize
   if (initResults.overflow === 0) {
     return {
-      status: STATUS.NOT_OPT,
+      status: STATUS.OPTIMIZED,
       rendering: initResults,
     };
   }
@@ -89,7 +89,6 @@ export const optimize = (sentence, evalFcn) => {
     };
   }
 
-  //let x = 0;
   while (true) {
     //don't select the first space after the dash- that would be noticeable and look wierd.
     // also don't select the last word, don't want to add a space after that.
@@ -108,8 +107,7 @@ export const optimize = (sentence, evalFcn) => {
 
     //console.log(newSentence.split(' '))
     let newResults = evalFcn(newSentence);
-    //if (x > 500) break;
-    //x++;
+
     if (newSpace === largerSpace && newResults.overflow > 0) {
       //console.log("Note: Can't add more spaces without overflow, reverting to previous" );
       finalResults = prevResults;

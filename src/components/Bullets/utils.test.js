@@ -65,8 +65,8 @@ beforeEach(() => {
   });
 });
 
-test("should return overflow of zero, and not optimized (status -1)", () => {
-  const optimizeResults = { rendering: { overflow: 0 }, status: -1 };
+test("should return overflow of zero, and optimized (status 0)", () => {
+  const optimizeResults = { rendering: { overflow: 0 }, status: 0 };
 
   expect(optimize("- hello\u2006world", mockEvalFn)).toEqual(optimizeResults);
 });
