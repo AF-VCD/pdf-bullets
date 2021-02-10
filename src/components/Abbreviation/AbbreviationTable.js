@@ -46,7 +46,7 @@ function AbbreviationTable({ data, setData }) {
 
   const update = (payload, source) => {
     //console.log({source, payload, tableRef: tableRef.current , data})
-    //console.log('update source: ', source)
+    // console.log("update source: ", source);
     if (source !== "loadData" && tableRef.current !== null) {
       const rawData = tableRef.current.hotInstance.getData();
       const newData = rawData.map((row) => {

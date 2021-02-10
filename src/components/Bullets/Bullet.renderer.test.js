@@ -155,7 +155,8 @@ describe("checking AF1206 bullets", () => {
 - dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidata
 - non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Lorem ipsum dolor sit amet, consectetur
 - nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit
-- in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in`;
+- in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
+- Energized no-notice load change spt; bed down/mobilized 10 anti-radiation wpns f/cmbt msn--armed 5 acft <6 hrs`;
 
     optimized.split("\n").forEach((line, i) => {
       render(
