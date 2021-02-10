@@ -1,4 +1,8 @@
-import AbbreviationTable from "./AbbreviationTable.js";
+import AbbreviationViewer, {
+  importSampleAbbrs,
+  getDataFromXLS,
+  exportToXLS,
+} from "./AbbreviationViewer";
 import React from "react";
 
 import { render, screen, act, waitFor } from "@testing-library/react";
@@ -62,49 +66,5 @@ jest.mock("@handsontable/react", () => {
 });
 
 it("renders without crashing", () => {
-  render(<AbbreviationTable data={defaultData} setData={jest.fn()} />);
-});
-
-test("Table data changes correctly ", () => {
-  const changedData = [
-    {
-      enabled: false,
-      value: "abbreviations",
-      abbr: "abbrs",
-    },
-    {
-      enabled: false,
-      value: "zebra",
-      abbr: "zbr",
-    },
-    {
-      enabled: true,
-      value: "optimize",
-      abbr: "optam",
-    },
-    {
-      enabled: false,
-      value: "with ",
-      abbr: "w/",
-    },
-    {
-      enabled: true,
-      value: "parentheses",
-      abbr: "()",
-    },
-  ];
-
-  const setData = jest.fn((data) =>
-    data.filter(
-      (row) => row.enabled !== null && row.value !== null && row.abbr !== null
-    )
-  );
-
-  const { rerender } = render(
-    <AbbreviationTable data={defaultData} setData={setData} />
-  );
-
-  rerender(<AbbreviationTable data={changedData} setData={setData} />);
-  userEvent.dblClick(screen.getByTestId(/parent/));
-  expect(setData).toReturnWith(changedData);
+  render(<AbbreviationViewer data={defaultData} setData={jest.fn()} />);
 });
