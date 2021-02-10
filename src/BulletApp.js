@@ -78,9 +78,11 @@ function BulletApp() {
 
   useEffect(() => {
     const newAbbrDict = {};
+
     abbrData
       .filter((row) => row.value !== null && row.abbr !== null)
       .forEach((row) => {
+        //console.log(row);
         let fullWord = String(row.value).replace(/\s/g, " ");
         let abbr = row.abbr;
         let enabled = row.enabled;
@@ -101,6 +103,7 @@ function BulletApp() {
   const abbrReplacer = useCallback(
     (sentence) => {
       const finalAbbrDict = {};
+      //console.log(abbrDict);
       Object.keys(abbrDict).forEach((word) => {
         const abbrs = abbrDict[word]; //an array
         //if there is at least one enabled abbreviation, take the lowest most element of it.
