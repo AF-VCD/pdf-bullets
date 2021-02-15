@@ -125,12 +125,7 @@ class SynonymViewer extends PureComponent {
 }
 
 class SynonymList extends PureComponent {
-  handleCardClick = (word) => {
-    return (e) => {
-      e.preventDefault();
-      this.props.onSelReplace(word);
-    };
-  };
+
   render() {
     return (
       <div>
@@ -156,6 +151,13 @@ class SynonymList extends PureComponent {
     );
   }
 }
+/**
+ * otherAbbrs: {
+ *   enabled: [array of abbreviations],
+ *   disabled: [array of abbreviations]
+ * }
+ *
+ */
 class Synonym extends PureComponent {
   render() {
     //don't forget! you need to add capability to check on disabled abbreviations
@@ -207,3 +209,4 @@ class Synonym extends PureComponent {
   }
 }
 export default SynonymViewer;
+export { Synonym, SynonymList };
