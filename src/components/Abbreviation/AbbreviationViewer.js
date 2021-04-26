@@ -1,64 +1,41 @@
-import { createRef } from "react";
-import XLSX from "xlsx";
+import { useRef, useState, useEffect } from "react";
+
 import SampleAbbrFile from "../../static/abbrs.xlsx";
 import AbbreviationTable from "./AbbreviationTable.js";
-
-export const importSampleAbbrs = (callback) => {
-  return new Promise((res) => {
-    const xhttp = new XMLHttpRequest();
-    xhttp.responseType = "blob";
-    xhttp.onload = () => {
-      res(xhttp.response);
-    };
-    xhttp.open("GET", SampleAbbrFile, true);
-    xhttp.send();
-  }).then(callback);
+import { getDataFromXLS, exportToXLS } from "./utils";
+export const importSampleAbbrs = () => {
+  return fetch(SampleAbbrFile).then((response) => response.blob()); // This is a PROMISE
 };
 
-export const getDataFromXLS = (file, callback) => {
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    const data = e.target.result;
-    const workbook = XLSX.read(data, {
-      type: "binary",
-      raw: true,
-    });
-    const rows = XLSX.utils
-      .sheet_to_json(workbook.Sheets[workbook.SheetNames[0]], {
-        header: ["enabled", "value", "abbr"],
-      })
-      .map(({ enabled, value, abbr }) => {
-        return { enabled, value, abbr };
-      });
+export function AbbreviationToolbar({ data, setData, ...props }) {
+  const fileInputRef = useRef();
+  const [pickedFile, setPickedFile] = useState({
+    name: "",
+    size: 0,
+    lastModified: 0,
+  });
 
-    // checks first row, enabled value and see if it matches header text
-    // normally enabled is a boolean.
-    if (rows[0].enabled.toString().match(/enabled/i)) {
-      callback(rows.slice(1));
-    } else {
-      callback(rows);
+  useEffect(() => {
+    if (pickedFile.name !== "") {
+      //console.log("processing new abbr file");
+      getDataFromXLS(pickedFile).then((data) => setData(data));
     }
-  };
-  reader.readAsBinaryString(file);
-};
-
-export const exportToXLS = (data) => {
-  const wb = XLSX.utils.book_new();
-  const sht = XLSX.utils.json_to_sheet(data);
-  XLSX.utils.book_append_sheet(wb, sht, "abbrs");
-  XLSX.writeFile(wb, "abbrs.xlsx");
-};
-
-function AbbrToolbar({ data, setData, ...props }) {
-  const fileInputRef = createRef();
+  }, [pickedFile]);
 
   function importAbbrs(e) {
-    if (!fileInputRef.current.value) {
-      console.log("no file picked");
+    const newFile = fileInputRef.current.files[0];
+    if (newFile === undefined) {
+      //console.log("No file was picked");
+      return;
+    } else if (
+      pickedFile.lastModified == newFile.lastModified &&
+      pickedFile.name === newFile.name &&
+      pickedFile.size === newFile.size
+    ) {
+      //console.log("same file picked");
       return;
     } else {
-      getDataFromXLS(fileInputRef.current.files[0], setData);
-      fileInputRef.current.value = "";
+      setPickedFile(newFile);
     }
   }
 
@@ -66,14 +43,23 @@ function AbbrToolbar({ data, setData, ...props }) {
     <div className="toolbox">
       <input
         type="file"
+        data-testid="uploader"
         onChange={importAbbrs}
         ref={fileInputRef}
         style={{ display: "none" }}
       ></input>
-      <button className="button" onClick={() => fileInputRef.current.click()}>
+      <button
+        className="button"
+        onClick={() => {
+          fileInputRef.current.click();
+        }}
+      >
         Import Abbrs
       </button>
-      <button className="button" onClick={() => exportToXLS(data)}>
+      <button
+        className="button"
+        onClick={() => exportToXLS(data, "abbrs.xlsx")}
+      >
         Export Abbrs
       </button>
       <button
@@ -84,7 +70,9 @@ function AbbrToolbar({ data, setData, ...props }) {
               "Are you sure you want to remove all existing acronyms and replace with a common list?"
             )
           ) {
-            importSampleAbbrs((file) => getDataFromXLS(file, setData));
+            importSampleAbbrs()
+              .then((file) => getDataFromXLS(file))
+              .then((data) => setData(data));
           }
         }}
       >
@@ -97,7 +85,7 @@ function AbbrToolbar({ data, setData, ...props }) {
 function AbbreviationViewer({ data, setData }) {
   return (
     <div>
-      <AbbrToolbar setData={setData} data={data} />
+      <AbbreviationToolbar setData={setData} data={data} />
       <AbbreviationTable data={data} setData={setData} />
     </div>
   );
