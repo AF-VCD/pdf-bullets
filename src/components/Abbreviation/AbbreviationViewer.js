@@ -1,11 +1,7 @@
 import { useRef, useState, useEffect } from "react";
 
-import SampleAbbrFile from "../../static/abbrs.xlsx";
 import AbbreviationTable from "./AbbreviationTable.js";
-import { getDataFromXLS, exportToXLS } from "./utils";
-export const importSampleAbbrs = () => {
-  return fetch(SampleAbbrFile).then((response) => response.blob()); // This is a PROMISE
-};
+import { getDataFromXLS, exportToXLS, importSampleAbbrs } from "./utils";
 
 export function AbbreviationToolbar({ data, setData, ...props }) {
   const fileInputRef = useRef();

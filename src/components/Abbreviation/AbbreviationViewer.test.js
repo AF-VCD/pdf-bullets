@@ -1,7 +1,4 @@
-import AbbreviationViewer, {
-  importSampleAbbrs,
-  AbbreviationToolbar,
-} from "./AbbreviationViewer";
+import AbbreviationViewer, { AbbreviationToolbar } from "./AbbreviationViewer";
 
 import React from "react";
 
@@ -86,11 +83,44 @@ test("AbbreviationToolbar File upload button click", () => {
   const setData = jest.fn((data) => {
     console.log(data);
   });
+
   render(<AbbreviationToolbar data={defaultData} setData={setData} />);
   const button = screen.getByRole("button", { name: /import abbrs/i });
+
   userEvent.click(button);
-  // can't figure out how to test this properly yet, so for now I'm just simulating the click
+
+  // can't figure out how to test this properly yet, so for now I'm just simulating the click.
+  // I think the below test does a good enough job of testing the upload logic
 });
+
+test("AbbreviationToolbar file upload", () => {
+  const setData = jest.fn();
+  Utils.getDataFromXLS.mockReturnValue(new Promise((res) => res(defaultData)));
+  render(<AbbreviationToolbar data={defaultData} setData={setData} />);
+
+  const uploader = screen.getByTestId("uploader");
+  var file = new File(["foo"], "foo.txt", {
+    type: "text/plain",
+  });
+  var file2 = new File(["foo"], "foo2.txt", {
+    type: "text/plain",
+  });
+  //upload file. should trigger getDataFromXLS
+  userEvent.upload(uploader, file);
+  expect(uploader.files[0]).toStrictEqual(file);
+  // upload same file again. should not trigger getDataFromXLS
+  userEvent.upload(uploader, file);
+  // upload undefined. should not trigger getDataFromXLS
+  userEvent.upload(uploader, undefined);
+  expect(uploader.files[0]).toStrictEqual(undefined);
+  //upload a different file. should trigger getDataFromXLS
+  userEvent.upload(uploader, file2);
+  expect(uploader.files[0]).toStrictEqual(file2);
+
+  // expect two callbacks.
+  expect(Utils.getDataFromXLS).toHaveBeenCalledTimes(2);
+});
+
 test("AbbreviationToolbar file export button click", () => {
   const setData = jest.fn((data) => {
     console.log(data);
@@ -100,23 +130,32 @@ test("AbbreviationToolbar file export button click", () => {
   userEvent.click(button);
   expect(Utils.exportToXLS).toHaveBeenCalled();
 });
-//todo("AbbreviationToolbar Sample file button click");
-
-test("AbbreviationToolbar file upload", () => {
+test("AbbreviationToolbar example file button click - confirmed", async () => {
   const setData = jest.fn((data) => {
     console.log(data);
   });
-  Utils.getDataFromXLS.mockReturnValue(new Promise((res) => res(defaultData)));
-  render(<AbbreviationToolbar data={defaultData} setData={setData} />);
 
-  const uploader = screen.getByTestId("uploader");
-  var file = new File(["foo"], "foo.txt", {
-    type: "text/plain",
+  window.confirm = jest.fn(() => true);
+  Utils.importSampleAbbrs = jest.fn(() => new Promise((res) => res()));
+
+  render(<AbbreviationToolbar data={defaultData} setData={setData} />);
+  const button = screen.getByRole("button", { name: /load common abbrs/i });
+  userEvent.click(button);
+  expect(window.confirm).toHaveBeenCalled();
+  expect(Utils.importSampleAbbrs).toHaveBeenCalled();
+  // for some reason (probably the promises that are then'd together) the below line doesn't pass.
+  //expect(Utils.getDataFromXLS).toHaveBeenCalled();
+});
+
+test("AbbreviationToolbar example file button click - cancelled", () => {
+  const setData = jest.fn((data) => {
+    console.log(data);
   });
-  userEvent.upload(uploader, file);
-  expect(uploader.files[0]).toStrictEqual(file);
-  userEvent.upload(uploader, file);
-  expect(uploader.files[0]).toStrictEqual(file);
-  userEvent.upload(uploader, undefined);
-  expect(uploader.files[0]).toStrictEqual(undefined);
+  window.confirm = jest.fn(() => false);
+  render(<AbbreviationToolbar data={defaultData} setData={setData} />);
+  const button = screen.getByRole("button", { name: /load common abbrs/i });
+  userEvent.click(button);
+  expect(window.confirm).toHaveBeenCalled();
+  expect(Utils.getDataFromXLS).not.toHaveBeenCalled();
+  expect(setData).not.toHaveBeenCalled();
 });

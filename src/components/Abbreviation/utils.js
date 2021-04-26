@@ -1,4 +1,5 @@
 import XLSX from "xlsx";
+import SampleAbbrFile from "../../static/abbrs.xlsx";
 
 export const getDataFromXLS = (file) => {
   return new Promise((res) => {
@@ -34,4 +35,8 @@ export const exportToXLS = (data, filename) => {
   const sht = XLSX.utils.json_to_sheet(data);
   XLSX.utils.book_append_sheet(wb, sht, "abbrs");
   XLSX.writeFile(wb, filename);
+};
+
+export const importSampleAbbrs = () => {
+  return fetch(SampleAbbrFile).then((response) => response.blob()); // This is a PROMISE
 };
