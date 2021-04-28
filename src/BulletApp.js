@@ -158,9 +158,6 @@ function BulletApp() {
     }
   }
 
-  function handleWidthChange(e) {
-    setWidth(parseFloat(e.target.value));
-  }
   function handleTextNorm() {
     const selectionsToReplace = [];
     const contentState = editorState.getCurrentContent();
@@ -184,14 +181,11 @@ function BulletApp() {
     setEditorState(EditorState.createWithContent(newContentState));
   }
   function handleTextUpdate(newText) {
-    return () =>
-      setEditorState(
-        EditorState.createWithContent(ContentState.createFromText(newText))
-      );
+    setEditorState(
+      EditorState.createWithContent(ContentState.createFromText(newText))
+    );
   }
-  function handleWidthUpdate(newWidth) {
-    return () => setWidth(newWidth);
-  }
+
   function handleSave() {
     return {
       width: width,
@@ -265,8 +259,7 @@ function BulletApp() {
             enableOptim={enableOptim}
             onOptimChange={handleOptimChange}
             width={width}
-            onWidthChange={handleWidthChange}
-            onWidthUpdate={handleWidthUpdate}
+            onWidthUpdate={setWidth}
             onTextNorm={handleTextNorm}
             onTextUpdate={handleTextUpdate}
             onSave={handleSave}
