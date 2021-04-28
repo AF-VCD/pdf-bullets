@@ -130,21 +130,21 @@ test("AbbreviationToolbar file export button click", () => {
   userEvent.click(button);
   expect(Utils.exportToXLS).toHaveBeenCalled();
 });
-test("AbbreviationToolbar example file button click - confirmed", async () => {
+test("AbbreviationToolbar example file button click - confirmed", (done) => {
   const setData = jest.fn((data) => {
-    console.log(data);
+    expect(data).toEqual(defaultData);
+    done();
   });
 
   window.confirm = jest.fn(() => true);
   Utils.importSampleAbbrs = jest.fn(() => new Promise((res) => res()));
+  Utils.getDataFromXLS.mockReturnValue(new Promise((res) => res(defaultData)));
 
   render(<AbbreviationToolbar data={defaultData} setData={setData} />);
   const button = screen.getByRole("button", { name: /load common abbrs/i });
   userEvent.click(button);
   expect(window.confirm).toHaveBeenCalled();
   expect(Utils.importSampleAbbrs).toHaveBeenCalled();
-  // for some reason (probably the promises that are then'd together) the below line doesn't pass.
-  //expect(Utils.getDataFromXLS).toHaveBeenCalled();
 });
 
 test("AbbreviationToolbar example file button click - cancelled", () => {

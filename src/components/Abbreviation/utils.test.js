@@ -1,4 +1,4 @@
-import { getDataFromXLS, exportToXLS } from "./utils";
+import { getDataFromXLS, exportToXLS, importSampleAbbrs } from "./utils";
 
 import { readFileSync, unlink } from "fs";
 
