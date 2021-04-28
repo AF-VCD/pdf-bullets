@@ -95,6 +95,12 @@ test("should return an optimized status with no overflow (larger spaces inserted
   expect(optimize(sentence, mockEvalFn)).toEqual(optimizeResults);
 });
 
+test("should return an optimized status with no overflow, no changes, without crashing ", () => {
+  const sentence = "iiiiiiiiiiii";
+  const optimizeResults = { rendering: { overflow: -1 }, status: 0 };
+  expect(optimize(sentence, mockEvalFn)).toEqual(optimizeResults);
+});
+
 // renderBulletText tests
 test("should not return much", () => {
   const sentence = "";

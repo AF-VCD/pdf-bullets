@@ -118,7 +118,7 @@ export const optimize = (sentence, evalFcn) => {
       finalResults = newResults;
       finalOptimStatus = STATUS.OPTIMIZED;
       break;
-    } else if (optWords.length === 2) {
+    } else if (optWords.length <= 2) {
       // no more optimization could be done.
       finalResults = newResults;
       if (
