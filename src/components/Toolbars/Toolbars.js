@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, PureComponent, createRef } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faAngleDown } from "@fortawesome/free-solid-svg-icons";
 import { getDataFromPDF, getDataFromJSON } from "./utils.js";
@@ -164,14 +164,12 @@ function InputTools({ onTextNorm }) {
   );
 }
 // saving settings
-class SaveTools extends PureComponent {
-  constructor(props) {
-    super(props);
-    this.exportRef = createRef();
-    this.state = { hovering: false };
-  }
-  onSave = () => {
-    const settings = this.props.onSave();
+function SaveTools({ getSavedSettings }) {
+  const [hovering, setHovering] = useState(false);
+  const exportRef = useRef();
+  const menuState = hovering ? "is-active" : "";
+  const saveSettings = () => {
+    const settings = getSavedSettings();
     //JSON stringifying an array for future growth
     const storedData = JSON.stringify([settings]);
     try {
@@ -190,71 +188,62 @@ class SaveTools extends PureComponent {
       }
     }
   };
-  onExport = () => {
-    const settings = this.props.onSave();
+  const exportSettings = () => {
+    const settings = getSavedSettings();
     //JSON stringifying an array for future growth
     const storedData = JSON.stringify([settings]);
     const dataURI =
       "data:application/JSON;charset=utf-8," + encodeURIComponent(storedData);
-    this.exportRef.current.href = dataURI;
-    this.exportRef.current.click();
+    exportRef.current.href = dataURI;
+    exportRef.current.click();
     console.log(
       "exported settings/data to JSON file with character length " +
         storedData.length
     );
   };
-  hoverOut = () => {
-    this.setState({ hovering: false });
-  };
-  toggleMenu = () => {
-    const current = this.state.hovering;
-    this.setState({ hovering: !current });
-  };
-  render() {
-    const menuState = this.state.hovering ? "is-active" : "";
-    return (
-      <div className={"dropdown " + menuState}>
-        <div className="dropdown-trigger">
-          <div className="buttons has-addons">
-            <button className="button" onClick={this.onSave}>
-              Save{" "}
-            </button>
-            <button
-              className="button"
-              aria-haspopup="true"
-              aria-controls="save-menu"
-            >
-              <span className="icon" onClick={this.toggleMenu}>
-                <FontAwesomeIcon icon={faAngleDown} />
-              </span>
-            </button>
-          </div>
-        </div>
-        <div
-          className="dropdown-menu"
-          id="save-menu"
-          role="menu"
-          onMouseLeave={this.hoverOut}
-        >
-          <div className="dropdown-content">
-            <a href="?#" className="dropdown-item" onClick={this.onSave}>
-              Cookie
-            </a>
-            <a href="?#" className="dropdown-item" onClick={this.onExport}>
-              JSON
-            </a>
-          </div>
-        </div>
 
-        <a
-          href="?#"
-          style={{ display: "none" }}
-          download="settings.json"
-          ref={this.exportRef}
-        ></a>
+  return (
+    <div className={"dropdown " + menuState}>
+      <div className="dropdown-trigger">
+        <div className="buttons has-addons">
+          <button className="button" onClick={saveSettings}>
+            Save{" "}
+          </button>
+          <button
+            className="button"
+            aria-haspopup="true"
+            aria-controls="save-menu"
+          >
+            <span className="icon" onClick={() => setHovering(!hovering)}>
+              <FontAwesomeIcon icon={faAngleDown} />
+            </span>
+          </button>
+        </div>
       </div>
-    );
-  }
+      <div
+        className="dropdown-menu"
+        id="save-menu"
+        role="menu"
+        onMouseLeave={() => setHovering(false)}
+      >
+        <div className="dropdown-content">
+          <a href="?#" className="dropdown-item" onClick={saveSettings}>
+            Cookie
+          </a>
+          <a href="?#" className="dropdown-item" onClick={exportSettings}>
+            JSON
+          </a>
+        </div>
+      </div>
+
+      <a
+        href="?#"
+        style={{ display: "none" }}
+        download="settings.json"
+        ref={exportRef}
+      ></a>
+    </div>
+  );
 }
 function Logo() {
   return (
@@ -287,7 +276,7 @@ function DocumentTools(props) {
     <nav className="navbar" role="navigation" aria-label="main navigation">
       <div className="navbar-start">
         <div className="navbar-item">
-          <SaveTools onSave={props.onSave} />
+          <SaveTools getSavedSettings={props.getSavedSettings} />
         </div>
         <div className="navbar-item">
           <ImportTools

@@ -262,7 +262,7 @@ function BulletApp() {
             onWidthUpdate={setWidth}
             onTextNorm={handleTextNorm}
             onTextUpdate={handleTextUpdate}
-            onSave={handleSave}
+            getSavedSettings={handleSave}
             onJSONImport={handleJSONImport}
             onThesaurusHide={handleThesaurusHide}
           />
