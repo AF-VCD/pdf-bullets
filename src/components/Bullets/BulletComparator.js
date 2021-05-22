@@ -95,6 +95,7 @@ export default function BulletComparator({
             onChange={onChange}
             handleKeyCommand={handleKeyCommand}
             stripPastedStyles={true}
+            spellCheck={true}
           />
         </div>
       </div>
