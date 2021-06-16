@@ -21,6 +21,7 @@ function BulletApp() {
   const [abbrData, setAbbrData] = useState(defaultAbbrData);
 
   const [abbrDict, setAbbrDict] = useState({});
+  const [abbrRegex, setAbbrRegex] = useState("");
 
   const [selection, setSelection] = useState("");
   const [currentTab, setCurrentTab] = useState(0);
@@ -59,24 +60,7 @@ function BulletApp() {
   }
 
   useEffect(() => {
-    let settingsArray;
-    try {
-      if (localStorage.getItem("bullet-settings")) {
-        settingsArray = JSON.parse(localStorage.getItem("bullet-settings"));
-        handleJSONImport(settingsArray);
-      }
-    } catch (err) {
-      if (err.name === "SecurityError") {
-        console.log(
-          "Was not able to get localstorage bullets due to use of file interface and browser privacy settings"
-        );
-      } else {
-        throw err;
-      }
-    }
-  }, []);
-
-  useEffect(() => {
+    // console.log("generating abbr dict");
     const newAbbrDict = {};
 
     abbrData
@@ -97,56 +81,52 @@ function BulletApp() {
         }
       });
 
+    Object.keys(newAbbrDict).forEach((word) => {
+      const abbrs = newAbbrDict[word]; //an array
+      //if there is at least one enabled abbreviation, take the lowest most element of it.
+      if (abbrs.enabled) {
+        newAbbrDict[word] = abbrs.enabled[abbrs.enabled.length - 1];
+      }
+    });
+
+    // courtesy of https://stackoverflow.com/questions/3446170/escape-string-for-use-in-javascript-regex
+    function escapeRegExp(string) {
+      return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); // $& means the whole matched string
+    }
+
+    let modifiers = "g";
+    const allApprovedAbbrs = Object.keys(newAbbrDict)
+        .map(escapeRegExp)
+        .join("|");
+
+    // some info on the boundary parts of the regex:
+    // (^|\\W|\\b)
+    //     ^ - ensures words at the beginning of line are considered for abbreviation
+    //     \\W - expects abbr to be preceded by a non-word, i.e. a space, semicolon, dash, etc.
+    //     \\b - also check for word boundaries, this is necessary for edge cases like 'f/ ' and 'w/ '.
+    //            Otherwise things like 'with chicken' and 'for $2M' won't resolve to 'w/chicken' and 'f/$2M'.
+    // (\\W|\\b|$)
+    //     \\W, \\b - see above
+    //     $ - ensures words at end of line are considered for abbreviation
+    const regExp = new RegExp(
+        "(^|\\W|\\b)(" + allApprovedAbbrs + ")(\\W|\\b|$)",
+        modifiers
+    );
+    setAbbrRegex(regExp);
     setAbbrDict(newAbbrDict);
   }, [abbrData]);
 
   const abbrReplacer = useCallback(
     (sentence) => {
-      const finalAbbrDict = {};
-      //console.log(abbrDict);
-      Object.keys(abbrDict).forEach((word) => {
-        const abbrs = abbrDict[word]; //an array
-        //if there is at least one enabled abbreviation, take the lowest most element of it.
-        if (abbrs.enabled) {
-          finalAbbrDict[word] = abbrs.enabled[abbrs.enabled.length - 1];
-        }
-      });
-
-      // courtesy of https://stackoverflow.com/questions/3446170/escape-string-for-use-in-javascript-regex
-      function escapeRegExp(string) {
-        return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); // $& means the whole matched string
-      }
-
-      let modifiers = "g";
-      const allApprovedAbbrs = Object.keys(finalAbbrDict)
-        .map(escapeRegExp)
-        .join("|");
-
-      // some info on the boundary parts of the regex:
-      // (^|\\W|\\b)
-      //     ^ - ensures words at the beginning of line are considered for abbreviation
-      //     \\W - expects abbr to be preceded by a non-word, i.e. a space, semicolon, dash, etc.
-      //     \\b - also check for word boundaries, this is necessary for edge cases like 'f/ ' and 'w/ '.
-      //            Otherwise things like 'with chicken' and 'for $2M' won't resolve to 'w/chicken' and 'f/$2M'.
-      // (\\W|\\b|$)
-      //     \\W, \\b - see above
-      //     $ - ensures words at end of line are considered for abbreviation
-      const regExp = new RegExp(
-        "(^|\\W|\\b)(" + allApprovedAbbrs + ")(\\W|\\b|$)",
-        modifiers
-      );
-      const newSentence = sentence.replace(regExp, (match, p1, p2, p3) => {
+      return sentence.replace(abbrRegex, (match, p1, p2, p3) => {
         //p2 = p2.replace(/ /g,'\\s')
-        let abbr = finalAbbrDict[p2];
+        let abbr = abbrDict[p2];
         if (!abbr) {
           abbr = "";
         }
         return p1 + abbr + p3;
       });
-      return newSentence;
-    },
-    [abbrDict]
-  );
+    }, [abbrDict, abbrRegex]);
 
   function handleOptimChange() {
     setEnableOptim(!enableOptim);
@@ -240,6 +220,22 @@ function BulletApp() {
       );
 
       setEditorState(newEditorStateSelect);
+    }
+  }
+
+  let settingsArray;
+  try {
+    if (localStorage.getItem("bullet-settings")) {
+      settingsArray = JSON.parse(localStorage.getItem("bullet-settings"));
+      handleJSONImport(settingsArray);
+    }
+  } catch (err) {
+    if (err.name === "SecurityError") {
+      console.log(
+          "Was not able to get localstorage bullets due to use of file interface and browser privacy settings"
+      );
+    } else {
+      throw err;
     }
   }
 
