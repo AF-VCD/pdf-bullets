@@ -35,7 +35,7 @@
     "react-table": "^7.6.2",
     "sanitize-html": "^2.1.2",
     "webfontloader": "^1.6.28",
-    "xlsx": "^0.16.9"
+    "xlsx": "^0.17.0"
   },
   "devDependencies": {
     "@testing-library/dom": "^7.29.0",
