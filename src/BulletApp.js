@@ -7,9 +7,8 @@ import { Logo, DocumentTools } from "./components/Toolbars/Toolbars";
 import { tokenize } from "./components/Bullets/utils";
 import AbbreviationViewer from "./components/Abbreviation/AbbreviationViewer";
 import SynonymViewer from "./components/Toolbars/Thesaurus.js";
-import { EditorState, ContentState, Modifier, SelectionState } from "draft-js";
+import { EditorState, ContentState, Modifier, SelectionState, CompositeDecorator } from "draft-js";
 import { defaultAbbrData, defaultText, defaultWidth } from "./const/defaults";
-import { undo } from "draft-js/lib/EditorState";
 
 const defaultEditorState = EditorState.createWithContent(
   ContentState.createFromText(defaultText)
@@ -157,31 +156,48 @@ function BulletApp() {
 
   function handleHighlightChange() {
     setEnableHighlight(!enableHighlight);
+    const contentState = editorState.getCurrentContent();
     if (enableHighlight === true) {
-      const contentState = editorState.getCurrentContent();
-
       setPrevContentState(contentState);
-      console.log(prevContentState);
-      const selectionsToReplace = [];
-      contentState.getBlockMap().forEach((block, key) => {
-        findWithRegex(/\s+/g, block, (anchorOffset, focusOffset) => {
-          const selection = SelectionState.createEmpty(key).merge({
-            anchorOffset,
-            focusOffset,
-          });
-          selectionsToReplace.push(selection);
+      let bulletText = contentState.getPlainText();
+      let userInput = bulletText.split(/\s|;|--|\//);
+      let findDuplicates = userInput => userInput.filter((item, index) => (userInput.indexOf(item) !== index && item.length > 1));
+      let duplicates = findDuplicates(userInput);
+      duplicates = [...new Set(duplicates)];
+
+      const Decorated = ({ children }) => {
+        return <span style={{ background: "yellow" }}>{children}</span>;
+      };
+
+      function findWithRegex(duplicates, contentBlock, callback) {
+        const text = contentBlock.getText();
+      
+        duplicates.forEach(word => {
+          const matches = [...text.matchAll(word)];
+          matches.forEach(match =>
+            callback(match.index, match.index + match[0].length)
+          );
         });
-      });
-      let newContentState = contentState;
+      }
+
+      function handleStrategy(contentBlock, callback) {
+        findWithRegex(duplicates, contentBlock, callback);
+      }
+
+      const createDecorator = () =>
+        new CompositeDecorator([
+          {
+            strategy: handleStrategy,
+            component: Decorated
+          }
+        ]);
+
       // need to reverse the selections list, because otherwise as the newContentState is iteratively changed,
       //  subsequent selections will get shifted and get all jacked up. This problem can be avoided by going backwards.
-      selectionsToReplace.reverse().forEach((selection) => {
-        newContentState = Modifier.replaceText(newContentState, selection, " ");
-      });
 
-      setEditorState(EditorState.createWithContent(newContentState));
+      setEditorState(EditorState.createWithContent(contentState, createDecorator()));
     } else {
-      console.log('else block');
+      setEditorState(EditorState.createWithContent(contentState));
     }
   }
 
