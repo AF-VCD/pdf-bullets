@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Editor, RichUtils } from "draft-js";
+import { Editor, RichUtils, CompositeDecorator, EditorState } from "draft-js";
 import "draft-js/dist/Draft.css";
 import Bullet from "./Bullet";
 
@@ -31,15 +31,52 @@ export default function BulletComparator({
 
   // Editor callback that runs whenever edits or selection changes occur.
   const onChange = (newEditorState) => {
-    const content = newEditorState.getCurrentContent();
-    // ordered map has a key and a block associasted with it
-    // if (enableHighlight) {
-    //   const blockMap = content.getBlockMap();
-    //   console.log(blockMap);
-    //       for(let [key,block] of blockMap){
-    //           console.log(block.getText());
+
+    // const contentState = newEditorState.getCurrentContent();
+    // if (enableHighlight === true) {
+    //   let bulletText = contentState.getPlainText();
+    //   let userInput = bulletText.split(/\s|;|--|\//);
+    //   let findDuplicates = userInput => userInput.filter((item, index) => (userInput.indexOf(item) !== index && item.length > 1));
+    //   let duplicates = findDuplicates(userInput);
+    //   duplicates = [...new Set(duplicates)];
+
+    //   const Decorated = ({ children }) => {
+    //     return <span style={{ background: "yellow" }}>{children}</span>;
+    //   };
+
+    //   function findWithRegex(duplicates, contentBlock, callback) {
+    //     const text = contentBlock.getText();
+      
+    //     duplicates.forEach(word => {
+    //       const matches = [...text.matchAll(word)];
+    //       matches.forEach(match =>
+    //         callback(match.index, match.index + match[0].length)
+    //       );
+    //     });
+    //   }
+
+    //   function handleStrategy(contentBlock, callback) {
+    //     findWithRegex(duplicates, contentBlock, callback);
+    //   }
+
+    //   const createDecorator = () =>
+    //     new CompositeDecorator([
+    //       {
+    //         strategy: handleStrategy,
+    //         component: Decorated
     //       }
-    // };
+    //     ]);
+
+    //   // need to reverse the selections list, because otherwise as the newContentState is iteratively changed,
+    //   //  subsequent selections will get shifted and get all jacked up. This problem can be avoided by going backwards.
+
+    //   setEditorState(EditorState.createWithContent(contentState, createDecorator()));
+    // } else {
+    //   setEditorState(EditorState.createWithContent(contentState));
+    // }
+  
+
+
         
     const { selectedText } = getSelectionInfo(newEditorState);
     if (onSelect && selectedText !== "") onSelect(selectedText);
