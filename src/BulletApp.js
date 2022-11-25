@@ -324,7 +324,7 @@ function BulletApp() {
           const highlightedEditorState = EditorState.createWithContent(contentState, createDecorator());
           const selectedEditorState = EditorState.forceSelection(highlightedEditorState, newSelectionState);
           const selectedContentState = selectedEditorState.getCurrentContent();
-        setEditorState(EditorState.createWithContent(selectedContentState, createDecorator()));
+        setEditorState(selectedEditorState);
         console.log('content set with decorator')
       } else {
         setEditorState(EditorState.createWithContent(contentState));
