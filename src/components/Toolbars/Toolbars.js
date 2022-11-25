@@ -201,6 +201,16 @@ class OutputTools extends PureComponent {
         >
           Auto-Space
         </a>
+        <a
+          className={
+            "control button is-dark" +
+            (!this.props.enableHighlight ? "" : "is-outlined")
+          }
+          onClick={this.props.onHighlightChange}
+          id="enableHighlight"
+        >
+          Highlight Duplicates
+        </a>
       </div>
     );
   }
@@ -357,6 +367,8 @@ class DocumentTools extends PureComponent {
             <OutputTools
               enableOptim={this.props.enableOptim}
               onOptimChange={this.props.onOptimChange}
+              enableHighlight={this.props.enableHighlight}
+              onHighlightChange={this.props.onHighlightChange}
               width={this.props.width}
               onWidthChange={this.props.onWidthChange}
               onWidthUpdate={this.props.onWidthUpdate}

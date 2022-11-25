@@ -14,6 +14,8 @@ export default function BulletComparator({
   onSelect,
   abbrReplacer,
   enableOptim,
+  enableHighlight,
+  onHighlightChange,
 }) {
   const bulletOutputID = "bulletOutput";
   const [heightMap, setHeightMap] = useState(new Map());
@@ -29,14 +31,16 @@ export default function BulletComparator({
 
   // Editor callback that runs whenever edits or selection changes occur.
   const onChange = (newEditorState) => {
-    //const content = editorState.getCurrentContent();
+    const content = newEditorState.getCurrentContent();
     // ordered map has a key and a block associasted with it
-    //const blockMap = content.getBlockMap();
-    /*
-        for(let [key,block] of blockMap){
-            console.log(block.getText());
-        }
-        */
+    // if (enableHighlight) {
+    //   const blockMap = content.getBlockMap();
+    //   console.log(blockMap);
+    //       for(let [key,block] of blockMap){
+    //           console.log(block.getText());
+    //       }
+    // };
+        
     const { selectedText } = getSelectionInfo(newEditorState);
     if (onSelect && selectedText !== "") onSelect(selectedText);
 
@@ -97,6 +101,8 @@ export default function BulletComparator({
             stripPastedStyles={true}
             spellCheck={true}
             autoCorrect={"off"}
+            enableHighlight={enableHighlight}
+            onHighlightChange={onHighlightChange}
           />
         </div>
       </div>

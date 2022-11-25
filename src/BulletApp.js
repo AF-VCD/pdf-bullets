@@ -9,6 +9,7 @@ import AbbreviationViewer from "./components/Abbreviation/AbbreviationViewer";
 import SynonymViewer from "./components/Toolbars/Thesaurus.js";
 import { EditorState, ContentState, Modifier, SelectionState } from "draft-js";
 import { defaultAbbrData, defaultText, defaultWidth } from "./const/defaults";
+import { undo } from "draft-js/lib/EditorState";
 
 const defaultEditorState = EditorState.createWithContent(
   ContentState.createFromText(defaultText)
@@ -16,7 +17,9 @@ const defaultEditorState = EditorState.createWithContent(
 
 // Note that all width measurements in this file are in millimeters.
 function BulletApp() {
+  const [prevContentState, setPrevContentState] = useState();
   const [enableOptim, setEnableOptim] = useState(true);
+  const [enableHighlight, setEnableHighlight] = useState(true);
   const [width, setWidth] = useState(defaultWidth);
   const [abbrData, setAbbrData] = useState(defaultAbbrData);
 
@@ -151,6 +154,38 @@ function BulletApp() {
   function handleOptimChange() {
     setEnableOptim(!enableOptim);
   }
+
+  function handleHighlightChange() {
+    setEnableHighlight(!enableHighlight);
+    if (enableHighlight === true) {
+      const contentState = editorState.getCurrentContent();
+
+      setPrevContentState(contentState);
+      console.log(prevContentState);
+      const selectionsToReplace = [];
+      contentState.getBlockMap().forEach((block, key) => {
+        findWithRegex(/\s+/g, block, (anchorOffset, focusOffset) => {
+          const selection = SelectionState.createEmpty(key).merge({
+            anchorOffset,
+            focusOffset,
+          });
+          selectionsToReplace.push(selection);
+        });
+      });
+      let newContentState = contentState;
+      // need to reverse the selections list, because otherwise as the newContentState is iteratively changed,
+      //  subsequent selections will get shifted and get all jacked up. This problem can be avoided by going backwards.
+      selectionsToReplace.reverse().forEach((selection) => {
+        newContentState = Modifier.replaceText(newContentState, selection, " ");
+      });
+
+      setEditorState(EditorState.createWithContent(newContentState));
+    } else {
+      console.log('else block');
+    }
+  }
+
+
   function handleSelect(newSel) {
     const maxWords = 8;
     if (newSel.trim() !== "") {
@@ -252,6 +287,8 @@ function BulletApp() {
       width={width}
       onSelect={handleSelect}
       enableOptim={enableOptim}
+      enableHighlight={enableHighlight}
+      onHighlightChange={handleHighlightChange}
     />,
     <AbbreviationViewer data={abbrData} setData={setAbbrData} />,
   ];
@@ -263,7 +300,9 @@ function BulletApp() {
           <Logo />
           <DocumentTools
             enableOptim={enableOptim}
+            enableHighlight={enableHighlight}
             onOptimChange={handleOptimChange}
+            onHighlightChange={handleHighlightChange}
             width={width}
             onWidthChange={handleWidthChange}
             onWidthUpdate={handleWidthUpdate}
