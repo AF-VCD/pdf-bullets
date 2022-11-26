@@ -18,7 +18,7 @@ const defaultEditorState = EditorState.createWithContent(
 function BulletApp() {
   const [prevContentState, setPrevContentState] = useState();
   const [enableOptim, setEnableOptim] = useState(true);
-  const [enableHighlight, setEnableHighlight] = useState(true);
+  const [enableHighlight, setEnableHighlight] = useState(false);
   const [width, setWidth] = useState(defaultWidth);
   const [abbrData, setAbbrData] = useState(defaultAbbrData);
 
@@ -156,8 +156,9 @@ function BulletApp() {
 
   function handleHighlightChange() {
     setEnableHighlight(!enableHighlight);
+    
     const contentState = editorState.getCurrentContent();
-    if (enableHighlight === true) {
+    if (enableHighlight === false) {
       let bulletText = contentState.getPlainText();
       let userInput = bulletText.split(/\s|;|--|\//);
       let findDuplicates = userInput => userInput.filter((item, index) => (userInput.indexOf(item) !== index && item.length > 1));
@@ -190,15 +191,15 @@ function BulletApp() {
             component: Decorated
           }
         ]);
-
-      setEditorState(EditorState.createWithContent(contentState, createDecorator()));
+      setEditorState(EditorState.set(editorState, {decorator: createDecorator()}));
     } else {
-      setEditorState(EditorState.createWithContent(contentState));
+      setEditorState(EditorState.set(editorState, {decorator: null}));
     }
   }
 
 
   function handleSelect(newSel) {
+    console.log(newSel + " " + enableHighlight);
     const maxWords = 8;
     if (newSel.trim() !== "") {
       setSelection(tokenize(newSel.trim()).slice(0, maxWords).join(" "));
@@ -288,17 +289,18 @@ function BulletApp() {
 
       setEditorState(newEditorStateSelect);
       const contentState = newEditorStateSelect.getCurrentContent();
-      if (enableHighlight === false) {
+      console.log(enableHighlight);
+      if (enableHighlight === true) {
         let bulletText = contentState.getPlainText();
         let userInput = bulletText.split(/\s|;|--|\//);
         let findDuplicates = userInput => userInput.filter((item, index) => (userInput.indexOf(item) !== index && item.length > 1));
         let duplicates = findDuplicates(userInput);
         duplicates = [...new Set(duplicates)];
-
+      
         const Decorated = ({ children }) => {
           return <span style={{ background: "yellow" }}>{children}</span>;
         };
-
+  
         function findWithRegex(duplicates, contentBlock, callback) {
           const text = contentBlock.getText();
         
@@ -309,11 +311,11 @@ function BulletApp() {
             );
           });
         }
-
+  
         function handleStrategy(contentBlock, callback) {
           findWithRegex(duplicates, contentBlock, callback);
         }
-
+  
         const createDecorator = () =>
           new CompositeDecorator([
             {
@@ -321,15 +323,9 @@ function BulletApp() {
               component: Decorated
             }
           ]);
-          const highlightedEditorState = EditorState.createWithContent(contentState, createDecorator());
-          const selectedEditorState = EditorState.forceSelection(highlightedEditorState, newSelectionState);
-          const selectedContentState = selectedEditorState.getCurrentContent();
-        setEditorState(selectedEditorState);
-        console.log('content set with decorator')
-      } else {
-        setEditorState(EditorState.createWithContent(contentState));
-        console.log('content set without decorator')
-      }
+          setEditorState(EditorState.set(newEditorStateSelect, {decorator: createDecorator()}));
+          
+        } else { setEditorState(EditorState.set(newEditorStateSelect, {decorator: null})); }
     }
   }
 

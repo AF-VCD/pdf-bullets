@@ -204,7 +204,7 @@ class OutputTools extends PureComponent {
         <a
           className={
             "control button is-dark" +
-            (!this.props.enableHighlight ? "" : "is-outlined")
+            (this.props.enableHighlight ? "" : "is-outlined")
           }
           onClick={this.props.onHighlightChange}
           id="enableHighlight"

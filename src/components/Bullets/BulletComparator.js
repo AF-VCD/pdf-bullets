@@ -31,57 +31,48 @@ export default function BulletComparator({
 
   // Editor callback that runs whenever edits or selection changes occur.
   const onChange = (newEditorState) => {
-
-    // const contentState = newEditorState.getCurrentContent();
-    // if (enableHighlight === true) {
-    //   let bulletText = contentState.getPlainText();
-    //   let userInput = bulletText.split(/\s|;|--|\//);
-    //   let findDuplicates = userInput => userInput.filter((item, index) => (userInput.indexOf(item) !== index && item.length > 1));
-    //   let duplicates = findDuplicates(userInput);
-    //   duplicates = [...new Set(duplicates)];
-
-    //   const Decorated = ({ children }) => {
-    //     return <span style={{ background: "yellow" }}>{children}</span>;
-    //   };
-
-    //   function findWithRegex(duplicates, contentBlock, callback) {
-    //     const text = contentBlock.getText();
-      
-    //     duplicates.forEach(word => {
-    //       const matches = [...text.matchAll(word)];
-    //       matches.forEach(match =>
-    //         callback(match.index, match.index + match[0].length)
-    //       );
-    //     });
-    //   }
-
-    //   function handleStrategy(contentBlock, callback) {
-    //     findWithRegex(duplicates, contentBlock, callback);
-    //   }
-
-    //   const createDecorator = () =>
-    //     new CompositeDecorator([
-    //       {
-    //         strategy: handleStrategy,
-    //         component: Decorated
-    //       }
-    //     ]);
-
-    //   // need to reverse the selections list, because otherwise as the newContentState is iteratively changed,
-    //   //  subsequent selections will get shifted and get all jacked up. This problem can be avoided by going backwards.
-
-    //   setEditorState(EditorState.createWithContent(contentState, createDecorator()));
-    // } else {
-    //   setEditorState(EditorState.createWithContent(contentState));
-    // }
-  
-
-
-        
+    console.log(newEditorState);
     const { selectedText } = getSelectionInfo(newEditorState);
     if (onSelect && selectedText !== "") onSelect(selectedText);
+    console.log(editorState);
+    const contentState = newEditorState.getCurrentContent();
+    if (enableHighlight === true) {
+      let bulletText = contentState.getPlainText();
+      let userInput = bulletText.split(/\s|;|--|\//);
+      let findDuplicates = userInput => userInput.filter((item, index) => (userInput.indexOf(item) !== index && item.length > 1));
+      let duplicates = findDuplicates(userInput);
+      duplicates = [...new Set(duplicates)];
+    
+      const Decorated = ({ children }) => {
+        return <span style={{ background: "yellow" }}>{children}</span>;
+      };
 
-    setEditorState(newEditorState);
+      function findWithRegex(duplicates, contentBlock, callback) {
+        const text = contentBlock.getText();
+      
+        duplicates.forEach(word => {
+          const matches = [...text.matchAll(word)];
+          matches.forEach(match =>
+            callback(match.index, match.index + match[0].length)
+          );
+        });
+      }
+
+      function handleStrategy(contentBlock, callback) {
+        findWithRegex(duplicates, contentBlock, callback);
+      }
+
+      const createDecorator = () =>
+        new CompositeDecorator([
+          {
+            strategy: handleStrategy,
+            component: Decorated
+          }
+        ]);
+        setEditorState(EditorState.set(newEditorState, {decorator: createDecorator()}));
+        
+      } else { setEditorState(EditorState.set(newEditorState, {decorator: null})); }
+ 
   };
 
   // This other bullet selection is for when things are selected on the optimized output
