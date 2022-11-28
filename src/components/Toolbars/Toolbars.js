@@ -206,7 +206,7 @@ class OutputTools extends PureComponent {
             "control button is-dark" +
             (this.props.enableHighlight ? "" : "is-outlined")
           }
-          onClick={this.props.onHighlightChange}
+          onClick={() => {this.props.onHighlightChange(); this.props.handleEnableHighlight()}}
           id="enableHighlight"
         >
           Highlight Duplicates
@@ -369,6 +369,7 @@ class DocumentTools extends PureComponent {
               onOptimChange={this.props.onOptimChange}
               enableHighlight={this.props.enableHighlight}
               onHighlightChange={this.props.onHighlightChange}
+              handleEnableHighlight={this.props.handleEnableHighlight}
               width={this.props.width}
               onWidthChange={this.props.onWidthChange}
               onWidthUpdate={this.props.onWidthUpdate}
