@@ -155,8 +155,8 @@ function BulletApp({enableHighlight, onHighlightChange}) {
   }
 
   function handleEnableHighlight() {
-    console.log("handleEnableHighlight fired");
-    console.log(enableHighlight);
+    // console.log("handleEnableHighlight fired");
+    // console.log(enableHighlight);
     const contentState = editorState.getCurrentContent();
     if (enableHighlight === false) {
       let bulletText = contentState.getPlainText();
@@ -167,8 +167,8 @@ function BulletApp({enableHighlight, onHighlightChange}) {
 
       function handleHighlightClick(e) {
         let yellowSpans = document.getElementsByClassName('yellow-highlight');
-        console.log(yellowSpans);
-        console.log(e.target);
+        // console.log(yellowSpans);
+        // console.log(e.target);
         for (let span of yellowSpans) {
           if (e.target.innerText == span.outerText) {
             if (span.style.background == 'yellow') {
@@ -214,7 +214,7 @@ function BulletApp({enableHighlight, onHighlightChange}) {
 
 
   function handleSelect(newSel) {
-    console.log(newSel + " " + enableHighlight);
+    // console.log(newSel + " " + enableHighlight);
     const maxWords = 8;
     if (newSel.trim() !== "") {
       setSelection(tokenize(newSel.trim()).slice(0, maxWords).join(" "));
@@ -304,7 +304,7 @@ function BulletApp({enableHighlight, onHighlightChange}) {
 
       setEditorState(newEditorStateSelect);
       const contentState = newEditorStateSelect.getCurrentContent();
-      console.log(enableHighlight);
+      // console.log(enableHighlight);
       if (enableHighlight === true) {
         let bulletText = contentState.getPlainText();
         let userInput = bulletText.split(/\s|;|--|\//);
@@ -314,8 +314,8 @@ function BulletApp({enableHighlight, onHighlightChange}) {
       
         function handleHighlightClick(e) {
           let yellowSpans = document.getElementsByClassName('yellow-highlight');
-          console.log(yellowSpans);
-          console.log(e.target);
+          // console.log(yellowSpans);
+          // console.log(e.target);
           for (let span of yellowSpans) {
             if (e.target.innerText == span.outerText) {
               if (span.style.background == 'yellow') {
