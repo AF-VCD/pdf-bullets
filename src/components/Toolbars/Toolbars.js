@@ -389,7 +389,9 @@ function getBulletsFromPdf(filedata) {
     return pdf.getMetadata().then(function (result) {
       const prefix = result.info.Custom["Short Title - Prefix"];
       const num = result.info.Custom["Short Title - Number"];
-      return prefix + "" + num;
+      const name = prefix + "" + num;
+      console.log("Detected form with name " + name)
+      return name;
     });
   });
   const getAllData = Promise.all([getFormName, getXFA]);

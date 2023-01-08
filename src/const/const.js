@@ -8,7 +8,7 @@ export const STATUS = {
 };
 
 // could not do a static class property because of MS edge
-export const Forms = {
+const Forms = {
   all: {
     AF707: {
       fields: [
@@ -47,3 +47,11 @@ export const Forms = {
     },
   },
 };
+
+Forms.all["DAF707"] = Forms.all["AF707"];
+Forms.all["DAF1206"] = Forms.all["AF1206"];
+Forms.all["DAF910"] = Forms.all["AF910"];
+Forms.all["DAF911"] = Forms.all["AF911"];
+
+
+export {Forms};
