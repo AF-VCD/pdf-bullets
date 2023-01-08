@@ -46,7 +46,7 @@ jest.mock("@handsontable/react", () => {
       this.props.afterChange(null, "loadData");
     }
     componentDidUpdate() {
-      this.props.afterChange(null, "loadData");
+      this.props.afterChange(null, "edit");
     }
     render() {
       return (
