@@ -28,14 +28,17 @@ jobs:
       run: npm ci
     - name: run tests
       run: CI=1 npm test
+    - name: Install SSH Client 🔑
+      uses: webfactory/ssh-agent@v0.7.0
+      with:
+        ssh-private-key: ${{ secrets.DEPLOY_SSH_KEY }}
     - name: build site/deploy
       run: |
         git config --global user.name $user_name
         git config --global user.email $user_email
-        git remote set-url origin https://${github_token}@github.com/${repository}
+        git remote set-url origin ssh://git@github.com/${repository}
         npm run deploy
       env:
         user_name: 'github-actions[bot]'
         user_email: 'github-actions[bot]@users.noreply.github.com'
-        github_token: ${{ secrets.ACTIONS_DEPLOY_ACCESS_TOKEN }}
         repository: ${{ github.repository }}
