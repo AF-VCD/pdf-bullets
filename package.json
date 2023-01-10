@@ -33,6 +33,7 @@
     "react-dom": "^16.14.0",
     "react-table": "^7.6.2",
     "sanitize-html": "^2.1.2",
+    "sass": "^1.56.1",
     "webfontloader": "^1.6.28",
     "xlsx": "^0.17.0"
   },
@@ -71,5 +72,5 @@
       "last 1 safari version"
     ]
   },
-  "homepage": "."
+  "homepage": ""
 }

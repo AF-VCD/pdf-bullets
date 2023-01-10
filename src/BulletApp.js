@@ -7,7 +7,7 @@ import { Logo, DocumentTools } from "./components/Toolbars/Toolbars";
 import { tokenize } from "./components/Bullets/utils";
 import AbbreviationViewer from "./components/Abbreviation/AbbreviationViewer";
 import SynonymViewer from "./components/Toolbars/Thesaurus.js";
-import { EditorState, ContentState, Modifier, SelectionState } from "draft-js";
+import { EditorState, ContentState, Modifier, SelectionState, CompositeDecorator } from "draft-js";
 import { defaultAbbrData, defaultText, defaultWidth } from "./const/defaults";
 
 const defaultEditorState = EditorState.createWithContent(
@@ -15,7 +15,7 @@ const defaultEditorState = EditorState.createWithContent(
 );
 
 // Note that all width measurements in this file are in millimeters.
-function BulletApp() {
+function BulletApp({enableHighlight, onHighlightChange}) {
   const [enableOptim, setEnableOptim] = useState(true);
   const [width, setWidth] = useState(defaultWidth);
   const [abbrData, setAbbrData] = useState(defaultAbbrData);
@@ -100,6 +100,8 @@ function BulletApp() {
     setAbbrDict(newAbbrDict);
   }, [abbrData]);
 
+  
+
   const abbrReplacer = useCallback(
     (sentence) => {
       const finalAbbrDict = {};
@@ -151,7 +153,68 @@ function BulletApp() {
   function handleOptimChange() {
     setEnableOptim(!enableOptim);
   }
+
+  function handleEnableHighlight() {
+    // console.log("handleEnableHighlight fired");
+    // console.log(enableHighlight);
+    const contentState = editorState.getCurrentContent();
+    if (enableHighlight === false) {
+      let bulletText = contentState.getPlainText();
+      let userInput = bulletText.split(/\s|;|--|\//);
+      let findDuplicates = userInput => userInput.filter((item, index) => (userInput.indexOf(item) !== index && item.length > 1));
+      let duplicates = findDuplicates(userInput);
+      duplicates = [...new Set(duplicates)];
+
+      function handleHighlightClick(e) {
+        let yellowSpans = document.getElementsByClassName('yellow-highlight');
+        // console.log(yellowSpans);
+        // console.log(e.target);
+        for (let span of yellowSpans) {
+          if (e.target.innerText == span.outerText) {
+            if (span.style.background == 'yellow') {
+              span.style.background = 'LawnGreen';
+            } else {
+              span.style.background = 'yellow';
+            }
+          }
+        }
+      }
+
+      const Decorated = ( {children} ) => {
+        return <span className={"yellow-highlight"} onClick={handleHighlightClick} style={{ background: "yellow", cursor: "pointer" }}>{children}</span>;
+      };
+
+      function findWithRegex(duplicates, contentBlock, callback) {
+        const text = contentBlock.getText();
+      
+        duplicates.forEach(word => {
+          const matches = [...text.matchAll(word)];
+          matches.forEach(match =>
+            callback(match.index, match.index + match[0].length)
+          );
+        });
+      }
+
+      function handleStrategy(contentBlock, callback) {
+        findWithRegex(duplicates, contentBlock, callback);
+      }
+
+      const createDecorator = () =>
+        new CompositeDecorator([
+          {
+            strategy: handleStrategy,
+            component: Decorated
+          }
+        ]);
+      setEditorState(EditorState.set(editorState, {decorator: createDecorator()}));
+    } else {
+      setEditorState(EditorState.set(editorState, {decorator: null}));
+    }
+  }
+
+
   function handleSelect(newSel) {
+    // console.log(newSel + " " + enableHighlight);
     const maxWords = 8;
     if (newSel.trim() !== "") {
       setSelection(tokenize(newSel.trim()).slice(0, maxWords).join(" "));
@@ -240,7 +303,65 @@ function BulletApp() {
       );
 
       setEditorState(newEditorStateSelect);
+      const contentState = newEditorStateSelect.getCurrentContent();
+      // console.log(enableHighlight);
+      if (enableHighlight === true) {
+        let bulletText = contentState.getPlainText();
+        let userInput = bulletText.split(/\s|;|--|\//);
+        let findDuplicates = userInput => userInput.filter((item, index) => (userInput.indexOf(item) !== index && item.length > 1));
+        let duplicates = findDuplicates(userInput);
+        duplicates = [...new Set(duplicates)];
+      
+        function handleHighlightClick(e) {
+          let yellowSpans = document.getElementsByClassName('yellow-highlight');
+          // console.log(yellowSpans);
+          // console.log(e.target);
+          for (let span of yellowSpans) {
+            if (e.target.innerText == span.outerText) {
+              if (span.style.background == 'yellow') {
+                span.style.background = 'LawnGreen';
+              } else {
+                span.style.background = 'yellow';
+              }
+            }
+          }
+        }
+  
+        const Decorated = ( {children} ) => {
+          return <span className={"yellow-highlight"} onClick={handleHighlightClick} style={{ background: "yellow", cursor: "pointer" }}>{children}</span>;
+        };
+  
+        function findWithRegex(duplicates, contentBlock, callback) {
+          const text = contentBlock.getText();
+        
+          duplicates.forEach(word => {
+            const matches = [...text.matchAll(word)];
+            matches.forEach(match =>
+              callback(match.index, match.index + match[0].length)
+            );
+          });
+        }
+  
+        function handleStrategy(contentBlock, callback) {
+          findWithRegex(duplicates, contentBlock, callback);
+        }
+  
+        const createDecorator = () =>
+          new CompositeDecorator([
+            {
+              strategy: handleStrategy,
+              component: Decorated
+            }
+          ]);
+  
+          setEditorState(EditorState.set(newEditorStateSelect, {decorator: createDecorator()}));
+          
+        } else {
+
+          setEditorState(EditorState.set(newEditorStateSelect, {decorator: null})); 
+        }
     }
+    
   }
 
   const tabs = ["Bullets", "Abbreviations"];
@@ -252,6 +373,9 @@ function BulletApp() {
       width={width}
       onSelect={handleSelect}
       enableOptim={enableOptim}
+      enableHighlight={enableHighlight}
+      onHighlightChange={onHighlightChange}
+      handleEnableHighlight={handleEnableHighlight}
     />,
     <AbbreviationViewer data={abbrData} setData={setAbbrData} />,
   ];
@@ -263,7 +387,10 @@ function BulletApp() {
           <Logo />
           <DocumentTools
             enableOptim={enableOptim}
+            enableHighlight={enableHighlight}
             onOptimChange={handleOptimChange}
+            onHighlightChange={onHighlightChange}
+            handleEnableHighlight={handleEnableHighlight}
             width={width}
             onWidthChange={handleWidthChange}
             onWidthUpdate={handleWidthUpdate}
