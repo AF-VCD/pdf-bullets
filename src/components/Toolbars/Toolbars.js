@@ -193,8 +193,8 @@ class OutputTools extends PureComponent {
 
         <a
           className={
-            "control button is-dark" +
-            (this.props.enableOptim ? "" : "is-outlined")
+            "control button " +
+            (this.props.enableOptim ? "is-dark" : "is-outlined")
           }
           onClick={this.props.onOptimChange}
           id="enableOptim"
@@ -203,13 +203,13 @@ class OutputTools extends PureComponent {
         </a>
         <a
           className={
-            "control button is-dark" +
-            (this.props.enableHighlight ? "" : "is-outlined")
+            "control button " +
+            (this.props.enableHighlight ? "is-success" : "is-outlined")
           }
           onClick={() => {this.props.onHighlightChange(); this.props.handleEnableHighlight()}}
           id="enableHighlight"
         >
-          Highlight Duplicates
+          Show Duplicates
         </a>
       </div>
     );
@@ -220,7 +220,7 @@ class InputTools extends PureComponent {
   render() {
     return (
       <button className="button" onClick={this.props.onTextNorm}>
-        Renormalize Input Spacing
+        Normalize Spaces
       </button>
     );
   }

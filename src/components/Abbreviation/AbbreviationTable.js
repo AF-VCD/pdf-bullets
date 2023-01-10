@@ -44,10 +44,13 @@ const tableSettings = {
 function AbbreviationTable({ data, setData }) {
   const tableRef = useRef(null);
 
-  const update = (payload, source) => {
+  const update = (source) => {
     //console.log({source, payload, tableRef: tableRef.current , data})
-    // console.log("update source: ", source);
-    if (source !== "loadData" && tableRef.current !== null) {
+    console.log("update source: ", source);
+    const updateSources = [
+      "ContextMenu.removeRow", "edit", "ContextMenu.rowAbove", "ContextMenu.rowBelow"
+    ]
+    if (updateSources.includes(source) && tableRef.current !== null) {
       const rawData = tableRef.current.hotInstance.getData();
       const newData = rawData.map((row) => {
         return {
@@ -66,7 +69,9 @@ function AbbreviationTable({ data, setData }) {
       {...tableSettings}
       data={data}
       ref={tableRef}
-      afterChange={update}
+      afterChange={(changes,source)=>update(source)}
+      afterRemoveRow={(i,a,r,source)=>update(source)}
+      afterCreateRow={(i,a,source)=>update(source)}
     />
   );
 }
