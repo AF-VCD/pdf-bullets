@@ -1,14 +1,14 @@
 {
   "files": {
-    "main.css": "./static/css/main.903b4c44.css",
-    "main.js": "./static/js/main.1b9c7db0.js",
-    "static/media/abbrs.xlsx": "./static/media/abbrs.ebd0e99b743c4acac912.xlsx",
-    "index.html": "./index.html",
-    "main.903b4c44.css.map": "./static/css/main.903b4c44.css.map",
-    "main.1b9c7db0.js.map": "./static/js/main.1b9c7db0.js.map"
+    "main.css": "/james-craven.github.io/public/index.html/static/css/main.74408458.css",
+    "main.js": "/james-craven.github.io/public/index.html/static/js/main.edb6c975.js",
+    "static/media/abbrs.xlsx": "/james-craven.github.io/public/index.html/static/media/abbrs.ebd0e99b743c4acac912.xlsx",
+    "index.html": "/james-craven.github.io/public/index.html/index.html",
+    "main.74408458.css.map": "/james-craven.github.io/public/index.html/static/css/main.74408458.css.map",
+    "main.edb6c975.js.map": "/james-craven.github.io/public/index.html/static/js/main.edb6c975.js.map"
   },
   "entrypoints": [
-    "static/css/main.903b4c44.css",
-    "static/js/main.1b9c7db0.js"
+    "static/css/main.74408458.css",
+    "static/js/main.edb6c975.js"
   ]
 }
