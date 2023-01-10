@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 
 
 //import {Bullet, BulletComparator, Skeleton} from "./components/bullets.js"
-import BulletApp from "./BulletApp.js"
+import TopBulletApp from "./highlightStateHolder.js";
 
 import "./styles/index.scss"
 import 'handsontable/dist/handsontable.full.css'
@@ -25,7 +25,7 @@ WebFont.load({
 ReactDOM.render(
   <>
     <div className="section" id="stuff" >
-      <BulletApp  />
+      <TopBulletApp  />
     </div>
     <div className="container" id="footer">
       <div>If you have feedback, submit
