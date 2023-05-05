@@ -2,7 +2,7 @@
 
 This is a re-work of the original [pdf-bullets](https://github.com/AF-VCD/pdf-bullets) project, created and maintained by Christopher Kodama ad the members of the Air Force Volunteer Cyber Depository group.
 
-## Background
+## What are "Bullets"
 
 One of the most pointless and time-consuming things that Air and Space Force officer and enlisted personnel do all the time is bullet-writing.
 
@@ -13,7 +13,7 @@ These bullets follow a few formatting rules:
 - Each bullet must be exactly one line, with the width of the line depending on the form (performance reports, award packages, etc).
 - Acronyms and abbreviations can be force-wide, organization, and/or commander-specific, with major inconsistencies with their abbreviation/acronym policies.
 
-## Formatting
+## How are Bullets Formatted
 
 Those bullet formatting rules lead to the following:
 
@@ -26,6 +26,8 @@ Those bullet formatting rules lead to the following:
 The purpose of _smarter_-pdf-bullets is to develop a set of tools to automate the pointless aspects of bullet-writing so that an officer and/or enlisted members can focus more on writing actual content rather than worry about irrelevant formatting.
 
 ## Application Usage
+
+### Acronym List Imports
 
 Note: When importing rules from a Excel (.xlsx) file containing acronym definition, the columns are:
 
@@ -42,9 +44,31 @@ United States Air Force: USAF
 United States Air Force Academy: USAFA  
 Will cause "United States Air Force Academy" to be abbreviated as "USAF Academy"
 
-## GitOps
+## Contributing
 
-Below are some rules for contributing to this repository. As time moves forward, a more formalized pull request and issue template will be established.
+Below are some GitOps rules for contributing to this repository. As time moves forward, more formalized pull request and issue templates will be established.
+
+### Github CI Pipeline
+
+The Github workflow will automatically fire a build and test for the repository upon successful merging or pushing to the main branch.
+
+### Pull Requests
+
+When describing a pull request, please provide the following:
+
+1. A title or summary as outlined in the [Committing and Merging](#committing-and-merging) section
+2. A description of what was changed and whether it was attached to an existing issue
+
+### Issues
+
+When describing an issue, please provide the following:
+
+1. A title or summary of the issues
+2. Did the issue occur in the Local Development Environment or Production Environment?
+   - If Local, describe the operating system and any other relevant information
+3. Describe the expected behavior vs. the observed behavior
+4. Provide all available error logs and network activity
+5. Provide a recommended fix or area of concern
 
 ### Branching
 
@@ -54,7 +78,7 @@ When creating a branch, we like to follow the naming template:
 
 Use a dash, `-`, as the delimiter, e.g., `this-is-a-feature-branch`
 
-### Committing/Merging
+### Committing and Merging
 
 When merging, we should squash all commits and follow the following commit message template:
 
