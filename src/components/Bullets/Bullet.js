@@ -16,7 +16,7 @@ function Bullet({
   const [loading, setLoading] = useState(false);
   const [optimStatus, setOptimStatus] = useState(STATUS.NOT_OPT);
   const [rendering, setBulletRendering] = useState({ textLines: [""] });
-  const widthPxAdjusted = widthPx + 0.55;
+  const widthPxAdjusted = widthPx < 75 ? 75 : widthPx + 0.55;
 
   function getTextWidth(txt, canvas) {
     const context = canvas.getContext("2d");
