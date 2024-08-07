@@ -1,4 +1,4 @@
-import XLSX from "xlsx";
+import * as XLSX from "xlsx";
 import SampleAbbrFile from "../../static/abbrs.xlsx";
 
 export const getDataFromXLS = (file) => {
