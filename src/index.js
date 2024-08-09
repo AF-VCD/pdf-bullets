@@ -23,7 +23,7 @@ ReactDOM.render(
     </div>
     <div className="container" id="footer">
       <div className="is-size-6 mb-2">
-        <a href="https://github.com/AF-VCD/pdf-bullets/blob/master/README.md">ANNOUNCEMENT (August 2024)</a>
+        <a href="https://github.com/AF-VCD/pdf-bullets#exclamation-august-2024-update">ANNOUNCEMENT (August 2024)</a>
       </div>
       <div>
         If you have feedback, submit an 
