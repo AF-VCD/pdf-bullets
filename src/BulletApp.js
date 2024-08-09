@@ -221,9 +221,6 @@ function BulletApp({enableHighlight, onHighlightChange}) {
     }
   }
 
-  function handleWidthChange(e) {
-    setWidth(parseFloat(e.target.value));
-  }
   function handleTextNorm() {
     const selectionsToReplace = [];
     const contentState = editorState.getCurrentContent();
@@ -247,14 +244,11 @@ function BulletApp({enableHighlight, onHighlightChange}) {
     setEditorState(EditorState.createWithContent(newContentState));
   }
   function handleTextUpdate(newText) {
-    return () =>
-      setEditorState(
-        EditorState.createWithContent(ContentState.createFromText(newText))
-      );
+    setEditorState(
+      EditorState.createWithContent(ContentState.createFromText(newText))
+    );
   }
-  function handleWidthUpdate(newWidth) {
-    return () => setWidth(newWidth);
-  }
+
   function handleSave() {
     return {
       width: width,
@@ -392,11 +386,10 @@ function BulletApp({enableHighlight, onHighlightChange}) {
             onHighlightChange={onHighlightChange}
             handleEnableHighlight={handleEnableHighlight}
             width={width}
-            onWidthChange={handleWidthChange}
-            onWidthUpdate={handleWidthUpdate}
+            onWidthUpdate={setWidth}
             onTextNorm={handleTextNorm}
             onTextUpdate={handleTextUpdate}
-            onSave={handleSave}
+            getSavedSettings={handleSave}
             onJSONImport={handleJSONImport}
             onThesaurusHide={handleThesaurusHide}
           />

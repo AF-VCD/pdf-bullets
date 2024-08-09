@@ -31,7 +31,12 @@ const defaultData = [
     abbr: "parens",
   },
 ];
-
+let changes = []
+for (const [i,item] of defaultData.entries()) {
+  for (const property in item){
+    changes.push([i, property, "", item[property]])
+  }
+}
 jest.mock("@handsontable/react", () => {
   const { Component } = jest.requireActual("react");
   class MockHotTable extends Component {
@@ -43,10 +48,10 @@ jest.mock("@handsontable/react", () => {
       };
     }
     componentDidMount() {
-      this.props.afterChange(null, "loadData");
+      this.props.beforeChange(changes);
     }
     componentDidUpdate() {
-      this.props.afterChange(null, "edit");
+      this.props.beforeChange(changes);
     }
     render() {
       return (

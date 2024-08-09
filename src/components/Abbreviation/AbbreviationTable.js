@@ -1,6 +1,11 @@
-import { useRef } from "react";
+import { useRef, useState} from "react";
+
+
 import { HotTable } from "@handsontable/react";
 import "handsontable/dist/handsontable.full.css";
+import { registerAllModules } from 'handsontable/registry';
+registerAllModules();
+
 
 const tableSettings = {
   columns: [
@@ -43,35 +48,43 @@ const tableSettings = {
 
 function AbbreviationTable({ data, setData }) {
   const tableRef = useRef(null);
-
-  const update = (source) => {
+  const update = (changes, source) => {
     //console.log({source, payload, tableRef: tableRef.current , data})
-    console.log("update source: ", source);
-    const updateSources = [
-      "ContextMenu.removeRow", "edit", "ContextMenu.rowAbove", "ContextMenu.rowBelow"
-    ]
-    if (updateSources.includes(source) && tableRef.current !== null) {
-      const rawData = tableRef.current.hotInstance.getData();
-      const newData = rawData.map((row) => {
-        return {
-          enabled: row[0],
-          value: row[1],
-          abbr: row[2],
-        };
-      });
-
-      setData(newData);
-    }
+    // console.log("update source: ", source);
+    // console.log({source, changes})
+    const newData = [...data] 
+    changes.forEach(([row, col, oldVal, newVal]) => {
+      newData[row][col] = newVal
+    })
+    setData(newData);
+    return false
   };
-
+  const removeRow = (index, amount, rows, source) => {
+    const newData = []
+    for (let i = 0; i < data.length; i++) {
+      let keep = true
+      for (let j = 0; j < rows.length; j++) {
+        if (rows[j] == i) {
+          keep = false
+        }
+      }
+      if (keep) {
+        newData.push(data[i])
+      }
+    }
+    setData(newData)
+    const colSort = tableRef.current.hotInstance.getPlugin('columnSorting')
+    const sortConfig = colSort.getSortConfig()
+    colSort.sort(sortConfig)
+    return false
+  }
   return (
     <HotTable
       {...tableSettings}
       data={data}
       ref={tableRef}
-      afterChange={(changes,source)=>update(source)}
-      afterRemoveRow={(i,a,r,source)=>update(source)}
-      afterCreateRow={(i,a,source)=>update(source)}
+      beforeChange={update}
+      beforeRemoveRow={removeRow}
     />
   );
 }

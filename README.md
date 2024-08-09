@@ -1,8 +1,16 @@
-# pdf-bullets
+# Bullet Shaping and Iteration Tool
 
-[Main Website](https://af-vcd.github.io/pdf-bullets/)
+## :exclamation: August 2024 Update
 
-pdf analysis of air force forms
+As of 11 August, I am longer working for the Air Force! 
+
+I have no plans to shut down or increase/decrease my level of support for the site, but just wanted to make any remaining users of this site aware. The only thing I am shutting down is my analytics backend in AWS that was costing me a few dollars a month. Here is a final plot of my website visit counts:
+
+![Plot](src/static/afbs-2024.png)
+
+Thank you all for the support over the past few years! 
+
+## pdf analysis of air force forms
 
 One of the most pointless and time-consuming things that Air Force officer and enlisted personnel do every year is bullet-writing. 
 
