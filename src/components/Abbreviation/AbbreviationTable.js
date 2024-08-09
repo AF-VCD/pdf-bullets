@@ -51,7 +51,7 @@ function AbbreviationTable({ data, setData }) {
   const update = (changes, source) => {
     //console.log({source, payload, tableRef: tableRef.current , data})
     // console.log("update source: ", source);
-    console.log({source, changes})
+    // console.log({source, changes})
     const newData = [...data] 
     changes.forEach(([row, col, oldVal, newVal]) => {
       newData[row][col] = newVal

@@ -41,7 +41,12 @@ const defaultData = [
     abbr: "parens",
   },
 ];
-
+let changes = []
+for (const [i,item] of defaultData.entries()) {
+  for (const property in item){
+    changes.push([i, property, "", item[property]])
+  }
+}
 jest.mock("@handsontable/react", () => {
   const { Component } = jest.requireActual("react");
   class MockHotTable extends Component {
@@ -53,14 +58,14 @@ jest.mock("@handsontable/react", () => {
       };
     }
     componentDidMount() {
-      this.props.afterChange(null, "loadData");
+      this.props.beforeChange(changes);
     }
     componentDidUpdate() {
-      this.props.afterChange(null, "loadData");
+      this.props.beforeChange(changes);
     }
     render() {
       return (
-        <div data-testid="parent" onClick={this.props.afterChange}>
+        <div data-testid="parent" onClick={this.props.beforeChange}>
           HELLO WORLD
         </div>
       );
@@ -93,7 +98,7 @@ test("AbbreviationToolbar File upload button click", () => {
   // I think the below test does a good enough job of testing the upload logic
 });
 
-test("AbbreviationToolbar file upload", () => {
+test("AbbreviationToolbar file upload", async () => {
   const setData = jest.fn();
   Utils.getDataFromXLS.mockReturnValue(new Promise((res) => res(defaultData)));
   render(<AbbreviationToolbar data={defaultData} setData={setData} />);
@@ -106,34 +111,35 @@ test("AbbreviationToolbar file upload", () => {
     type: "text/plain",
   });
   //upload file. should trigger getDataFromXLS
-  userEvent.upload(uploader, file);
+  await userEvent.upload(uploader, file);
   expect(uploader.files[0]).toStrictEqual(file);
   // upload same file again. should not trigger getDataFromXLS
-  userEvent.upload(uploader, file);
+  await userEvent.upload(uploader, file);
   // upload undefined. should not trigger getDataFromXLS
-  userEvent.upload(uploader, undefined);
+  await userEvent.upload(uploader, undefined);
+
   expect(uploader.files[0]).toStrictEqual(undefined);
   //upload a different file. should trigger getDataFromXLS
-  userEvent.upload(uploader, file2);
+  await userEvent.upload(uploader, file2);
+
   expect(uploader.files[0]).toStrictEqual(file2);
 
   // expect two callbacks.
   expect(Utils.getDataFromXLS).toHaveBeenCalledTimes(2);
 });
 
-test("AbbreviationToolbar file export button click", () => {
+test("AbbreviationToolbar file export button click", async () => {
   const setData = jest.fn((data) => {
     console.log(data);
   });
   render(<AbbreviationToolbar data={defaultData} setData={setData} />);
   const button = screen.getByRole("button", { name: /export abbrs/i });
-  userEvent.click(button);
+  await userEvent.click(button);
   expect(Utils.exportToXLS).toHaveBeenCalled();
 });
-test("AbbreviationToolbar example file button click - confirmed", (done) => {
+test("AbbreviationToolbar example file button click - confirmed", async () => {
   const setData = jest.fn((data) => {
     expect(data).toEqual(defaultData);
-    done();
   });
 
   window.confirm = jest.fn(() => true);
@@ -142,19 +148,19 @@ test("AbbreviationToolbar example file button click - confirmed", (done) => {
 
   render(<AbbreviationToolbar data={defaultData} setData={setData} />);
   const button = screen.getByRole("button", { name: /load common abbrs/i });
-  userEvent.click(button);
+  await userEvent.click(button);
   expect(window.confirm).toHaveBeenCalled();
   expect(Utils.importSampleAbbrs).toHaveBeenCalled();
 });
 
-test("AbbreviationToolbar example file button click - cancelled", () => {
+test("AbbreviationToolbar example file button click - cancelled", async () => {
   const setData = jest.fn((data) => {
     console.log(data);
   });
   window.confirm = jest.fn(() => false);
   render(<AbbreviationToolbar data={defaultData} setData={setData} />);
   const button = screen.getByRole("button", { name: /load common abbrs/i });
-  userEvent.click(button);
+  await userEvent.click(button);
   expect(window.confirm).toHaveBeenCalled();
   expect(Utils.getDataFromXLS).not.toHaveBeenCalled();
   expect(setData).not.toHaveBeenCalled();
