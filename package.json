@@ -52,7 +52,7 @@
     "test:coverage": "react-scripts test --coverage --watchAll=false",
     "test:debug": "react-scripts --inspect-brk test --runInBand --no-cache",
     "eject": "react-scripts eject",
-    "deploy": "gh-pages -d build -u 'github-actions-bot <support+actions@github.com>'",
+    "deploy": "gh-pages -d build",
     "predeploy": "CI=false npm run build",
     "cypress": "cypress open"
   },
