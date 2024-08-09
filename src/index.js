@@ -22,6 +22,9 @@ ReactDOM.render(
       <BulletApp />
     </div>
     <div className="container" id="footer">
+      <div className="is-size-6 mb-2">
+        <a href="https://github.com/AF-VCD/pdf-bullets/blob/master/README.md">ANNOUNCEMENT (August 2024)</a>
+      </div>
       <div>
         If you have feedback, submit an 
         <a href="https://github.com/AF-VCD/pdf-bullets/issues"> issue </a>
@@ -32,7 +35,7 @@ ReactDOM.render(
         This site utilizes PDF.JS (pdf import), react-table (spreadsheet),
         draft-js (editor), the DataMuse API (thesaurus), and Bulma (CSS).
       </div>
-      <div>Maintained by Christopher Kodama </div>
+      <div>Maintained by <a href="https://www.xoid.net">Christopher Kodama</a></div>
     </div>
   </>,
   document.getElementById("root")
