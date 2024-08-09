@@ -27,6 +27,6 @@ jobs:
     - name: build site/deploy
       run: |
         git remote set-url origin https://${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}
-        npx gh-pages -d build -u "github-actions-bot <support+actions@github.com>"
+        npm run deploy
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
