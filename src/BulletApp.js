@@ -8,7 +8,7 @@ import { tokenize } from "./components/Bullets/utils";
 import AbbreviationViewer from "./components/Abbreviation/AbbreviationViewer";
 import SynonymViewer from "./components/Toolbars/Thesaurus.js";
 import { EditorState, ContentState, Modifier, SelectionState, CompositeDecorator } from "draft-js";
-import { defaultAbbrData, defaultText, defaultWidth } from "./const/defaults";
+import { defaultAbbrData, defaultText, defaultWidth, stopWords } from "./const/defaults";
 
 const defaultEditorState = EditorState.createWithContent(
   ContentState.createFromText(defaultText)
@@ -186,9 +186,13 @@ function BulletApp({enableHighlight, onHighlightChange}) {
 
       function findWithRegex(duplicates, contentBlock, callback) {
         const text = contentBlock.getText();
+        const duplicatesMinusStopWords = new Set(duplicates).difference(stopWords);
       
-        duplicates.forEach(word => {
-          const matches = [...text.matchAll(word)];
+        duplicatesMinusStopWords.forEach(word => {
+          // TODO Apply word boundaries here
+          // use global (g) and case insensitive (i) match
+          let re = new RegExp(String.raw`\s${word}\s`, "gi");
+          const matches = [...text.matchAll(re)];
           matches.forEach(match =>
             callback(match.index, match.index + match[0].length)
           );

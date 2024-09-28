@@ -10,6 +10,17 @@ I have no plans to shut down or increase/decrease my level of support for the si
 
 Thank you all for the support over the past few years! 
 
+## How to run this code
+
+Install NPM per your OS-specific guidance found here: https://nodejs.org/en/download/package-manager
+
+run 'npm run build'  
+cd into the build directory, then serve the files via an HTTP server
+
+If testing on Windows, these commands will do for testing (use a better server for production):
+
+'npm run build; cd build; python -m http.server'; then browse to http://localhost:8000
+
 ## pdf analysis of air force forms
 
 One of the most pointless and time-consuming things that Air Force officer and enlisted personnel do every year is bullet-writing. 
