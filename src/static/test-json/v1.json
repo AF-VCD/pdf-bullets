@@ -1,0 +1,34 @@
+[
+    {
+        "width": "202.321mm",
+        "text": "test data\\nmore test data\\neven more test data\\niiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii\\nasdfasdfjkalsdjfioasdfjioasdfas8df908asdfuas89djf89ashdfiasndfjinasdf9jas890dfj90asdf90as90df90asdf90asdf90asdf99999999\\nparentheses* with $25M with my \\n\\n",
+        "abbrData": [
+            [
+                true,
+                "abbreviations",
+                "abbrs"
+            ],
+            [
+                true,
+                "table",
+                "tbl"
+            ],
+            [
+                true,
+                "optimize",
+                "optim"
+            ],
+            [
+                true,
+                "with ",
+                "w/"
+            ],
+            [
+                true,
+                "parentheses*",
+                "parens"
+            ]
+        ],
+        "enableOptim": true
+    }
+]
