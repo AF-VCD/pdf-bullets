@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Editor, RichUtils, CompositeDecorator, EditorState } from "draft-js";
 import "draft-js/dist/Draft.css";
 import Bullet from "./Bullet";
+import { stopWords } from "../../const/defaults";
 
 
 const DPI = 96;
@@ -66,9 +67,12 @@ export default function BulletComparator({
   
         function findWithRegex(duplicates, contentBlock, callback) {
           const text = contentBlock.getText();
+          const duplicatesMinusStopWords = new Set(duplicates).difference(stopWords);
         
-          duplicates.forEach(word => {
-            const matches = [...text.matchAll(word)];
+          duplicatesMinusStopWords.forEach(word => {
+            // use global (g) and case insensitive (i) match
+            let re = new RegExp(String.raw`\s${word}\s`, "gi");
+            const matches = [...text.matchAll(re)];
             matches.forEach(match =>
               callback(match.index, match.index + match[0].length)
             );
