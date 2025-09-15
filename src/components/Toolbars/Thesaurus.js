@@ -104,7 +104,7 @@ class SynonymViewer extends PureComponent {
 
     return (
       <div className="card">
-        <header className="card-header has-background-light	is-shadowless">
+        <header className="card-header	is-shadowless">
           <div className="card-header-title">
             <span>Thesaurus{this.props.word ? ":" : ""}</span>
             {this.props.word ? header : ""}
@@ -125,7 +125,6 @@ class SynonymViewer extends PureComponent {
 }
 
 class SynonymList extends PureComponent {
-
   render() {
     return (
       <div>
@@ -141,7 +140,11 @@ class SynonymList extends PureComponent {
                   otherAbbrs={otherAbbrs}
                 />
                 <a className="icon" onMouseDown={handleCardClick(word, this)}>
-                  <FontAwesomeIcon icon={faPlus} size="xs" color="#51cf66" />
+                  <FontAwesomeIcon
+                    icon={faPlus}
+                    size="xs"
+                    className="thesaurus-plus"
+                  />
                 </a>
               </span>
             );

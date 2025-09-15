@@ -12,7 +12,6 @@ function Bullet({
   const canvasRef = useRef(null);
   const [outputTextLines, setOutputTextLines] = useState(() => [" "]);
 
-  const [color, setColor] = useState("inherit");
   const [loading, setLoading] = useState(false);
   const [optimStatus, setOptimStatus] = useState(STATUS.NOT_OPT);
   const [rendering, setBulletRendering] = useState({ textLines: [""] });
@@ -67,15 +66,12 @@ function Bullet({
   }, [rendering, enableOptim, text, widthPxAdjusted]);
 
   //color effect
-  useEffect(() => {
-    if (loading) {
-      setColor("silver");
-    } else if (optimStatus === STATUS.FAILED_OPT) {
-      setColor("red");
-    } else {
-      setColor("black");
-    }
-  }, [loading, outputTextLines, optimStatus]);
+  // choose a theme-aware class for text color
+  const statusClass = loading
+    ? "is-loading"
+    : optimStatus === STATUS.FAILED_OPT
+    ? "has-text-danger"
+    : "";
 
   // the style properties help lock the canvas in the same spot and make it essentially invisible.
   //whitespace: pre-wrap is essential as it allows javascript string line breaks to appear properly.
@@ -91,9 +87,9 @@ function Bullet({
         }}
       />
       <div
+        className={statusClass}
         style={{
           minHeight: height,
-          color: color,
           display: "flex",
           flexDirection: "column",
         }}

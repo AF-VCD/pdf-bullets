@@ -1,94 +1,259 @@
 
 @charset "utf-8";
-
-
 // If need, change your variables before importing Bulma
 // $title-color: #ff0000;
 
 @import "bulma/bulma.scss";
 
-textarea.bullets{
+/* ---------------------------
+   THEME TOKENS & OVERRIDES
+----------------------------*/
+html { color-scheme: dark light; }
 
-    height: 200px;
-    white-space: pre-line;
-    text-indent: 0px;
-    overflow: hidden;
-    border: none;
-    resize: none;
-    /*word-break: break-all;*/
+:root {
+  --bg: #14161A;
+  --text: #f2f3f5;
+  --muted: #a3a3a3;
+  --border: #ffffff26;
+  --bg-elevated: #14161A;
+  --logo: #e6e9ff;
+  --plus-icon: #ff2828;
+
+  /* Highlights & validation (dark) */
+  --hl-bg: #e7c64b;
+  --hl-alt-bg: #58d66e;
+  --hl-fg: #0b0b0c;
+  --valid: var(--text);
+  --invalid: #ff2828;
 }
-.border{
-    width:fit-content;
-    border: solid black 1.1px;
+
+/* SYSTEM LIGHT OVERRIDE */
+@media (prefers-color-scheme: light) {
+  :root {
+    --bg: #ffffff;
+    --text: #111111;
+    --muted: #6b7280;
+    --border: #1111111c;
+    --bg-elevated: #ffffff;
+    --logo: #0F0F0F;
+
+    --hl-bg: #fff3a3;
+    --hl-alt-bg: #c9f7a8;
+    --hl-fg: #111111;
+    --valid: var(--text);
+    --invalid: #ff2828;
+  }
 }
-.bulletContainer{
-    margin:10px 10px 0px 0px;
+
+/* MANUAL OVERRIDES (leave as-is, order after the above so they win) */
+:root[data-theme="light"] {
+  color-scheme: light;
+  --bg: #ffffff;
+  --text: #111111;
+  --muted: #6b7280;
+  --border: #1111111c;
+  --bg-elevated: #ffffff;
+  --logo: #0F0F0F;
+
+  --hl-bg: #fff3a3;
+  --hl-alt-bg: #c9f7a8;
+  --hl-fg: #111111;
+  --valid: var(--text);
+  --invalid: #ff2828;
 }
-.bullets{
-    //font-family: "AdobeTimes";
-    font-family: 'Times New Roman'; 
-    font-size: 12pt;
-    display:inline;
-    font-kerning:none;
-    text-rendering: geometricPrecision;
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #14161A;
+  --text: #f2f3f5;
+  --muted: #a3a3a3;
+  --border: #ffffff26;
+  --bg-elevated: #14161A;
+  --logo: #e6e9ff;
+
+  --hl-bg: #e7c64b;
+  --hl-alt-bg: #58d66e;
+  --hl-fg: #0b0b0c;
+  --valid: var(--text);
+  --invalid: #ff2828;
 }
-input.htCheckboxRendererInput{
-    margin: 2px auto!important;
-    display:block!important;
+
+/* ---------------------------
+   GLOBAL & LAYOUT
+----------------------------*/
+html, body, #root {
+  min-height: 100vh;
+  background: var(--bg);
 }
-#thesaurus{
-    padding: 10px;
-    margin:10px 10px 0px 0px;
-    width: unset;
+body { color: var(--text); margin: 0; }
+::selection { background: var(--hl-bg); color: var(--hl-fg); }
+
+/* Typography */
+.title { color: var(--text); }
+.logo  { color: var(--logo); }
+h1, h2 { color: var(--text); font-family: monospace; }
+
+/* Navbar & tabs */
+.navbar { background-color: var(--bg-elevated); }
+.navbar-item, .navbar-link { color: var(--text); }
+.navbar.is-wrap {
+  background: var(--bg-elevated);
+  padding: .5rem;
+}
+.navbar.is-wrap .navbar-start {
+  display: flex;
+  flex-wrap: wrap;         /* key line */
+  align-items: center;
+  gap: .5rem;              /* consistent spacing between items */
+}
+
+/* Tighter items so they pack nicely when wrapped */
+.navbar.is-wrap .navbar-item {
+  padding: 0;              /* remove bulky navbar padding */
+}
+
+/* Let grouped controls wrap too (Bulma buttons/fields) */
+.navbar.is-wrap .field.has-addons,
+.navbar.is-wrap .buttons.has-addons {
+  flex-wrap: wrap;
+  gap: .25rem;
+}
+
+/* Keep control heights consistent (buttons, selects, inputs) */
+.navbar.is-wrap .button,
+.navbar.is-wrap .input {
+  height: 2.25rem;         /* matches Bulma default button height */
+  line-height: 2.25rem;
+}
+
+/* Optional: keep tabs readable across themes */
+.tabs a { color: var(--text); }
+.tabs li.is-active a {
+  color: var(--text);
+  border-bottom-color: var(--border);
+}
+.tabs ul { border-bottom-color: var(--border);}
+
+/* Generic containers */
+.section, .container, .columns, .column { background: transparent; }
+
+/* Borders & footer */
+.border {
+  border: 1.1px solid var(--border);
+  width: fit-content;
+}
+#footer {
+  color: var(--muted);
+  text-align: center;
+  font-size: 12px;
+}
+#footer div { display: block; }
+
+/* ---------------------------
+   FORMS & CONTROLS
+----------------------------*/
+.input,
+.textarea,
+.select select {
+  background: var(--bg-elevated);
+  color: var(--text);
+  border-color: var(--border);
+}
+.input::placeholder,
+.textarea::placeholder { color: var(--muted); opacity: 1; }
+
+/* Output area theming */
+.output-box,
+textarea.output-box {
+  background: var(--bg-elevated);
+  color: var(--text);            /* default/valid */
+  border: 1px solid var(--border);
+}
+.has-text-success { color: var(--valid); }    /* valid/OK text */
+.output-box.is-valid { color: var(--valid); }
+.output-box.is-invalid,
+.has-text-danger,
+.is-danger { color: var(--invalid) !important; }
+.is-loading      { color: var(--muted); }     /* loading/working state */
+
+.public-DraftEditor-content {
+  color: var(--text);
+  caret-color: var(--text);
+}
+
+
+/* ---------------------------
+   HIGHLIGHTING (duplicates)
+----------------------------*/
+/* Preferred highlight classes used by the decorator */
+.dup-highlight {
+  background: var(--hl-bg);
+  color: var(--hl-fg);
+  border-radius: 2px;
+  padding: 0 .08em;
+  cursor: pointer;
+}
+.dup-highlight--alt {
+  background: var(--hl-alt-bg);
+}
+
+/* If earlier code injects inline "yellow" styles, force ours */
+.yellow-highlight {
+  background: var(--hl-bg) !important;
+  color: var(--hl-fg) !important;
+  border-radius: 2px;
+  padding: 0 .08em;
+  cursor: pointer;
+}
+
+/* ---------------------------
+   PROJECT-SPECIFIC STYLES
+----------------------------*/
+textarea.bullets {
+  height: 200px;
+  white-space: pre-line;
+  text-indent: 0px;
+  overflow: hidden;
+  border: none;
+  resize: none;
+  /* word-break: break-all; */
+}
+
+.bulletContainer { margin: 10px 10px 0 0; }
+
+.bullets {
+  // font-family: "AdobeTimes";
+  font-family: 'Times New Roman';
+  font-size: 12pt;
+  display: inline;
+  font-kerning: none;
+  text-rendering: geometricPrecision;
+}
+
+input.htCheckboxRendererInput {
+  margin: 2px auto !important;
+  display: block !important;
+}
+
+#thesaurus {
+  padding: 10px;
+  margin: 10px 10px 0 0;
+  width: unset;
 }
 #thesaurus > ul {
-    columns:10;
-    list-style-type:circle;
-    margin: 5px auto;
+  columns: 10;
+  list-style-type: circle;
+  margin: 5px auto;
+}
+#thesaurus > ul > li { margin: auto 5px; }
+.thesaurus-plus { color: var(--plus-icon); }
+.thesaurus-plus:hover,
+.thesaurus-plus:focus {
+  opacity: 0.9;
 }
 
-#thesaurus > ul > li {
-    margin:auto 5px;
-}
+#abbrTable { margin: 10px 10px 0 0; }
+#bulletIOWrapper { min-height: 10px; }
 
-
-#abbrTable{
-    margin:10px 10px 0px 0px;
-}
-#bulletIOWrapper{
-    min-height:10px;
-}
-.logo{
-    color: #0F0F0F;
-}
-h1{
-    font-family:monospace;
-}
-h2{
-    font-family: monospace;
-}
-
-#topStuff{
-    /*position: fixed;
-    top: 0;
-    width: 100%;
-    margin-right:10px;*/
-    background-color: white;
-}
-
-.toolbox{
-    display:inherit;
-}
-
-.toolbox button{
-    margin:5px;
-}
-
-#footer{
-    text-align:center;
-    font-size:12px;
-    color:grey;
-}
-#footer div{
-    display:block
-}
+.toolbox { display: inherit; }
+.toolbox button { margin: 5px; }

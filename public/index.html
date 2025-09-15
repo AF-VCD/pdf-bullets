@@ -4,7 +4,11 @@
     <meta charset="utf-8" />
     <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#000000" />
+    
+    <meta name="theme-color" content="#14161A" />
+    <!-- Let the UA style built-in controls for both schemes; prefer dark first -->
+    <meta name="color-scheme" content="dark light" />
+    
     <meta
       name="description"
       content="Web site created using create-react-app"
@@ -25,6 +29,53 @@
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
     <title>AF Bullet Shaping Tool</title>
+
+    <!-- Dark-first default; flips if data-theme="light" -->
+    <style>
+      html, body { background: #14161A; color: #f2f3f5; }
+      html[data-theme="light"], html[data-theme="light"] body {
+        background: #ffffff; color: #111111;
+      }
+    </style>
+
+    <!-- Apply saved manual theme before React/CSS loads (no flash) -->
+    <script>
+      (function () {
+        try {
+          var docEl = document.documentElement;
+          var stored = localStorage.getItem('theme'); // 'light' | 'dark' | 'system' | null
+          var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+          // Decide which colors to paint immediately
+          var chosen = (stored === 'light' || stored === 'dark')
+            ? stored
+            : (prefersDark ? 'dark' : 'light');
+
+          // If the user explicitly chose light/dark, set the data attribute now.
+          if (stored === 'light' || stored === 'dark') {
+            docEl.setAttribute('data-theme', stored);
+          } else {
+            docEl.removeAttribute('data-theme'); // system
+          }
+
+          // Paint background/text to avoid any flash
+          var bg = chosen === 'dark' ? '#14161A' : '#ffffff';
+          var fg = chosen === 'dark' ? '#f2f3f5' : '#111111';
+          docEl.style.background = bg;
+          docEl.style.color = fg;
+          if (document.body) {
+            document.body.style.background = bg;
+            document.body.style.color = fg;
+          }
+
+          // Keep the browser UI (address bar) in sync
+          var metaTheme = document.querySelector('meta[name="theme-color"]');
+          if (metaTheme) metaTheme.setAttribute('content', bg);
+        } catch (e) {
+          /* no-op */
+        }
+      })();
+    </script>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
